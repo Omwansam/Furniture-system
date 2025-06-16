@@ -1,0 +1,63 @@
+.new-arrival{
+    background-color: #FFF9E5; /* Light beige background */
+    padding: 50px 0;
+    
+}
+
+.arrivals-container {
+    display: flex;
+    align-items: center;
+    max-width: 1400px;
+    width: 90%;
+    gap: 80px;
+    margin: 0 auto;
+}
+
+.arrivals-content {
+    max-width: 400px;
+    text-align: center;
+    
+}
+
+.arrivals-subtitle {
+    font-size: 24px;
+    color: #333;
+    font-weight: 500;
+    
+}
+
+.arrivals-title {
+    font-size: 48px;
+    font-weight: bold;
+    color: #000;
+    margin: 10px 0;
+    margin-bottom: 10px;
+    
+}
+
+.order-btn {
+    background: transparent;
+    border: 1px solid black;
+    padding: 10px 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+.order-btn:hover {
+    background: black;
+    color: white;
+}
+.arrivals-image{
+    width: 900px;
+    height: 700px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    
+}
+.arrivals-image img {
+    max-width: 100%;
+    height: 100%;
+    
+}

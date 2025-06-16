@@ -1,0 +1,41 @@
+.admin-sidebar {
+    background-color: #34495e;
+    color: white;
+    width: 220px;
+    height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  .admin-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .admin-sidebar li {
+    margin-bottom: 20px;
+  }
+  
+  .admin-sidebar a {
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .admin-sidebar a.active,
+  .admin-sidebar a:hover {
+    background-color: #1abc9c;
+    color: white;
+  }
+  
+  .sidebar-icon {
+    font-size: 18px;
+  }
+  

@@ -1,0 +1,128 @@
+.furnitures-section{
+    padding: 40px 30px;
+    background-color:#f5f5f5;
+    
+}
+.furnitures-container {
+    
+    margin: 0 auto;
+    max-width: 1200px;
+    
+}
+.filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #FAF4F4;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+.filter-bar label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.filter-bar input[type="number"],
+.filter-bar select {
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+}
+
+.filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 12px;
+    background: #333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.filter-btn:hover {
+    background: #555;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.essentials-card {
+    
+    max-width: 300px;
+    padding: 15px;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
+}
+
+
+.essentials-card:hover {
+    transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.essentials-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+.essentials{
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.essentials-card h3 {
+    font-size: 30px;
+    font-weight: 500;
+    margin: 10px 0;
+    color: #333;
+    text-decoration: none;
+}
+
+.essentials-card p {
+    font-size: 20px;
+    font-weight: bold;
+    color: #444;
+}
+
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 8px 12px;
+    margin: 0 5px;
+    border: 1px solid #ccc;
+    background: white;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background 0.3s ease-in-out;
+}
+
+.pagination button:hover {
+    background: #ddd;
+}
+
+.pagination .active {
+    background: #333;
+    color: white;
+    border-color: #333;
+}

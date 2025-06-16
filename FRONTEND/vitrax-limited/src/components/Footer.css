@@ -1,0 +1,155 @@
+.footer {
+    background: #fff;
+    padding: 40px 20px;
+    font-family: Arial, sans-serif;
+    
+  }
+  
+  .footer-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    max-width: 1400px;
+    margin: 0 auto;
+    
+  }
+  .footer-column {
+    min-width: 200px;
+    margin-bottom: 20px;
+    
+
+  }
+
+  .footer-title{
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  .footer-subtitle{
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  .footer-column h4 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  .footer-links {
+    list-style: none;
+    padding: 0;
+    
+  }
+  .footer-links li{
+    margin: 8px 0;
+  }
+  .footer-link{
+    text-decoration: none;
+    color: #333;
+    transition: color 0.3s easse-in-out;
+  }
+
+  .footer-link:hover{
+    color: #007bff;
+  }
+
+  .newsletter{
+    text-align: left;
+  }
+  .newsletter-input {
+    display: flex;
+    margin-top: 10px;
+    border-radius: 4px;
+    overflow: hidden;
+  
+  }
+  
+  .newsletter-input input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+
+  .newsletter-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .newsletter-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .footer-bottom {
+    
+    padding: 15px 0;
+    margin-top: 10px;
+    border-top: 1px solid #ddd;
+    font-size: 14px;
+    color: #555;
+  }
+/*
+
+  
+  
+  .footer-column ul li {
+    margin-bottom: 8px;
+  }
+  
+  .footer-column ul li a {
+    text-decoration: none;
+    color: #000;
+    transition: color 0.3s;
+  }
+  
+  .footer-column ul li a:hover {
+    color: gray;
+  }
+  
+  /* Newsletter Styling 
+  .newsletter-input {
+    display: flex;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .newsletter-input input {
+    border: none;
+    padding: 10px;
+    flex: 1;
+    outline: none;
+  }
+  
+  .newsletter-input button {
+    background: black;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .newsletter-input button:hover {
+    background: gray;
+  }
+  
+  
+  .footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+    font-size: 14px;
+    color: #555;
+  }
+  */

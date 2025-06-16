@@ -1,0 +1,135 @@
+.blog-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 1100px;
+    margin: auto;
+    gap: 20px;
+    padding: 20px;
+    border: 1px solid salmon;
+    
+  }
+
+  .blog-content-wrapper {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+  
+  .blogs {
+    width: 100%;
+    flex: 2;
+  }
+  
+  .blog-card {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 15px;
+  }
+  
+  .blog-image {
+    width: 200px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  
+  .blog-content {
+    padding-left: 15px;
+  }
+  
+  .blog-meta {
+    font-size: 12px;
+    color: #777;
+    display: flex;
+    gap: 10px;
+  }
+  
+  .blog-meta span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .blog-content h3 {
+    margin: 10px 0;
+  }
+  
+  .blog-content a {
+    text-decoration: none;
+    color: #ffb400;
+    font-weight: bold;
+  }
+  .sidebar {
+    flex: 1;
+    width: 30%;
+  }
+  
+  .search-bar {
+    display: flex;
+    margin-bottom: 20px;
+  }
+  
+  .search-bar input {
+    flex: 1;
+    padding: 8px;
+  }
+  
+  .search-bar button {
+    padding: 8px;
+    background: #ffb400;
+    border: none;
+    cursor: pointer;
+  }
+  .categories ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .categories li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+  }
+  
+  .recent-post {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .recent-post img {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+  
+  /* Pagination at the Bottom */
+  .pagination {
+    display: flex;
+    
+    justify-content: center;
+    margin-top: 40px;
+  }
+  
+  .pagination button {
+    background-color: #fcefcf;
+    border: none;
+    padding: 8px 12px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+  
+  .pagination button.active {
+    background-color: black;
+    color: white;
+  }
+  
+  .pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  

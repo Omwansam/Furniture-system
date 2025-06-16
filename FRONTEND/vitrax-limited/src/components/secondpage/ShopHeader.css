@@ -1,0 +1,95 @@
+/* Shop Header Container */
+.shop-header {
+    background: url("../../assets/Background1.png") center/cover no-repeat;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    padding: 20px;
+  }
+  
+  /* Blurred Overlay 
+  .shop-header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.5); 
+    backdrop-filter: blur(8px);
+  } */
+  
+  /* Content Layer */
+  .shop-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+  
+  /* Logo Styling */
+  .shop-logo {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    margin-bottom: 5px;
+    
+  }
+  
+  /* Shop Title */
+  .shop-content h1 {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 8px 0;
+    color: #222;
+  }
+  
+  /* Breadcrumb Navigation */
+  .breadcrumb {
+    font-size: 16px;
+    color: #777;
+    margin-top: 5px;
+  }
+  
+  /* Breadcrumb Links */
+  .breadcrumb-link {
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+  }
+  
+  .breadcrumb-link:hover {
+    color: #000;
+    font-weight: bold;
+  }
+  
+  /* Breadcrumb Separator */
+  .breadcrumb-separator {
+    margin: 0 5px;
+    color: #000;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  /* Active Page */
+  .active {
+    color: black;
+    font-weight: bold;
+  }
+
+
+
+  /* Meubel House_Logos-05 
+
+position: absolute;
+width: 77px;
+height: 77px;
+left: 682px;
+top: 161px;
+
+background: url(Meubel House_Logos-01);
+
+  */

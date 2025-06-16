@@ -1,0 +1,51 @@
+.socials-section{
+  padding:60px 20px ;
+  position: relative;
+  background-color: #FAF4F4;
+  background: url("../../assets/background2.png") no-repeat center center/cover;
+}
+
+/*.socials-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.7);
+  background: url("../../assets/background2.png") no-repeat center center/cover; 
+}
+*/
+.socials-container{
+  text-align: center;
+  margin: 0 auto;
+  max-width: 1200px;
+}
+.socials-title {
+  font-size: 28px;
+  font-weight: bold;
+  position: relative;
+  margin-bottom: 5px;
+  
+}
+.socials-subtitle {
+  color: #555;
+  font-size: 18px;
+  margin-bottom: 20px;
+  position: relative;
+  
+}
+.socials-btn{
+  position: relative;
+  color: #000;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 12px 50px;
+  border-radius: 30px;
+  box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: #FAF4F4;
+  cursor: pointer;
+}
+.socials-btn:hover {
+  background: black;
+  color: white;
+}
+
