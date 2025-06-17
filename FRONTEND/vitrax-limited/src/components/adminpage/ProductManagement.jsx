@@ -424,13 +424,13 @@ const ProductManagement = () => {
         {/**Bulk Actions */}
         {selectedProducts.length > 0 && (
           <div className="bulk-actions">
-            <span>{selectedProducts.length} products selected</span>
-            <button onClick={() => handleBulkAction("activate")}>Activate</button>
-            <button onClick={() => handleBulkAction("deactivate")}>Deactivate</button>
-            <button onClick={() => handleBulkAction("delete")} className="danger">
+            <span className='selected-count'>{selectedProducts.length} products selected</span>
+            <button className='btns btn-secondary' onClick={() => handleBulkAction("activate")}>Activate</button>
+            <button className='btns btn-secondary' onClick={() => handleBulkAction("deactivate")}>Deactivate</button>
+            <button className='btns btn-danger' onClick={() => handleBulkAction("delete")} >
               Delete
             </button>
-            <button onClick={() => setSelectedProducts([])}>Clear</button>
+            <button className='btns btn-clear' onClick={() => setSelectedProducts([])}>Clear</button>
           </div>
         )}
 
@@ -475,12 +475,14 @@ const ProductManagement = () => {
                   </td>
 
                   <td>
-                    <div className='flexing-items'>
-                      <img src={product.image} alt={product.name} width="40" />
-                      <div>
-                        <div>{product.name}</div>
-                        <small>{product.sku}</small>
-                        {product.featured && <span className='badge'>Featured</span>}
+                    <div className='product-info'>
+                      <img className='product-thumbnail' src={product.image} alt={product.name}  />
+                      <div className='product-feature'>
+                        <div className='product-name'>{product.name}</div>
+                        <small className='product-sku'>{product.sku}</small>
+                        
+                        {product.featured && <span className='featured-badge'>Featured</span>}
+                        
                       </div>
                     </div>
                   </td>

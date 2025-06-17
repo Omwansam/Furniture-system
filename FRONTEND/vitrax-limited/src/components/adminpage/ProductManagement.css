@@ -1,6 +1,7 @@
 .product-management{
   border: 2px solid green;
   padding: 20px;
+  height: 90vh;
 }
 .product-header{
   display: flex;
@@ -102,3 +103,94 @@
   width: 100%;
   /* max-width: 200px; */
 }
+
+/*Bulk actions styling */
+.btns{
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px ;
+  cursor: pointer;
+  font-size: 14px;
+}
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  background-color: #f9fafb;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px #e5e7eb;
+}
+
+.selected-count{
+  font-weight: 500;
+  font-size: 16px;
+}
+.btn-secondary {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.btn-danger {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.btn-clear {
+  background: none;
+  color: black;
+}
+
+/* Table Styling */
+.product-table{
+  border: 1px solid #ddd;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+.product-table th,
+.product-table td {
+  border-bottom: 1px solid #eee;
+  padding: 12px;
+  text-align: left;
+}
+.product-info {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.product-thumbnail {
+  width: 40px;
+  height: 40px;
+  background-color: #eee;
+  border-radius: 6px;
+}
+
+.product-name {
+  font-weight: 600;
+}
+
+.product-sku {
+  font-size: 12px;
+  color: gray;
+  margin-right: 15px;
+}
+.featured-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem; /* top-bottom: 4px, left-right: 8px */
+  font-size: 0.75rem;       /* text-sm (12px) */
+  font-weight: 500;         /* medium weight */
+  line-height: 1;
+  border-radius: 8px;    /* fully rounded = pill shape */
+  background-color: #3b82f6; /* light gray (like Tailwind's gray-100) */
+  color: #fff;           /* dark gray text (like gray-700) */
+  white-space: nowrap;
+  margin-top: 4px;
+
+}
+
+
