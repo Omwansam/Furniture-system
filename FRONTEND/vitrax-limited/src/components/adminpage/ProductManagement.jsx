@@ -1,6 +1,7 @@
 import React from 'react'
 import {useState} from "react"
 import './ProductManagement.css'
+import { FaCheckCircle, FaExclamationTriangle, FaStar } from 'react-icons/fa';
 
 
 
@@ -150,6 +151,31 @@ const ProductManagement = () => {
       featured: false,
       createdAt: "2023-05-12",
       updatedAt: "2024-01-14",
+    },
+    {
+      id: "PRD-006",
+      name: "Office Chair",
+      category: "Office",
+      price: 299,
+      cost: 150,
+      stock: 25,
+      minStock: 10,
+      status: "Active",
+      image: "/placeholder.svg?height=200&width=200",
+      description: "Ergonomic office chair with lumbar support and adjustable height",
+      sku: "OC-004",
+      weight: 18,
+      dimensions: "65cm x 65cm x 120cm",
+      material: "Mesh, Plastic, Steel",
+      color: "Black",
+      supplier: "ErgoWork Solutions",
+      tags: ["ergonomic", "office", "adjustable"],
+      rating: 4.4,
+      reviews: 156,
+      sold: 234,
+      featured: false,
+      createdAt: "2023-04-05",
+      updatedAt: "2024-01-12",
     },
   ]);
 
@@ -312,10 +338,10 @@ const ProductManagement = () => {
 
   const getStockStatus = (stock, minStock) => {
     if (stock === 0)
-      return { status: "Out of Stock", color: "text-red", icon: "⚠️" };
+      return { status: "Out of Stock", color: "text-red", icon: <FaExclamationTriangle /> };
     if (stock <= minStock)
-      return { status: "Low Stock", color: "text-orange", icon: "⚠️" };
-    return { status: "In Stock", color: "text-green", icon: "✔️" };
+      return { status: "Low Stock", color: "text-orange", icon: <FaExclamationTriangle /> };
+    return { status: "In Stock", color: "text-green", icon: <FaCheckCircle /> };
   };
 
   const toggleSelectAll = (e) => {
@@ -488,7 +514,7 @@ const ProductManagement = () => {
                   </td>
 
                   <td>{product.category}</td>
-                  <td>${product.price.toFixed(2)}</td>
+                  <td>Ksh {product.price.toFixed(2)}</td>
                   <td>
                     <span className={stockInfo.color}>{stockInfo.icon} {product.stock}</span>
                   </td>
@@ -498,16 +524,18 @@ const ProductManagement = () => {
                       </span>
                   </td>
                   <td>
-                    <div>{product.rating} ★ ({product.reviews})</div>
+                    <div>{product.rating} <FaStar className='rating-icon'/> ({product.reviews})</div>
                     <small>{product.sold} sold</small>
                   </td>
-                  <td>
-                    <button onClick={() => alert("View details")}>View</button>
-                    <button onClick={() => {
+                  <td >
+                    <div className='actions-buttons'>
+                    <button className='action-btn btn-view' onClick={() => alert("View details")}>View</button>
+                    <button className='action-btn btn-edit' onClick={() => {
                       setEditingProduct({ ...product });
                       setIsEditDialogOpen(true);
                     }}>Edit</button>
-                    <button className="danger" onClick={() => handleDeleteProduct(product.id)}>Delete</button>
+                    <button className="action-btn btns-danger" onClick={() => handleDeleteProduct(product.id)}>Delete</button>
+                    </div>
                   </td>
                 </tr>
               )
@@ -516,22 +544,24 @@ const ProductManagement = () => {
         </table>
 
         {/* Pagination */}
-        <div className="pagination ">
-          <span>Showing {paginatedProducts.length} of {sortedProducts.length} results</span>
-          <div>
-            <button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>
+        <div className="pagination-container ">
+          <span className='pagination-info'>
+            Showing {paginatedProducts.length} of {sortedProducts.length} results
+          </span>
+          <div className='pagination-controls'>
+            <button className='pagination-btn' disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>
               Previous
             </button>
             {[...Array(totalPages)].map((_, i) => (
               <button
                 key={i}
-                className={currentPage === i + 1 ? "active" : ""}
+                className={`pagination-btn ${currentPage === i + 1 ? "active" : ""}`}
                 onClick={() => setCurrentPage(i + 1)}
               >
                 {i + 1}
               </button>
             ))}
-            <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)}>
+            <button className='pagination-btn' disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)}>
               Next
             </button>
           </div>
