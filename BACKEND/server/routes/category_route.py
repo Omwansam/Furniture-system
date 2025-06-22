@@ -3,14 +3,19 @@ from models import Category, Product
 from extensions import db
 from flask_jwt_extended import jwt_required
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func, case
+from datetime import datetime
 
 # Blueprint Configuration
 category_bp = Blueprint('categories', __name__)
+
+#####################################################################################################################################################################
 
 # --------------------------
 # ADMIN CATEGORY MANAGEMENT
 # --------------------------
 
+###########################################################################################################################################################
 @category_bp.route('', methods=['POST'])
 @jwt_required()
 def create_category():
@@ -46,6 +51,68 @@ def create_category():
     except IntegrityError:
         db.session.rollback()
     return jsonify({'message': 'Category name already exists'}), 409
+
+###########################################################################################################################################################
+
+
+#Update a category details
+@category_bp.route('/<int:category_id>', methods=['PUT'])
+@jwt_required()
+def update_category(category_id):
+    """Update a category (Admin Only)"""
+    category = Category.query.get_or_404(category_id)
+    data  = request.get_json()
+
+    if 'category_name' in data:
+        if not data['category_name']:
+            return jsonify({
+                'error': 'Category name cannot be empty'
+            }), 400
+        category.category_name = data['category_name'].strip()
+
+    if'category_description' in data:
+        category.category_description = data['category_description'].strip()
+
+    try:
+        db.session.commit()
+        return jsonify({
+            'success': True,
+            'category': {
+                'category_id': category.category_id,
+                'category_name':category.category_name,
+                'category_description':category.category_description
+            },
+            'message': 'Category updated successfully'
+        }), 200
+    
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({'message': 'Category name already exists'}), 409   
+
+
+#################################################################################################################################################
+
+# Delete a category
+@category_bp.route('/<int:category_id>', methods=['DELETE'])
+@jwt_required()
+def delete_category(category_id):
+    """Delete a category (Admin only)"""
+    category = Category.query.get_or_404(category_id)
+
+    #prevent deletion of category if category has  products
+    if category.products.count() > 0:
+        return jsonify({
+            'success': False,
+            'message' : 'Cannot delete category with products'
+        }), 400
+    
+    db.session.delete(category)
+    db.session.commit()
+    return jsonify({
+        'success': True,
+        'message': 'Category deleted successfully'
+    }), 200
+
 
 ##############################################################################################################################################
 
@@ -144,16 +211,77 @@ def get_category_details(category_id):
 
 ######################################################################################################################################################
 
+@category_bp.route('/stats', methods=['GET'])
+def get_category_stats():
+    """Get statistics about categories and products"""
+    # Count products per category
+    stats = db.session.query(
+        Category.category_id,
+        Category.category_name,
+        func.count(Product.product_id).label('product_count'),
+        func.sum(Product.stock_quantity).label('total_stock'),
+        func.avg(Product.product_price).label('avg_price'),
+        func.min(Product.product_price).label('min_price'),
+        func.max(Product.product_price).label('max_price')
+    ).join(Product, isouter=True
+    ).group_by(Category.category_id).all()
+
+    # Format results
+    result = [{
+        'category_id': s.category_id,
+        'category_name': s.category_name,
+        'product_count': s.product_count or 0,
+        'total_stock': s.total_stock or 0,
+        'avg_price': float(s.avg_price) if s.avg_price else 0,
+        'min_price': float(s.min_price) if s.min_price else 0,
+        'max_price': float(s.max_price) if s.max_price else 0
+    } for s in stats]
+    
+    return jsonify({
+        'success': True,
+        'stats': result,
+        'timestamp': datetime.utcnow().isoformat()
+    }), 200
+
+#############################################################################################################################################################
+
+# Search categories
+
+@category_bp.route('/search', methods=['GET'])
+def search_categories():
+    """Search categories by name"""
+    query = request.args.get('q', '').strip()
 
 
+    if not query or len(query) < 2:
+        return jsonify({
+            'success': False,
+            'error': 'Search query must be at least 2 characters'
+        }), 400
+    
+    categories = Category.query.filter(
+        Category.category_name.ilike(f'%{query}%')
+    ).order_by(
+        case(
+            [(Category.category_name.ilike(f'%{query}%'), 0)],
+            else_=1
+        ),
+        Category.category_name.asc()
+    ).limit(10).all()
+
+    return jsonify({
+        'success': True,
+        'results': [{
+            'category': {
+                'category_id': category.category_id,
+                'category_name': category.category_name,
+                'category_description': category.category_description
+            }
+        } for category in categories]
+    }), 200
 
 
-# Delete a category
-@category_bp.route('/<int:category_id>', methods=['DELETE'])
-@jwt_required()
-def delete_category(category_id):
-    category = Category.query.get_or_404(category_id)
-    db.session.delete(category)
-    db.session.commit()
-    return jsonify({'message': 'Category deleted successfully'}), 200
+######################################################################################################################################################################
+
+
 

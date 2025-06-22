@@ -75,7 +75,7 @@ class Category(db.Model):
     category_description = db.Column(db.Text, nullable=False)
 
     #Relationship mapping the categories to products
-    products = db.relationship('Product', back_populates="category" )
+    products = db.relationship('Product', back_populates="category", lazy='dynamic' )
 
 ###############################################################################################################################################
 
