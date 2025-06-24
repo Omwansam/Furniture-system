@@ -12,6 +12,10 @@ def generate_unique_filename(filename, product_id):
     extension = filename.rsplit('.',1)[1].lower()
     return f"product_{product_id}_{basename}.{extension}"
 
+###########################################################################################################################################
+# Blog media 
+
+
 
 def save_product_image(file, product_id):
     """Save the uploaded image and return the relative path."""
