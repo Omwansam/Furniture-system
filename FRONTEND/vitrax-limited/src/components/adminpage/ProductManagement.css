@@ -75,7 +75,6 @@
 
 .card-content{
   background-color: #fff;
-  border: 1px solid purple;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1 );
   padding: 1rem;
@@ -225,4 +224,141 @@
   color: #fff;
 }
 
+/* Pagination styling */
+.pagination-container{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 10px;
+}
+.pagination-info{
+  font-size: 14px;
+  color: #555;
+}
 
+.pagination-controls{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.pagination-btn{
+  padding: 6px 12px;
+  font-size: 14px ;
+  border: 1px solid #ccc ;
+  background-color: #fff;
+  color: #333;
+  border-radius: 6px ;
+  cursor: pointer;
+  transition: all 0.2s ease ;
+}
+
+.pagination-btn:hover:not(:disabled){
+  background-color: #f0f0f0;
+}
+.pagination-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/*Dialogue Styling
+ */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0; 
+  /*inset: 0;*/
+  background-color: rgba(0, 0, 0, 0.5 );
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.dialog-content {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.dialog-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.close-dialog{
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: #666;
+  cursor: pointer;
+  position:relative;
+  /* top: 1.2rem;
+  right: 1.5rem; */
+  transition: color 0.3s ease;
+
+}
+.close-dialog:hover{
+  color: #000;
+}
+
+
+.tab-buttons{
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+}
+.tab-buttons button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: #eee;
+  font-weight: bold;
+  cursor: pointer;
+}
+.tab-buttons button.active{
+  background: #007bff;
+  color: #fff;
+}
+
+.form-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+.full-width {
+  grid-column: 1 / -1;
+}
+
+
+
+
+
+
+
+
+.dialog-footer {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.button-outlines{
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 8px 14px;
+  border-radius: 4px;
+}
+.button-primary{
+  background-color: #007bff;
+  color: #fff;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 4px;
+}

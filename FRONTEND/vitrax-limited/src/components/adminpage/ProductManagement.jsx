@@ -1,7 +1,7 @@
 import React from 'react'
 import {useState} from "react"
 import './ProductManagement.css'
-import { FaCheckCircle, FaExclamationTriangle, FaStar } from 'react-icons/fa';
+import { FaCheckCircle, FaExclamationTriangle, FaStar, FaTimes } from 'react-icons/fa';
 
 
 
@@ -19,6 +19,7 @@ const ProductManagement = () => {
   const [sortOrder, setSortOrder] = useState("asc");
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState(0)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [viewMode, setViewMode] = useState("table");
@@ -362,7 +363,7 @@ const ProductManagement = () => {
         <div className='product-btn'>
           <button className='btn btn-outline'>Import</button>
           <button className='btn btn-outline'>Export</button>
-          <button className='btn btn-primary'>
+          <button className='btn btn-primary' onClick={() => setIsAddDialogOpen(true)}>
             Add Product
           </button>
         </div>
@@ -568,134 +569,386 @@ const ProductManagement = () => {
         </div>
       </div>
 
+
+
       {/**Add Product Dialog */}
       {isAddDialogOpen && (
         <div className='dialog-overlay'>
           <div className='dialog-content'>
+            <div className='dialog-header'>
+              <div className='dialog-title'>
             <h2>Add New Product</h2>
-            <form onSubmit={(e) => e.preventDefault()}>
-              <label>
-                Product Name *
-                <input
-                  value={newProduct.name}
-                  onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-                />
-              </label>
+            <p>Create a new product in your furniture catalog</p>
+              </div>
 
-              <label>
-                Category
-                <select
-                  value={newProduct.category}
-                  onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+
+            {/**Close Icon Button */}
+            <button
+              className='close-dialog'
+              onClick={() => setIsAddDialogOpen(false)}
+            >
+              <FaTimes/>
+            </button>
+            </div>
+
+
+            {/* Tabs */}
+            <div className='tab-buttons'>
+              {['Basic Info', 'Details', 'Inventory'].map((tab, index) => (
+                <button
+                  key={tab}
+                  className={activeTab === index ? 'active' : ''}
+                  onClick={() => setActiveTab(index)}
                 >
-                  {categories.slice(1).map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Description
-                <textarea
-                  value={newProduct.description}
-                  onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-                />
-              </label>
-              <label>
-                Price *
-                <input
-                  type="number"
-                  value={newProduct.price}
-                  onChange={(e) => setNewProduct({ ...newProduct, price: Number(e.target.value) })}
-                />
-              </label>
-              <label>
-                Stock
-                <input
-                  type="number"
-                  value={newProduct.stock}
-                  onChange={(e) => setNewProduct({ ...newProduct, stock: Number(e.target.value) })}
-                />
-              </label>
-              <label>
-                Featured?
-                <input
-                  type="checkbox"
-                  checked={newProduct.featured}
-                  onChange={(e) => setNewProduct({ ...newProduct, featured: e.target.checked })}
-                />
-              </label>
+                  {tab}
+                </button>
+              ))}
+            </div>
+
+            <form onSubmit={(e) => e.preventDefault()}>
+              {/* ===Basic Info Tab*/}
+              {activeTab === 0 && (
+                <div className='form-grid'>
+                  <label>
+                    Product Name *
+                    <input
+                      value={newProduct.name}
+                      onChange={(e) => setNewProduct({ ...newProduct,name: e.target.value})}
+                    />
+                  </label>
+
+                  <label>
+                    SKU
+                    <input
+                      value={newProduct.sku || ''}
+                      placeholder="Auto-generated if empty"
+                      onChange={(e) =>
+                        setNewProduct({ ...newProduct, sku: e.target.value })
+                      }
+                    />
+                  </label>
+
+                  <label>
+                    Category *
+                    <select
+                      value={newProduct.category}
+                      onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value})}
+                    >
+                      <option value="">Select category</option>
+                      {categories.slice(1).map((cat) => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </label>
+                  
+                  {/** 
+                  <label>
+                    Supplier
+
+                    <select
+                      value={newProduct.supplier || ''}
+                      onChange={(e) => setNewProduct({ ...newProduct, supplier: e.target.value})}
+                    >
+                      <option value="">Select supplier</option>
+                      {suppliers?.map((sup) => (
+                        <option>
+                          {sup.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label> **/}
+
+
+                  <label className="full-width">
+                  Description
+                    <textarea
+                      value={newProduct.description}
+                      onChange={(e) =>
+                        setNewProduct({ ...newProduct, description: e.target.value })
+                      }
+                    />
+                  </label>
+                </div>
+              )}
+
+              {/* === DETAILS TAB === */}
+        {activeTab === 1 && (
+          <div className="form-grid">
+            <label>
+              Material
+              <input
+                value={newProduct.material || ''}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, material: e.target.value })
+                }
+                placeholder="e.g., Solid Wood, Fabric"
+              />
+            </label>
+            <label>
+              Color
+              <input
+                value={newProduct.color || ''}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, color: e.target.value })
+                }
+                placeholder="e.g., Brown, White"
+              />
+            </label>
+            <label>
+              Dimensions
+              <input
+                value={newProduct.dimensions || ''}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, dimensions: e.target.value })
+                }
+                placeholder="L x W x H (cm)"
+              />
+            </label>
+            <label>
+              Weight (kg)
+              <input
+                type="number"
+                value={newProduct.weight || 0}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, weight: Number(e.target.value) })
+                }
+              />
+            </label>
+            <label className="full-width">
+              Featured?
+              <input
+                type="checkbox"
+                checked={newProduct.featured || false}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, featured: e.target.checked })
+                }
+              />
+            </label>
+          </div>
+        )}
+
+              {/* === INVENTORY TAB === */}
+        {activeTab === 2 && (
+          <div className="form-grid">
+            <label>
+              Selling Price *
+              <input
+                type="number"
+                value={newProduct.price || 0}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, price: Number(e.target.value) })
+                }
+              />
+            </label>
+            <label>
+              Cost Price
+              <input
+                type="number"
+                value={newProduct.cost || 0}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, cost: Number(e.target.value) })
+                }
+              />
+            </label>
+            <label>
+              Stock Quantity
+              <input
+                type="number"
+                value={newProduct.stock || 0}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, stock: Number(e.target.value) })
+                }
+              />
+            </label>
+            <label>
+              Minimum Stock
+              <input
+                type="number"
+                value={newProduct.minStock || 0}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, minStock: Number(e.target.value) })
+                }
+              />
+            </label>
+          </div>
+        )}
+
+              
               <div className="dialog-footer">
-                <button type="button" onClick={() => setIsAddDialogOpen(false)}>Cancel</button>
-                <button type="button" onClick={handleAddProduct}>Create Product</button>
+                <button type="button"  className='button-outlines' onClick={() => setIsAddDialogOpen(false)}>Cancel</button>
+                <button type="button" className='button-primary' onClick={handleAddProduct}>Create Product</button>
               </div>
             </form>
           </div>
         </div>
-      )}
-
-      {/* Edit Product Dialog */}
-      {isEditDialogOpen && editingProduct && (
-        <div className="dialog-overlay">
-          <div className="dialog-content">
-            <h2>Edit Product</h2>
-            <form onSubmit={(e) => e.preventDefault()}>
-              <label>
-                Product Name
-                <input
-                  value={editingProduct.name}
-                  onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
-                />
-              </label>
-              <label>
-                Category
-                <select
-                  value={editingProduct.category}
-                  onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })}
-                >
-                  {categories.slice(1).map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Description
-                <textarea
-                  value={editingProduct.description}
-                  onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
-                />
-              </label>
-              <label>
-                Price
-                <input
-                  type="number"
-                  value={editingProduct.price}
-                  onChange={(e) => setEditingProduct({ ...editingProduct, price: Number(e.target.value) })}
-                />
-              </label>
-              <label>
-                Stock
-                <input
-                  type="number"
-                  value={editingProduct.stock}
-                  onChange={(e) => setEditingProduct({ ...editingProduct, stock: Number(e.target.value) })}
-                />
-              </label>
-              <label>
-                Featured?
-                <input
-                  type="checkbox"
-                  checked={editingProduct.featured}
-                  onChange={(e) => setEditingProduct({ ...editingProduct, featured: e.target.checked })}
-                />
-              </label>
-              <div className="dialog-footer">
-                <button type="button" onClick={() => setIsEditDialogOpen(false)}>Cancel</button>
-                <button type="button" onClick={handleEditProduct}>Update Product</button>
-              </div>
-            </form>
-          </div>
+      )}{/** Edit Product Dialog */}
+{isEditDialogOpen && editingProduct && (
+  <div className="dialog-overlay">
+    <div className="dialog-content">
+      <div className="dialog-header">
+        <div className="dialog-title">
+          <h2>Edit Product</h2>
+          <p>Modify the details of this product in your furniture catalog</p>
         </div>
-      )}
+        <button
+          className="close-dialog"
+          onClick={() => setIsEditDialogOpen(false)}
+        >
+          <FaTimes />
+        </button>
+      </div>
+
+      {/* Tabs */}
+      <div className="tab-buttons">
+        {['Basic Info', 'Details', 'Inventory'].map((tab, index) => (
+          <button
+            key={tab}
+            className={activeTab === index ? 'active' : ''}
+            onClick={() => setActiveTab(index)}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      <form onSubmit={(e) => e.preventDefault()}>
+        {/* BASIC INFO */}
+        {activeTab === 0 && (
+          <div className="form-grid">
+            <label>
+              Product Name *
+              <input
+                value={editingProduct.name || ''}
+                onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
+              />
+            </label>
+            <label>
+              SKU
+              <input
+                value={editingProduct.sku || ''}
+                placeholder="Auto-generated if empty"
+                onChange={(e) => setEditingProduct({ ...editingProduct, sku: e.target.value })}
+              />
+            </label>
+            <label>
+              Category *
+              <select
+                value={editingProduct.category || ''}
+                onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })}
+              >
+                <option value="">Select category</option>
+                {categories.slice(1).map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </label>
+            <label className="full-width">
+              Description
+              <textarea
+                value={editingProduct.description || ''}
+                onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
+              />
+            </label>
+          </div>
+        )}
+
+        {/* DETAILS */}
+        {activeTab === 1 && (
+          <div className="form-grid">
+            <label>
+              Material
+              <input
+                value={editingProduct.material || ''}
+                onChange={(e) => setEditingProduct({ ...editingProduct, material: e.target.value })}
+                placeholder="e.g., Solid Wood, Fabric"
+              />
+            </label>
+            <label>
+              Color
+              <input
+                value={editingProduct.color || ''}
+                onChange={(e) => setEditingProduct({ ...editingProduct, color: e.target.value })}
+                placeholder="e.g., Brown, White"
+              />
+            </label>
+            <label>
+              Dimensions
+              <input
+                value={editingProduct.dimensions || ''}
+                onChange={(e) => setEditingProduct({ ...editingProduct, dimensions: e.target.value })}
+                placeholder="L x W x H (cm)"
+              />
+            </label>
+            <label>
+              Weight (kg)
+              <input
+                type="number"
+                value={editingProduct.weight || 0}
+                onChange={(e) => setEditingProduct({ ...editingProduct, weight: Number(e.target.value) })}
+              />
+            </label>
+            <label className="full-width">
+              Featured?
+              <input
+                type="checkbox"
+                checked={editingProduct.featured || false}
+                onChange={(e) => setEditingProduct({ ...editingProduct, featured: e.target.checked })}
+              />
+            </label>
+          </div>
+        )}
+
+        {/* INVENTORY */}
+        {activeTab === 2 && (
+          <div className="form-grid">
+            <label>
+              Selling Price *
+              <input
+                type="number"
+                value={editingProduct.price || 0}
+                onChange={(e) => setEditingProduct({ ...editingProduct, price: Number(e.target.value) })}
+              />
+            </label>
+            <label>
+              Cost Price
+              <input
+                type="number"
+                value={editingProduct.cost || 0}
+                onChange={(e) => setEditingProduct({ ...editingProduct, cost: Number(e.target.value) })}
+              />
+            </label>
+            <label>
+              Stock Quantity
+              <input
+                type="number"
+                value={editingProduct.stock || 0}
+                onChange={(e) => setEditingProduct({ ...editingProduct, stock: Number(e.target.value) })}
+              />
+            </label>
+            <label>
+              Minimum Stock
+              <input
+                type="number"
+                value={editingProduct.minStock || 0}
+                onChange={(e) => setEditingProduct({ ...editingProduct, minStock: Number(e.target.value) })}
+              />
+            </label>
+          </div>
+        )}
+
+        <div className="dialog-footer">
+          <button type="button" className='button-outlines' onClick={() => setIsEditDialogOpen(false)}>Cancel</button>
+          <button type="button" className='button-primary' onClick={handleEditProduct}>Update Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
+
+
+
+      
 
 
       
