@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { FiFacebook, FiLinkedin, FiInstagram } from "react-icons/fi";
 import ProductDetails from '../components/ProductDetails';
 import RelatedProducts from '../components/RelatedProducts';
@@ -10,6 +10,7 @@ const API_BASE_URL = "http://127.0.0.1:5000/api";
 
 const SingleProduct = () => {
   const { productId } = useParams();
+  const navigate= useNavigate();
   const [product, setProduct] = useState(null);
   const [mainImage, setMainImage] = useState("");
   const [thumbnails, setThumbnails] = useState([]);
@@ -18,6 +19,12 @@ const SingleProduct = () => {
   const [quantity, setQuantity] = useState(1);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
+
+
+  // Added for popup
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     if (!productId) return;
@@ -56,26 +63,64 @@ const SingleProduct = () => {
     fetchProduct();
   }, [productId]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!product) return;
 
-    // Check if product already exists in cart
-    const existingItemIndex = cartItems.findIndex(
-      item => item.product.product_id === product.product_id
-    );
+     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setShowLoginPrompt(true); // Show popup
+        setTimeout(() => {
+          setShowLoginPrompt(false);
+          navigate("/login"); 
+        }, 2000); // auto-hide redirects after 2s
+        return;
+      }
 
-    if (existingItemIndex >= 0) {
-      // Update quantity if product exists
-      const updatedItems = [...cartItems];
-      updatedItems[existingItemIndex].quantity += quantity;
-      setCartItems(updatedItems);
-    } else {
-      // Add new item to cart
-      setCartItems([...cartItems, { product, quantity }]);
+      const response = await fetch(`http://127.0.0.1:5000/cart/items`, {
+        
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          product_id: product.product_id,
+          quantity: quantity,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to add item to cart");
+      }
+
+      setIsCartOpen(true);
+    } catch (err) {
+       setErrorMessage(err.message);
+      setShowErrorPopup(true);
+      setTimeout(() => setShowErrorPopup(false), 3000);
     }
-
-    setIsCartOpen(true);
   };
+
+    // Check if product already exists in cart
+    //const existingItemIndex = cartItems.findIndex(
+    //  item => item.product.product_id === product.product_id
+    //);
+
+    //if (existingItemIndex >= 0) {
+      // Update quantity if product exists
+    //  const updatedItems = [...cartItems];
+    //  updatedItems[existingItemIndex].quantity += quantity;
+    //  setCartItems(updatedItems);
+    //} else {
+      // Add new item to cart
+    //  setCartItems([...cartItems, { product, quantity }]);
+    //}
+
+  //  setIsCartOpen(true);
+  //};
 
   const handleCloseCart = () => {
     setIsCartOpen(false);
@@ -122,19 +167,20 @@ const SingleProduct = () => {
         </div>
 
         {/* Right Section - Product Details */}
-      <div className="product-details">
-        <h1>{product.product_name}</h1>
-        <p className="price">Rs. {product.product_price.toLocaleString()}</p>
-        <div className="rating">⭐⭐⭐⭐☆ <span>5 Customer Reviews</span></div>
+      <div className="product-details-section">
+        <h1 className="product-title">{product.product_name}</h1>
         <p className="description">{product.product_description}</p>
+        <p className="price">KSh {product.product_price.toLocaleString()}</p>
+        <div className="rating">⭐⭐⭐⭐☆ <span className="review-count">5 Customer Reviews</span></div>
+        
 
-        {/* Size Options */}
+        {/* Size Options 
         <div className="size-options">
           <span>Size:</span>
           <button className="size-btn">L</button>
           <button className="size-btn">XL</button>
           <button className="size-btn">XS</button>
-        </div>
+        </div> */}
 
         {/* Color Options */}
         <div className="color-options">
@@ -146,8 +192,8 @@ const SingleProduct = () => {
 
         {/* Quantity Selector & Add to Cart */}
         <div className="quantity-container">
-          <button onClick={() => setQuantity(quantity > 1 ? quantity - 1 : 1)}>-</button>
-          <span>{quantity}</span>
+          <button  onClick={() => setQuantity(quantity > 1 ? quantity - 1 : 1)}>-</button>
+          <span >{quantity}</span>
           <button onClick={() => setQuantity(quantity + 1)}>+</button>
         </div>
         <button className="add-to-cart-btn" onClick={handleAddToCart}>
@@ -162,7 +208,10 @@ const SingleProduct = () => {
         />
       )}
         
-
+        {/**Delivery statement */}
+        <div className="delivery-statement">
+          <p >Home / Office Delivery is Only Available in Nairobi and Mombasa within city limits </p>
+        </div>
         {/* Product Meta */}
         <div className="single-meta">
           <p><strong>SKU:</strong> {product.product_id || "N/A"}</p>
@@ -171,7 +220,7 @@ const SingleProduct = () => {
         </div>
 
         {/* Social Media Share Icons */}
-        <div className="single-icons">
+        <div className="social-share">
           <FiFacebook className="social-icon" />
           <FiLinkedin className="social-icon" />
           <FiInstagram className="social-icon" />
@@ -180,6 +229,16 @@ const SingleProduct = () => {
       </div>
       <ProductDetails />
       <RelatedProducts />
+
+      {/* Login Popup Message */}
+      {showLoginPrompt && (
+        <div className="toast-popup">
+          Please log in to add items to cart.
+        </div>
+      )}
+      {showErrorPopup && (
+        <div className="toast-popup error-popup">{errorMessage}</div>
+      )}
     </div>
   );
 };

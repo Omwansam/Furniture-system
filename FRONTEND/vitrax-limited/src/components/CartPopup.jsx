@@ -70,7 +70,7 @@ const CartPopup = ({ cartItems = [], onClose }) => {
 
         <div className="cart-subtotal">
           <p>
-            <strong>Subtotal:</strong> Rs. {subtotal.toLocaleString()}
+            <strong>Subtotal:</strong> KSh {subtotal.toLocaleString()}
           </p>
         </div>
 

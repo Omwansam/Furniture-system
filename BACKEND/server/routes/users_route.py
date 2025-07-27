@@ -104,5 +104,3 @@ def register():
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": "An error occurred while creating the user", "details": str(e)}), 500
-
-

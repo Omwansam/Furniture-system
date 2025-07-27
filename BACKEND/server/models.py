@@ -1,11 +1,14 @@
 from extensions import db
 from enum import Enum
+from datetime import datetime
 
 class OrderStatus(Enum):
-    PENDING ='Pending'
-    SHIPPED = 'Shipped'
-    DELIVERED = 'Delivered'
-    CANCELLED = 'Cancelled'
+    PENDING = 'pending'
+    PROCESSING = 'processing'
+    SHIPPED = 'shipped'
+    DELIVERED = 'delivered'
+    CANCELLED = 'cancelled'
+    RETURNED = 'returned'
 
 class PaymentStatus(Enum):
     SUCCESS = 'Success'
@@ -20,12 +23,19 @@ class DiscountType(Enum):
     REGULAR = 'Regular'
     PERCENTAGE = 'Percentage'
     FIXED = 'Fixed'
+    COUPON = 'coupon'
 
 class ShippingStatus(Enum):
     PENDING ='Pending'
     SHIPPED = 'Shipped'
     DELIVERED = 'Delivered'
     CANCELLED = 'Cancelled'
+
+class RefundStatus(Enum):
+    REQUESTED = 'requested'
+    APPROVED = 'approved'
+    REJECTED = 'rejected'
+    PROCESSED = 'processed'    
 
 ##################################################################################
 class Admin(db.Model):
@@ -58,6 +68,14 @@ class User(db.Model):
     payment_method = db.relationship('PaymentMethod', back_populates="user")
     #Relationship mapping the user to multiple wishlists
     wishlists = db.relationship('Wishlist', back_populates="user")
+    #Relationships mapping user to refunds
+    refunds = db.relationship('Refund', back_populates="user")
+
+
+    payments = db.relationship('Payment', back_populates="user")
+
+    transactions = db.relationship('Transaction', back_populates='user')
+
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -103,6 +121,7 @@ class Product(db.Model):
     # Relationship with ProductImage
     images = db.relationship('ProductImage', back_populates='product', cascade='all, delete-orphan')
 
+    cart_items = db.relationship('CartItem', back_populates="product")
 
 
 #####################################################################################################################################################################################
@@ -119,14 +138,17 @@ class Order(db.Model):
 
     #Foreign Key To store user id
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+
+
     #Relationship mapping the order to the related user
     user = db.relationship('User', back_populates="orders")
     #Relationships mapping the order to multiple order items
     order_items = db.relationship('OrderItem', back_populates="order")
     #Relationship to map the order to the payment
     payment = db.relationship('Payment', uselist=False, back_populates="order")
-    
-    
+    #Relationship to map order to refunds
+    refunds = db.relationship('Refund', back_populates="order")
 
 
 ##############################################################################################################################################################################
@@ -170,11 +192,15 @@ class Payment(db.Model):
     order_id = db.Column(db.Integer, db.ForeignKey('orders.order_id'), nullable=False)
     #Foreign key to store payment method id
     payment_method_id = db.Column(db.Integer, db.ForeignKey('payment_methods.payment_method_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False) 
     #Relationship mapping the payment to the related order
     order = db.relationship('Order', back_populates="payment")
     #Relationship mapping the payment to the related payment method
     payment_method = db.relationship('PaymentMethod', back_populates="payment")
 
+    payment_responses = db.relationship('PaymentResponse', back_populates='payment')
+    transactions = db.relationship('Transaction', back_populates='payment')
+    user = db.relationship('User', back_populates='payments')
 
 
 ####################################################################################################################################################################
@@ -197,6 +223,56 @@ class PaymentMethod(db.Model):
 
 ################################################################################################################################################################################
 
+class PaymentResponse(db.Model):
+    __tablename__ = 'payment_response'
+
+    id = db.Column(db.Integer, primary_key=True)
+    response_code = db.Column(db.String(10), nullable=False)
+    response_description = db.Column(db.String(255))
+    merchant_request_id = db.Column(db.String(100))
+    checkout_request_id = db.Column(db.String(100))
+    result_code = db.Column(db.String(10))
+    result_description = db.Column(db.String(255))
+    raw_callback = db.Column(db.JSON)  # Stores the complete callback data
+    created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
+
+
+    #Foreign Key To store payment id
+    payment_id = db.Column(db.Integer, db.ForeignKey('payments.payment_id'), nullable=False)
+    #Relationships mapping the payment method to multiple payments responses
+    payment = db.relationship('Payment', back_populates="payment_responses")
+
+    def __repr__(self):
+        return f'<PaymentResponse {self.id}>'
+
+###############################################################################################################################################################################################
+
+class Transaction(db.Model):
+    __tablename__ = 'transactions'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    transaction_id = db.Column(db.String(100), unique=True)
+    amount = db.Column(db.Float)
+    phone_number = db.Column(db.String(20))
+    status = db.Column(db.String(20), default='PENDING')
+    mpesa_receipt_number = db.Column(db.String(50))
+    created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
+
+
+    #Foreign Key To store payment id
+    payment_id = db.Column(db.Integer, db.ForeignKey('payments.payment_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Direct user reference
+    #Relationships mapping the payment method to multiple payments responses
+    payment = db.relationship('Payment', back_populates="transactions")
+    user = db.relationship('User')
+
+
+    def __repr__(self):
+        return f'<Transaction {self.transaction_id}>'
+
+
+
+########################################################################################################################################################################################################
 class ShoppingCart(db.Model):
     __tablename__ ='shopping_carts'
 
@@ -228,9 +304,10 @@ class CartItem(db.Model):
 
     #Foreign Key To store shopping cart id
     shopping_cart_id = db.Column(db.Integer, db.ForeignKey('shopping_carts.shopping_cart_id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.product_id'), nullable=False)
     #Relationship mapping the cart item to the related shopping cart
     shopping_cart = db.relationship('ShoppingCart', back_populates="cart_items")
-    
+    product = db.relationship('Product', back_populates="cart_items")
     
 
 
@@ -319,6 +396,11 @@ class ShippingInformation(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
     updated_at = db.Column(db.DateTime, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
+
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.order_id'), nullable=False)
+    order = db.relationship('Order', backref='shipping_info')
+
+
 ###################################################################################################################################################################################################
 
 class BillingInformation(db.Model):
@@ -373,3 +455,35 @@ class BlogImage(db.Model):
     is_primary = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
     updated_at = db.Column(db.DateTime, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())    
+
+################################################################################################################################################################################################
+class Refund(db.Model):
+    __tablename__ = 'refunds'
+    
+    refund_id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.order_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    reason = db.Column(db.Text)
+    status = db.Column(db.Enum(RefundStatus), default=RefundStatus.REQUESTED)
+    admin_notes = db.Column(db.Text)
+    requested_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
+    processed_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
+    
+    order = db.relationship('Order', back_populates='refunds')
+    user = db.relationship('User', back_populates='refunds')
+
+###############################################################################################################################################################################################################
+class Coupon(db.Model):
+    __tablename__ = 'coupons'
+    
+    coupon_id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(50), unique=True, nullable=False)
+    discount_type = db.Column(db.Enum(DiscountType), nullable=False)
+    discount_value = db.Column(db.Float, nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
+    valid_from = db.Column(db.DateTime, default=datetime.now)
+    valid_to = db.Column(db.DateTime, server_default=db.func.current_timestamp())
+    min_order_amount = db.Column(db.Float)
+    max_discount_amount = db.Column(db.Float)
+    usage_limit = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
