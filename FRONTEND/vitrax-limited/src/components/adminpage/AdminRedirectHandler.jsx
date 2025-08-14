@@ -1,78 +1,48 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const AdminRedirectHandler = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      // If still loading, wait
-      if (loading) return;
-      
-      setIsRedirecting(true);
-      
-      // If no user is logged in, redirect to admin login
+    console.log('AdminRedirectHandler - user:', user);
+    console.log('AdminRedirectHandler - loading:', loading);
+    
+    if (!loading) {
       if (!user) {
+        console.log('No user, redirecting to admin login');
         navigate("/admin/login", { replace: true });
-        return;
-      }
-
-      // If user is logged in and is admin, redirect to dashboard
-      if (user.role === 'admin') {
+      } else if (user.role === 'admin') {
+        console.log('Admin user, redirecting to dashboard');
         navigate("/admin/overview", { replace: true });
-        return;
+      } else {
+        console.log('Non-admin user, redirecting to admin login');
+        navigate("/admin/login", { replace: true });
       }
+    }
+  }, [user, loading, navigate]);
 
-      // If user is logged in but not admin, redirect to admin login
-      navigate("/admin/login", { replace: true });
-    };
-
-    checkAuth();
-  }, [navigate, user, loading]);
-
-  // Show loading while auth is being checked or while redirecting
-  if (loading || isRedirecting) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        fontSize: '18px',
-        color: '#666',
-        backgroundColor: '#f8f9fa'
-      }}>
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '16px'
-        }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            border: '4px solid #f3f3f3',
-            borderTop: '4px solid #3498db',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
-          }}></div>
-          <span>Checking admin session...</span>
+  // Show a simple loading message
+  return (
+    <div style={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      height: '100vh',
+      fontSize: '18px',
+      color: '#333',
+      backgroundColor: '#f8f9fa'
+    }}>
+      <div style={{ textAlign: 'center' }}>
+        <div>🔄 Checking admin session...</div>
+        <div style={{ fontSize: '14px', marginTop: '10px', color: '#666' }}>
+          Loading: {loading ? 'Yes' : 'No'} | User: {user ? user.username || 'Unknown' : 'None'}
         </div>
-        <style>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
       </div>
-    );
-  }
-
-  // This should never be reached due to navigation, but return null as fallback
-  return null;
+    </div>
+  );
 };
 
 export default AdminRedirectHandler;

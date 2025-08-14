@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaChartLine, FaChartBar, FaDollarSign, FaShoppingCart, FaUsers, FaBox, FaTrendingUp, FaTrendingDown, FaCalendarAlt, FaDownload, FaFilter } from 'react-icons/fa';
+import { FaChartLine, FaChartBar, FaDollarSign, FaShoppingCart, FaUsers, FaBox, FaArrowUp, FaArrowDown, FaCalendarAlt, FaDownload, FaFilter } from 'react-icons/fa';
 import './AdvancedAnalytics.css';
 
 const AdvancedAnalytics = () => {
@@ -88,7 +88,7 @@ const AdvancedAnalytics = () => {
   };
 
   const getGrowthIcon = (growth) => {
-    return growth >= 0 ? <FaTrendingUp className="growth-up" /> : <FaTrendingDown className="growth-down" />;
+    return growth >= 0 ? <FaArrowUp className="growth-up" /> : <FaArrowDown className="growth-down" />;
   };
 
   const getGrowthClass = (growth) => {

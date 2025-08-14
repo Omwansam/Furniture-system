@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import "./auth.css";
@@ -9,6 +9,7 @@ const AdminLoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -16,26 +17,44 @@ const AdminLoginPage = () => {
   useEffect(() => {
     const user = localStorage.getItem("furniture_user");
     if (user) {
-      const userData = JSON.parse(user);
-      if (userData.role === 'admin') {
-        navigate("/admin/overview");
+      try {
+        const userData = JSON.parse(user);
+        if (userData.role === 'admin') {
+          navigate("/admin/overview");
+        }
+      } catch (error) {
+        console.error('Error parsing user data:', error);
       }
     }
   }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      const success = await login(email, password, 'admin');
+      const success = await login(email, password);
       if (success) {
-        navigate("/admin/overview");
+        // Check if the logged in user is admin
+        const user = localStorage.getItem("furniture_user");
+        if (user) {
+          const userData = JSON.parse(user);
+          if (userData.role === 'admin') {
+            navigate("/admin/overview");
+          } else {
+            alert("Access denied. Admin privileges required.");
+            // Logout non-admin user
+            localStorage.removeItem("furniture_user");
+          }
+        }
       } else {
-        alert("Login failed. Please check your credentials or ensure you have admin access.");
+        alert("Login failed. Please check your credentials.");
       }
     } catch (err) {
       console.error("Login error:", err);
       alert("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -59,6 +78,7 @@ const AdminLoginPage = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               required
+              disabled={loading}
             />
           </div>
           <div className="form-group">
@@ -74,11 +94,13 @@ const AdminLoginPage = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 required
+                disabled={loading}
               />
               <button
                 type="button"
                 className="toggle-password"
                 onClick={() => setShowPassword((prev) => !prev)}
+                disabled={loading}
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
@@ -89,8 +111,15 @@ const AdminLoginPage = () => {
             <a href="#">Forgot password?</a>
           </div>
 
-          <button type="submit" className="submit-btn">Login</button>
+          <button type="submit" className="submit-btn" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
         </form>
+        
+        <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#e3f2fd', borderRadius: '5px', fontSize: '14px', border: '1px solid #2196f3' }}>
+          <strong>💡 Demo Info:</strong><br />
+          To test admin functionality, create an admin user through the backend or use existing admin credentials.
+        </div>
       </div>
     </div>
   );

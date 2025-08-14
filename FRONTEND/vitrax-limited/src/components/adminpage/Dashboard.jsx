@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
@@ -12,11 +12,11 @@ import SupplierManagement from './SupplierManagement';
 import UserManagement from './UserManagement';
 import Reports from './Reports';
 import Settings from './Settings';
-import './Dashboard.css'
-
-
+import './Dashboard.css';
 
 const Dashboard = () => {
+  console.log('Dashboard component rendering...');
+  
   return (
     <div className="dashboard-container">
       <div className="dashboard-sidebar">
@@ -48,6 +48,5 @@ const Dashboard = () => {
     </div>
   );
 };
-    
 
-export default Dashboard
+export default Dashboard;
