@@ -1,37 +1,55 @@
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+
 const AdminRedirectHandler = () => {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
-
-      if (!token) {
+      // If still loading, wait
+      if (loading) return;
+      
+      // If no user is logged in, redirect to admin login
+      if (!user) {
         navigate("/admin/login");
         return;
       }
 
-      try {
-        const response = await fetch("http://localhost:5000/auth/protected", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data?.is_admin) {
-            navigate("/admin/overview", { replace: true });
-          } else {
-            navigate("/admin/login");
-          }
-        } else {
-          navigate("/admin/login");
-        }
-      } catch {
-        navigate("/admin/login");
+      // If user is logged in and is admin, redirect to dashboard
+      if (user.role === 'admin') {
+        navigate("/admin/overview", { replace: true });
+        return;
       }
+
+      // If user is logged in but not admin, redirect to admin login
+      navigate("/admin/login");
     };
 
     checkAuth();
-  }, [navigate]);
+  }, [navigate, user, loading]);
 
-  return <div>Checking admin session...</div>;
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        fontSize: '18px',
+        color: '#666'
+      }}>
+        Checking admin session...
+      </div>
+    );
+  }
+
+  return null;
 };
+
+
+
+
+export default AdminRedirectHandler;
+
