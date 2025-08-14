@@ -10,11 +10,13 @@ export const ProtectedRoute = ({ children, roles = [] }) => {
   if (loading) return <div>Loading...</div>;
 
   if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    const isAdminRoute = location.pathname.startsWith('/admin');
+    return <Navigate to={isAdminRoute ? "/admin" : "/login"} state={{ from: location }} replace />;
   }
 
   if (roles.length && !roles.includes(user.role)) {
-    return <Navigate to="/unauthorized" replace />;
+    const isAdminRoute = location.pathname.startsWith('/admin');
+    return <Navigate to={isAdminRoute ? "/admin" : "/unauthorized"} replace />;
   }
 
   return children;

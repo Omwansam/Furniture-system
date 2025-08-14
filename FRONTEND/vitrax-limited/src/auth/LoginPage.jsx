@@ -22,7 +22,7 @@ const LoginPage = () => {
     e.preventDefault();
 
     try {
-      const success = await login(email, password, 'customer');
+      const success = await login(email, password, 'user');
       if (success) {
         navigate(from, { replace: true });
       } else {

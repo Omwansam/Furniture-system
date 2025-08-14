@@ -27,8 +27,8 @@ const AdminLoginPage = () => {
     e.preventDefault();
 
     try {
-      const success = await login(email, password, 'admin');
-      if (success) {
+      const result = await login(email, password, 'admin');
+      if (result && result.success && result.role === 'admin') {
         navigate("/admin/overview");
       } else {
         alert("Login failed. Please check your credentials or ensure you have admin access.");

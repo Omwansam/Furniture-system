@@ -14,7 +14,7 @@ export const getProducts = async () => {
 
 export const getProductById = async (id) => {
   try {
-    const response = await axios.get(`${API_URL}/${id}`);
+    const response = await axios.get(`http://localhost:5000/api/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching product:', error);
@@ -52,7 +52,7 @@ export const createProduct = async (productData) => {
 // 🔹 Update an existing product
 export const updateProduct = async (id, productData) => {
   try {
-    const response = await axios.put(`${API_URL}/${id}`, productData, {
+    const response = await axios.put(`http://localhost:5000/api/${id}`, productData, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -68,7 +68,7 @@ export const updateProduct = async (id, productData) => {
 // 🔹 Delete a product
 export const deleteProduct = async (id) => {
   try {
-    const response = await axios.delete(`${API_URL}/${id}`, {
+    const response = await axios.delete(`http://localhost:5000/api/${id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },

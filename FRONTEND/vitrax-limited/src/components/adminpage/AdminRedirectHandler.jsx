@@ -1,3 +1,6 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 const AdminRedirectHandler = () => {
   const navigate = useNavigate();
 
@@ -6,7 +9,7 @@ const AdminRedirectHandler = () => {
       const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
 
       if (!token) {
-        navigate("/admin/login");
+        navigate("/admin");
         return;
       }
 
@@ -20,13 +23,13 @@ const AdminRedirectHandler = () => {
           if (data?.is_admin) {
             navigate("/admin/overview", { replace: true });
           } else {
-            navigate("/admin/login");
+            navigate("/admin");
           }
         } else {
-          navigate("/admin/login");
+          navigate("/admin");
         }
       } catch {
-        navigate("/admin/login");
+        navigate("/admin");
       }
     };
 
@@ -35,3 +38,5 @@ const AdminRedirectHandler = () => {
 
   return <div>Checking admin session...</div>;
 };
+
+export default AdminRedirectHandler;

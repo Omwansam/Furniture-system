@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }) => {
           id: data.user.id.toString(),
           email: data.user.email,
           username: data.user.username,
-          role: data.user.role || (data.user.is_admin ? 'admin' : 'customer'),
+          role: data.user.role || (data.user.is_admin ? 'admin' : 'user'),
           access_token: data.access_token,
           refresh_token: data.refresh_token
         };
@@ -107,7 +107,10 @@ export const AuthProvider = ({ children }) => {
           localStorage.setItem('adminRefreshToken', data.refresh_token);
         }
         setLoading(false);
-        return true;
+        return {
+          success: true,
+          role: userData.role
+        };
       }
 
       setLoading(false);
@@ -132,7 +135,7 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         // Auto login after successful signup
-        return await login(email, password, 'customer');
+        return await login(email, password, 'user');
       }
 
       setLoading(false);

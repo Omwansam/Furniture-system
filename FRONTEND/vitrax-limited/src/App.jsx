@@ -11,6 +11,7 @@ import Shop from "./pages/Shop";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Footer from "./components/Footer";
+import Unauthorized from "./pages/Unauthorized";
 import Blog from "./pages/Blog";
 import SingleProduct from "./pages/SingleProduct";
 import CheckOut from "./pages/CheckOut";
@@ -83,6 +84,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            <Route path="/unauthorized" element={<Unauthorized />} />
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" />} />
