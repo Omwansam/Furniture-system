@@ -10,6 +10,11 @@ export const ProtectedRoute = ({ children, roles = [] }) => {
   if (loading) return <div>Loading...</div>;
 
   if (!user) {
+    // If trying to access admin routes, redirect to admin login
+    if (roles.includes('admin')) {
+      return <Navigate to="/admin/login" state={{ from: location }} replace />;
+    }
+    // Otherwise redirect to regular login
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
