@@ -9,11 +9,20 @@ from sqlalchemy.exc import SQLAlchemyError
 
 order_bp = Blueprint('order', __name__)
 
+
+def _extract_user_id(identity):
+    if identity is None:
+        return None
+    if isinstance(identity, dict):
+        return identity.get('id')
+    return identity
+
 def is_admin():
     """Check if current user is admin"""
     try:
         verify_jwt_in_request()
-        user_id = get_jwt_identity()
+        identity = get_jwt_identity()
+        user_id = _extract_user_id(identity)
         user = User.query.get(user_id)
         return user and user.is_admin
     except:
@@ -56,7 +65,8 @@ def apply_coupon(coupon_code, order_amount):
 @jwt_required()
 def checkout():
     """Enhanced checkout process with coupon support"""
-    user_id = get_jwt_identity()
+    identity = get_jwt_identity()
+    user_id = _extract_user_id(identity)
     data = request.get_json()
     
     # Validate required fields
@@ -135,12 +145,15 @@ def checkout():
             product.stock_quantity -= cart_item.quantity
         
         # Process payment
+        # Create payment to match current Payment model schema
+        payment_method_id = data.get('payment_method_id') or data.get('payment_method')
         payment = Payment(
             order_id=new_order.order_id,
-            amount=total_amount,
-            payment_method=data['payment_method'],
+            user_id=user_id,
+            payment_amount=f"{total_amount:.2f}",
             transaction_id=f"txn_{datetime.now().strftime('%Y%m%d%H%M%S')}",
-            status=PaymentStatus.COMPLETED,
+            payment_status=PaymentStatus.COMPLETED,
+            payment_method_id=int(payment_method_id) if payment_method_id is not None else 1,
             payment_date=db.func.current_timestamp()
         )
         db.session.add(payment)

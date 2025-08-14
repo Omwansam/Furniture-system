@@ -1,9 +1,11 @@
 
 
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import "./auth.css";
 import SignupPage from "./SignupPage";
+import { useAuth } from "../context/AuthContext";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -11,18 +13,21 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
 
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+
   const API_URL = "http://localhost:5000/auth/login";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const loginData = { email, password };
-
     try {
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loginData),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
@@ -32,11 +37,8 @@ const LoginPage = () => {
         return;
       }
 
-      localStorage.setItem("access_token", data.access_token);
-      localStorage.setItem("refresh_token", data.refresh_token);
-      localStorage.setItem("role", data.user.role);
-
-      window.location.href = "/";
+      login(email, password, data.user.role);
+      navigate(from, { replace: true });
     } catch (err) {
       console.error("Login error:", err);
     }

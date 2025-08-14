@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/product'; // Adjust to your backend URL
+const API_URL = 'http://localhost:5000/api/product'; // Backend URL
 
 export const getProducts = async () => {
   try {

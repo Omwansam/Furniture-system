@@ -10,7 +10,7 @@ const AdminLoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const API_URL = "http://localhost:5000/auth/admin/login";
+  const API_URL = "http://localhost:5000/auth/login";
 
   // If already logged in, redirect
   useEffect(() => {
@@ -37,7 +37,7 @@ const AdminLoginPage = () => {
         return;
       }
 
-      if (data.user?.role !== "admin") {
+      if (!(data.user?.is_admin || data.user?.role === "admin")) {
         alert("Access denied: Not an admin");
         return;
       }
@@ -45,7 +45,7 @@ const AdminLoginPage = () => {
       // Store admin tokens
       localStorage.setItem("adminToken", data.access_token);
       localStorage.setItem("adminRefreshToken", data.refresh_token);
-      localStorage.setItem("role", data.user.role);
+      localStorage.setItem("role", data.user.role || (data.user.is_admin ? 'admin' : 'customer'));
 
       navigate("/admin/overview");
     } catch (err) {

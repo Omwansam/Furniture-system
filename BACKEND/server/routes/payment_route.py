@@ -11,6 +11,14 @@ from utils.daraja_client import initiate_stk_push
 
 #Blueprint Configuration
 payment_bp = Blueprint('payment', __name__)
+
+
+def _extract_user_id(identity):
+    if identity is None:
+        return None
+    if isinstance(identity, dict):
+        return identity.get('id')
+    return identity
 logger=logging.getLogger(__name__)
 
 
@@ -27,7 +35,8 @@ def mpesa_stk_push():
         "amount": 1000
     }
     """
-    user_id = get_jwt_identity()
+    identity = get_jwt_identity()
+    user_id = _extract_user_id(identity)
     data = request.get_json()
     
     # Validate input

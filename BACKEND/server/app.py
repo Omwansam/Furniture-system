@@ -8,7 +8,7 @@ from routes.products_route import product_bp
 from routes.productImage_route import product_image_bp
 from routes.billing_route import billing_bp
 from routes.category_route import category_bp
-from routes.admin_route import admin_bp
+
 from routes.blog_route import blog_bp
 from routes.cart_route import cart_bp
 from routes.order_route import order_bp
@@ -45,7 +45,7 @@ app.register_blueprint(product_image_bp,url_prefix = '/productimages')
 app.register_blueprint(product_bp,url_prefix = '/api')
 app.register_blueprint(billing_bp, url_prefix = '/billing')
 app.register_blueprint(category_bp,url_prefix = '/categories')
-app.register_blueprint(admin_bp, url_prefix = '/auths')
+
 app.register_blueprint(blog_bp, url_prefix = '/blog')
 app.register_blueprint(cart_bp, url_prefix = '/cart')
 app.register_blueprint(order_bp, url_prefix = '/orders')

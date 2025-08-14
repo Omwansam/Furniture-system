@@ -53,5 +53,8 @@ class Config:
     STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
     STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
 
+    # Backward-compatible alias (some utils referenced MPESA_STK_PUSH_URL)
+    MPESA_STK_PUSH_URL = DARAJA_STK_PUSH_URL
+
     # Ensure upload folder exists
     os.makedirs(UPLOAD_FOLDER, exist_ok=True) 

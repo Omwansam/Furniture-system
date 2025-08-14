@@ -3,7 +3,7 @@ const AdminRedirectHandler = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem("adminToken");
+      const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
 
       if (!token) {
         navigate("/admin/login");
@@ -11,12 +11,17 @@ const AdminRedirectHandler = () => {
       }
 
       try {
-        const response = await fetch("http://localhost:5000/admin/protected", {
+        const response = await fetch("http://localhost:5000/auth/protected", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (response.ok) {
-          navigate("/admin/overview", { replace: true });
+          const data = await response.json();
+          if (data?.is_admin) {
+            navigate("/admin/overview", { replace: true });
+          } else {
+            navigate("/admin/login");
+          }
         } else {
           navigate("/admin/login");
         }

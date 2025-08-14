@@ -121,7 +121,8 @@ def initiate_stk_push(phone_number, amount, order_id, description='Furniture Pay
     # Make API request
     try:
         response = requests.post(
-            current_app.config['MPESA_STK_PUSH_URL'],
+            # Use DARAJA_STK_PUSH_URL from config (alias MPESA_STK_PUSH_URL also provided)
+            current_app.config.get('DARAJA_STK_PUSH_URL', current_app.config.get('MPESA_STK_PUSH_URL')),
             json=payload,
             headers=headers,
             timeout=30

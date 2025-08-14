@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from extensions import db
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import db, ShoppingCart, CartItem, Product, ProductImage
+from models import ShoppingCart, CartItem, Product, ProductImage
 
 
 #Blueprint Configuration
@@ -26,7 +26,8 @@ def update_cart_total(cart):
 @jwt_required()
 def get_cart():
     """Get the shopping cart for current user"""
-    user_id = get_jwt_identity()
+    identity = get_jwt_identity()
+    user_id = identity.get('id') if isinstance(identity, dict) else identity
     cart = ShoppingCart.query.filter_by(user_id=user_id).first()
 
     if not cart:
@@ -83,8 +84,8 @@ def get_cart():
 @jwt_required()
 def add_to_cart():
     """Add an item to the shopping cart"""
-
-    user_id = get_jwt_identity()
+    identity = get_jwt_identity()
+    user_id = identity.get('id') if isinstance(identity, dict) else identity
     data = request.get_json()
     
     if not data or 'product_id' not in data:
@@ -158,7 +159,8 @@ def add_to_cart():
 @jwt_required()
 def update_cart_item(item_id):
     """Update quantity of a cart item"""
-    user_id = get_jwt_identity()
+    identity = get_jwt_identity()
+    user_id = identity.get('id') if isinstance(identity, dict) else identity
     data = request.get_json()
     
     if not data or 'quantity' not in data:
@@ -197,7 +199,7 @@ def update_cart_item(item_id):
     item.quantity = quantity
     item.added_at = db.func.current_timestamp()
     update_cart_total(cart)
-    db.session.commit
+    db.session.commit()
     
     return jsonify({
         "message": "Cart item updated successfully",
@@ -214,7 +216,8 @@ def update_cart_item(item_id):
 def remove_from_cart(item_id):
     """Remove an item from the shopping cart"""
 
-    user_id = get_jwt_identity()
+    identity = get_jwt_identity()
+    user_id = identity.get('id') if isinstance(identity, dict) else identity
 
     cart = ShoppingCart.query.filter_by(user_id=user_id).first()
     if not cart:
@@ -245,7 +248,8 @@ def remove_from_cart(item_id):
 @jwt_required()
 def clear_cart():
     """Clear all items from the shopping cart"""
-    user_id = get_jwt_identity()
+    identity = get_jwt_identity()
+    user_id = identity.get('id') if isinstance(identity, dict) else identity
     
     cart = ShoppingCart.query.filter_by(user_id=user_id).first()
     if not cart:
