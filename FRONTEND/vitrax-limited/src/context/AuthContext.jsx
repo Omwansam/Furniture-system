@@ -13,20 +13,8 @@ export const AuthProvider = ({ children }) => {
       try {
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
-
-        // Verify token is still valid
-        verifyToken(parsedUser.access_token).catch(() => {
-          // If token verification fails, try refreshing
-          if (parsedUser.refresh_token) {
-            refreshToken(parsedUser.refresh_token).catch(() => {
-              // If refresh fails, logout
-              logout();
-            });
-          } else {
-            logout();
-          }
-        });
       } catch (error) {
+        console.error('Error parsing stored user:', error);
         localStorage.removeItem('furniture_user');
       }
     }
@@ -42,6 +30,7 @@ export const AuthProvider = ({ children }) => {
       });
       return response.ok;
     } catch (error) {
+      console.error('Token verification failed:', error);
       return false;
     }
   };
@@ -71,6 +60,7 @@ export const AuthProvider = ({ children }) => {
       }
       return false;
     } catch (error) {
+      console.error('Token refresh failed:', error);
       return false;
     }
   };
@@ -93,7 +83,7 @@ export const AuthProvider = ({ children }) => {
           id: data.user.id.toString(),
           email: data.user.email,
           username: data.user.username,
-          role: data.user.role || (data.user.is_admin ? 'admin' : 'customer'),
+          role: data.user.role || (data.user.is_admin ? 'admin' : 'user'),
           access_token: data.access_token,
           refresh_token: data.refresh_token
         };
@@ -113,6 +103,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
       return false;
     } catch (error) {
+      console.error('Login error:', error);
       setLoading(false);
       return false;
     }
@@ -132,12 +123,13 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         // Auto login after successful signup
-        return await login(email, password, 'customer');
+        return await login(email, password, 'user');
       }
 
       setLoading(false);
       return false;
     } catch (error) {
+      console.error('Signup error:', error);
       setLoading(false);
       return false;
     }
@@ -146,6 +138,9 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('furniture_user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminRefreshToken');
   };
 
   return (
