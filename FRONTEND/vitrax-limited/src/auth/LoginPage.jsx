@@ -18,29 +18,19 @@ const LoginPage = () => {
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
 
-  const API_URL = "http://localhost:5000/auth/login";
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.message || "Login failed");
-        return;
+      const success = await login(email, password, 'customer');
+      if (success) {
+        navigate(from, { replace: true });
+      } else {
+        alert("Login failed. Please check your credentials.");
       }
-
-      login(email, password, data.user.role);
-      navigate(from, { replace: true });
     } catch (err) {
       console.error("Login error:", err);
+      alert("An error occurred. Please try again.");
     }
   };
 

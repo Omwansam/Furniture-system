@@ -22,50 +22,46 @@ const CartPopup = ({ cartItems = [], onClose }) => {
 
   // Calculate subtotal
   const subtotal = cartItems.reduce((sum, item) => {
-    return sum + (item.product?.product_price || 0) * (item.quantity || 0);
+    return sum + (parseFloat(item.price) || 0) * (item.quantity || 0);
   }, 0);
+
+  const itemCount = cartItems.length;
 
   return (
     <div className="cart-popup-overlay">
       <div className="cart-popup">
-        <h2>Shopping Cart</h2>
-        <button className="close-btn" onClick={onClose}>
-          <FiX />
-        </button>
+        <div className="cart-header">
+          <h2>Shopping Cart</h2>
+          <span className="cart-count">({itemCount} item{itemCount !== 1 ? 's' : ''})</span>
+          <button className="close-btn" onClick={onClose}>
+            <FiX />
+          </button>
+        </div>
 
         <div className="cart-items-container">
-          {cartItems.map((item, index) => {
-            const product = item.product;
-            
-            // Safely get the primary image or first image
-            const primaryImage = product?.images?.find(img => img.is_primary) || 
-                               product?.images?.[0] || 
-                               { image_url: "/placeholder-image.jpg" };
-
-            return (
-              <div key={`${product?.product_id || index}`} className="cart-item">
-                <img
-                  src={
-                    primaryImage.image_url.startsWith('http') 
-                      ? primaryImage.image_url 
-                      : `http://127.0.0.1:5000${primaryImage.image_url}`
-                  }
-                  alt={product?.product_name || 'Product image'}
-                  className="cart-item-img"
-                  onError={(e) => {
-                    e.target.src = "/placeholder-image.jpg";
-                  }}
-                />
-                <div className="cart-item-details">
-                  <h3>{product?.product_name || 'Unknown Product'}</h3>
-                  <p>Quantity: {item.quantity || 0}</p>
-                  <p className="cart-price">
-                    Rs. {(product?.product_price || 0).toLocaleString()}
-                  </p>
-                </div>
+          {cartItems.map((item, index) => (
+            <div key={item.cart_item_id || index} className="cart-item">
+              <img
+                src={
+                  item.image_url?.startsWith('http') 
+                    ? item.image_url 
+                    : `http://localhost:5000${item.image_url || '/placeholder-image.jpg'}`
+                }
+                alt={item.product_name || 'Product image'}
+                className="cart-item-img"
+                onError={(e) => {
+                  e.target.src = "/placeholder-image.jpg";
+                }}
+              />
+              <div className="cart-item-details">
+                <h3>{item.product_name || 'Unknown Product'}</h3>
+                <p>Quantity: {item.quantity || 0}</p>
+                <p className="cart-price">
+                  KSh {(parseFloat(item.price) || 0).toLocaleString()}
+                </p>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
 
         <div className="cart-subtotal">

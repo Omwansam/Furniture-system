@@ -1,28 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FiFacebook, FiLinkedin, FiInstagram } from "react-icons/fi";
+import { FiFacebook, FiLinkedin, FiInstagram, FiShoppingCart, FiHeart, FiTruck, FiShield, FiRefreshCw } from "react-icons/fi";
 import ProductDetails from '../components/ProductDetails';
 import RelatedProducts from '../components/RelatedProducts';
-import CartPopup from "../components/CartPopup";
+import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 import "./SingleProduct.css";
 
-const API_BASE_URL = "http://127.0.0.1:5000/api";
+const API_BASE_URL = "http://localhost:5000/api";
 
 const SingleProduct = () => {
   const { productId } = useParams();
-  const navigate= useNavigate();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { addToCart } = useCart();
+  
   const [product, setProduct] = useState(null);
   const [mainImage, setMainImage] = useState("");
   const [thumbnails, setThumbnails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState([]);
+  const [addingToCart, setAddingToCart] = useState(false);
 
-
-  // Added for popup
+  // Toast notifications
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -66,83 +69,75 @@ const SingleProduct = () => {
   const handleAddToCart = async () => {
     if (!product) return;
 
-     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setShowLoginPrompt(true); // Show popup
+    // Check if user is authenticated
+    if (!user) {
+      setShowLoginPrompt(true);
         setTimeout(() => {
           setShowLoginPrompt(false);
-          navigate("/login"); 
-        }, 2000); // auto-hide redirects after 2s
+        navigate("/login", { state: { from: `/singleproduct/${productId}` } });
+      }, 2000);
         return;
       }
 
-      const response = await fetch(`http://127.0.0.1:5000/cart/items`, {
-        
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          product_id: product.product_id,
-          quantity: quantity,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to add item to cart");
+    setAddingToCart(true);
+    try {
+      const success = await addToCart(product, quantity);
+      
+      if (success) {
+        // Show success message
+        setShowSuccessPopup(true);
+        setTimeout(() => setShowSuccessPopup(false), 3000);
+      } else {
+        throw new Error("Failed to add item to cart");
       }
-
-      setIsCartOpen(true);
     } catch (err) {
        setErrorMessage(err.message);
       setShowErrorPopup(true);
       setTimeout(() => setShowErrorPopup(false), 3000);
+    } finally {
+      setAddingToCart(false);
     }
-  };
-
-    // Check if product already exists in cart
-    //const existingItemIndex = cartItems.findIndex(
-    //  item => item.product.product_id === product.product_id
-    //);
-
-    //if (existingItemIndex >= 0) {
-      // Update quantity if product exists
-    //  const updatedItems = [...cartItems];
-    //  updatedItems[existingItemIndex].quantity += quantity;
-    //  setCartItems(updatedItems);
-    //} else {
-      // Add new item to cart
-    //  setCartItems([...cartItems, { product, quantity }]);
-    //}
-
-  //  setIsCartOpen(true);
-  //};
-
-  const handleCloseCart = () => {
-    setIsCartOpen(false);
   };
 
   const handleThumbnailClick = (imgUrl) => {
     setMainImage(imgUrl);
   };
 
-  if (loading) return <div>Loading product...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!product) return <div>Product not found</div>;
+  if (loading) return (
+    <div className="loading-container">
+      <div className="loading-spinner">
+        <FiRefreshCw className="spinning" />
+        <p>Loading product details...</p>
+      </div>
+    </div>
+  );
+  
+  if (error) return (
+    <div className="error-container">
+      <h2>Error Loading Product</h2>
+      <p>{error}</p>
+      <button onClick={() => window.location.reload()}>Try Again</button>
+    </div>
+  );
+  
+  if (!product) return (
+    <div className="error-container">
+      <h2>Product Not Found</h2>
+      <p>The product you're looking for doesn't exist.</p>
+      <button onClick={() => navigate('/shop')}>Back to Shop</button>
+    </div>
+  );
 
   return (
-    <div>
+    <div className="single-product-page">
       <div className="single-product-container">
         {/* Left Section - Images */}
         <div className="image-section">
-          <div className="main-image">
+          <div className="main-image-container">
             <img
-              src={mainImage.startsWith('http') ? mainImage : `http://127.0.0.1:5000${mainImage}`}
+              src={mainImage.startsWith('http') ? mainImage : `http://localhost:5000${mainImage}`}
               alt={product.product_name}
+              className="main-image"
               onError={(e) => {
                 e.target.src = "/placeholder-image.jpg";
               }}
@@ -153,7 +148,7 @@ const SingleProduct = () => {
               {thumbnails.map((img, index) => (
                 <img
                   key={index}
-                  src={img.image_url.startsWith('http') ? img.image_url : `http://127.0.0.1:5000${img.image_url}`}
+                  src={img.image_url.startsWith('http') ? img.image_url : `http://localhost:5000${img.image_url}`}
                   alt={`Thumbnail ${index + 1}`}
                   className={img.image_url === mainImage ? "active-thumbnail" : ""}
                   onClick={() => handleThumbnailClick(img.image_url)}
@@ -168,72 +163,145 @@ const SingleProduct = () => {
 
         {/* Right Section - Product Details */}
       <div className="product-details-section">
+          <div className="product-header">
         <h1 className="product-title">{product.product_name}</h1>
-        <p className="description">{product.product_description}</p>
-        <p className="price">KSh {product.product_price.toLocaleString()}</p>
-        <div className="rating">⭐⭐⭐⭐☆ <span className="review-count">5 Customer Reviews</span></div>
-        
+            <div className="product-rating">
+              <div className="stars">⭐⭐⭐⭐☆</div>
+              <span className="review-count">5 Customer Reviews</span>
+            </div>
+          </div>
 
-        {/* Size Options 
-        <div className="size-options">
-          <span>Size:</span>
-          <button className="size-btn">L</button>
-          <button className="size-btn">XL</button>
-          <button className="size-btn">XS</button>
-        </div> */}
+          <div className="product-price-section">
+        <p className="price">KSh {product.product_price.toLocaleString()}</p>
+            <div className="price-badges">
+              <span className="badge free-shipping">
+                <FiTruck /> Free Shipping
+              </span>
+              <span className="badge warranty">
+                <FiShield /> 1 Year Warranty
+              </span>
+            </div>
+          </div>
+
+          <div className="product-description">
+            <p>{product.product_description}</p>
+          </div>
 
         {/* Color Options */}
+          <div className="product-options">
         <div className="color-options">
-          <span>Color:</span>
-          <button className="color-circle" style={{ backgroundColor: "blue" }}></button>
-          <button className="color-circle" style={{ backgroundColor: "black" }}></button>
-          <button className="color-circle" style={{ backgroundColor: "gold" }}></button>
+              <label>Color:</label>
+              <div className="color-buttons">
+                <button className="color-circle active" style={{ backgroundColor: "brown" }} title="Brown"></button>
+                <button className="color-circle" style={{ backgroundColor: "black" }} title="Black"></button>
+                <button className="color-circle" style={{ backgroundColor: "beige" }} title="Beige"></button>
+                <button className="color-circle" style={{ backgroundColor: "gray" }} title="Gray"></button>
+              </div>
+            </div>
         </div>
 
         {/* Quantity Selector & Add to Cart */}
+          <div className="product-actions">
+            <div className="quantity-selector">
+              <label>Quantity:</label>
         <div className="quantity-container">
-          <button  onClick={() => setQuantity(quantity > 1 ? quantity - 1 : 1)}>-</button>
-          <span >{quantity}</span>
+                <button 
+                  onClick={() => setQuantity(quantity > 1 ? quantity - 1 : 1)}
+                  disabled={quantity <= 1}
+                >
+                  -
+                </button>
+                <span>{quantity}</span>
           <button onClick={() => setQuantity(quantity + 1)}>+</button>
         </div>
-        <button className="add-to-cart-btn" onClick={handleAddToCart}>
+            </div>
+
+            <div className="action-buttons">
+              <button 
+                className="add-to-cart-btn" 
+                onClick={handleAddToCart}
+                disabled={addingToCart}
+              >
+                {addingToCart ? (
+                  <>
+                    <FiRefreshCw className="spinning" />
+                    Adding...
+                  </>
+                ) : (
+                  <>
+                    <FiShoppingCart />
             Add To Cart
+                  </>
+                )}
           </button>
 
-          {/* Cart Popup */}
-      {isCartOpen && (
-        <CartPopup 
-          cartItems={cartItems} 
-          onClose={handleCloseCart} 
-        />
-      )}
-        
-        {/**Delivery statement */}
-        <div className="delivery-statement">
-          <p >Home / Office Delivery is Only Available in Nairobi and Mombasa within city limits </p>
-        </div>
-        {/* Product Meta */}
-        <div className="single-meta">
-          <p><strong>SKU:</strong> {product.product_id || "N/A"}</p>
-          <p><strong>Category:</strong> Sofas</p>
-          <p><strong>Tags:</strong> Sofa, Chair, Home, Shop</p>
+              <button className="wishlist-btn">
+                <FiHeart />
+              </button>
+            </div>
+          </div>
+
+          {/* Product Features */}
+          <div className="product-features">
+            <div className="feature">
+              <FiTruck />
+              <div>
+                <h4>Free Delivery</h4>
+                <p>Nairobi & Mombasa within city limits</p>
+              </div>
+            </div>
+            <div className="feature">
+              <FiShield />
+              <div>
+                <h4>1 Year Warranty</h4>
+                <p>Full coverage on all products</p>
+              </div>
+            </div>
+            <div className="feature">
+              <FiRefreshCw />
+              <div>
+                <h4>Easy Returns</h4>
+                <p>30-day return policy</p>
+              </div>
+            </div>
         </div>
 
-        {/* Social Media Share Icons */}
+        {/* Product Meta */}
+          <div className="product-meta">
+            <div className="meta-item">
+              <strong>SKU:</strong> {product.product_id || "N/A"}
+            </div>
+            <div className="meta-item">
+              <strong>Category:</strong> Furniture
+            </div>
+            <div className="meta-item">
+              <strong>Tags:</strong> Sofa, Chair, Home, Shop
+            </div>
+        </div>
+
+          {/* Social Media Share */}
         <div className="social-share">
+            <span>Share:</span>
           <FiFacebook className="social-icon" />
           <FiLinkedin className="social-icon" />
           <FiInstagram className="social-icon" />
         </div>
       </div>
       </div>
+
+      {/* Product Details & Related Products */}
       <ProductDetails />
       <RelatedProducts />
 
-      {/* Login Popup Message */}
+      {/* Toast Notifications */}
       {showLoginPrompt && (
         <div className="toast-popup">
           Please log in to add items to cart.
+        </div>
+      )}
+      {showSuccessPopup && (
+        <div className="toast-popup success-popup">
+          Item added to cart successfully!
         </div>
       )}
       {showErrorPopup && (

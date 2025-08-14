@@ -3,20 +3,23 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import "./auth.css";
+import { useAuth } from "../context/AuthContext";
 
 const AdminLoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const API_URL = "http://localhost:5000/auth/login";
-
-  // If already logged in, redirect
+  // If already logged in as admin, redirect
   useEffect(() => {
-    const token = localStorage.getItem("adminToken");
-    if (token) {
-      navigate("/admin/overview");
+    const user = localStorage.getItem("furniture_user");
+    if (user) {
+      const userData = JSON.parse(user);
+      if (userData.role === 'admin') {
+        navigate("/admin/overview");
+      }
     }
   }, [navigate]);
 
@@ -24,30 +27,12 @@ const AdminLoginPage = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.message || "Login failed");
-        return;
+      const success = await login(email, password, 'admin');
+      if (success) {
+        navigate("/admin/overview");
+      } else {
+        alert("Login failed. Please check your credentials or ensure you have admin access.");
       }
-
-      if (!(data.user?.is_admin || data.user?.role === "admin")) {
-        alert("Access denied: Not an admin");
-        return;
-      }
-
-      // Store admin tokens
-      localStorage.setItem("adminToken", data.access_token);
-      localStorage.setItem("adminRefreshToken", data.refresh_token);
-      localStorage.setItem("role", data.user.role || (data.user.is_admin ? 'admin' : 'customer'));
-
-      navigate("/admin/overview");
     } catch (err) {
       console.error("Login error:", err);
       alert("Something went wrong. Please try again.");

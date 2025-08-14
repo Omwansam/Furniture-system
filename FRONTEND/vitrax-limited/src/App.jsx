@@ -1,8 +1,9 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
 
-import { AuthProvider } from "./AuthContext";
-import { ProtectedRoute } from "./ProtectedRoute";
+import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
+import { ProtectedRoute } from "./context/ProtectedRoute";
 
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
@@ -33,9 +34,10 @@ const Layout = ({ children }) => {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Layout>
-          <Routes>
+      <CartProvider>
+        <Router>
+          <Layout>
+            <Routes>
             {/* Public */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<LoginPage />} />
@@ -63,8 +65,16 @@ function App() {
               }
             />
 
-            {/* Admin Protected */}
+            {/* Admin Routes */}
             <Route path="/admin" element={<AdminLoginPage />} />
+            <Route
+              path="/admin/overview"
+              element={
+                <ProtectedRoute roles={["admin"]}>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/admin/*"
               element={
@@ -79,6 +89,7 @@ function App() {
           </Routes>
         </Layout>
       </Router>
+        </CartProvider>
     </AuthProvider>
   );
 }

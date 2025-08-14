@@ -2,9 +2,14 @@ import React, { useState } from 'react';
 import './Navbar.css';
 import { Link } from "react-router-dom";
 import { FaUser, FaSearch, FaHeart, FaShoppingCart } from 'react-icons/fa';
+import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
+import CartPopup from './CartPopup';
 
 const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false); // Toggle visibility of the search input
+  const { user } = useAuth();
+  const { itemsCount, isCartOpen, openCart, closeCart, cartItems } = useCart();
 
   return (
     <nav className="navbar">
@@ -21,7 +26,7 @@ const Navbar = () => {
         {/* Right Side Icons */}
         <div className="nav-icons">
           {/* User Icon - Link to Login or SignUp */}
-          <Link to="/login">
+          <Link to={user ? "/login" : "/login"}>
             <button className="icon-btn">
               <FaUser className="icon" />
             </button>
@@ -41,11 +46,22 @@ const Navbar = () => {
           </button>
 
           {/* Shopping Cart Icon */}
-          <button className="icon-btn">
+          <button className="icon-btn cart-icon" onClick={openCart}>
             <FaShoppingCart className="icon" />
+            {itemsCount > 0 && (
+              <span className="cart-badge">{itemsCount}</span>
+            )}
           </button>
         </div>
       </div>
+
+      {/* Cart Popup */}
+      {isCartOpen && (
+        <CartPopup 
+          cartItems={cartItems} 
+          onClose={closeCart} 
+        />
+      )}
     </nav>
   );
 };

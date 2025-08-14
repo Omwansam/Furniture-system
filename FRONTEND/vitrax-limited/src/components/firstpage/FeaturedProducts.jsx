@@ -21,7 +21,13 @@ const FeaturedProducts = () => {
           const primaryImage = product.images.find(img => img.is_primary) || product.images[0];
           return (
             <div key={index} className='product-card'>
-              <img src={primaryImage?.image_url} alt={product.product_name} />
+              <img 
+                src={primaryImage?.image_url?.startsWith('http') ? primaryImage.image_url : `http://localhost:5000/${primaryImage?.image_url}`} 
+                alt={product.product_name}
+                onError={(e) => {
+                  e.target.src = '/placeholder-image.jpg';
+                }}
+              />
               <h3>{product.product_name}</h3>
               <p className='view-more'>View More</p>
             </div>
