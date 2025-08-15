@@ -4,12 +4,6 @@ import './ProductManagement.css'
 import { FaCheckCircle, FaExclamationTriangle, FaStar, FaTimes } from 'react-icons/fa';
 
 
-
-
-
-
-
-
 const ProductManagement = () => {
 
   const [searchTerm, setSearchTerm] = useState("");

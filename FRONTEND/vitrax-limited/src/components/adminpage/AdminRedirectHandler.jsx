@@ -7,49 +7,43 @@ const AdminRedirectHandler = () => {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      // If still loading, wait
-      if (loading) return;
-      
-      // If no user is logged in, redirect to admin login
-      if (!user) {
-        navigate("/admin/login");
-        return;
-      }
+    console.log('AdminRedirectHandler - user:', user);
+    console.log('AdminRedirectHandler - loading:', loading);
 
-      // If user is logged in and is admin, redirect to dashboard
-      if (user.role === 'admin') {
-        navigate("/admin/overview", { replace: true });
-        return;
-      }
+    if (loading) return;
 
-      // If user is logged in but not admin, redirect to admin login
-      navigate("/admin/login");
-    };
+    if (!user) {
+      console.log('No user, redirecting to admin login');
+      navigate("/admin/login", { replace: true });
+    } else if (user.role === 'admin') {
+      console.log('Admin user, redirecting to dashboard');
+      navigate("/admin/overview", { replace: true });
+    } else {
+      console.log('Non-admin user, redirecting to admin login');
+      navigate("/admin/login", { replace: true });
+    }
+  }, [user, loading, navigate]);
 
-    checkAuth();
-  }, [navigate, user, loading]);
-
-  if (loading) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        fontSize: '18px',
-        color: '#666'
-      }}>
-        Checking admin session...
+  return (
+    <div style={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      height: '100vh',
+      fontSize: '18px',
+      color: '#333',
+      backgroundColor: '#f8f9fa'
+    }}>
+      <div style={{ textAlign: 'center' }}>
+        <div>🔄 Checking admin session...</div>
+        <div style={{ fontSize: '14px', marginTop: '10px', color: '#666' }}>
+          Loading: {loading ? 'Yes' : 'No'} | User: {user ? user.username || 'Unknown' : 'None'}
+        </div>
       </div>
-    );
-  }
-
-  return null;
+    </div>
+  );
 };
 
-
-
-
 export default AdminRedirectHandler;
+
 

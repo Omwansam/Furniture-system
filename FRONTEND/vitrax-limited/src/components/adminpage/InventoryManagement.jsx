@@ -186,13 +186,13 @@ const InventoryManagement = () => {
   };
 
   if (loading) {
-  return (
+    return (
       <div className="inventory-management">
         <div className="loading-container">
           <div className="loading-spinner"></div>
           <p>Loading inventory...</p>
         </div>
-    </div>
+      </div>
     );
   }
 
@@ -452,6 +452,4 @@ const InventoryManagement = () => {
   );
 };
 
-
-export default InventoryManagement
-
+export default InventoryManagement;
