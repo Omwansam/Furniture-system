@@ -18,7 +18,7 @@ import Cart from "./pages/Cart";
 import LoginPage from "./auth/LoginPage";
 import Dashboard from "./components/adminpage/Dashboard";
 import AdminLoginPage from "./auth/AdminLoginPage";
-import AdminRedirectHandler from "./components/adminpage/AdminRedirectHandler";
+
 
 const Layout = ({ children }) => {
   const location = useLocation();
@@ -67,16 +67,10 @@ function App() {
             />
 
             {/* Admin Routes */}
-            <Route path="/admin" element={<AdminRedirectHandler />} />
             <Route path="/admin/login" element={<AdminLoginPage />} />
-            <Route
-              path="/admin/overview"
-              element={
-                <ProtectedRoute roles={["admin"]}>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
+            
+            
+            
             <Route
               path="/admin/*"
               element={

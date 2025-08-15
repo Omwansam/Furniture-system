@@ -19,38 +19,22 @@ const AdminLoginPage = () => {
   useEffect(() => {
     const user = localStorage.getItem("furniture_user");
     if (user) {
-      try {
-        const userData = JSON.parse(user);
-        if (userData.role === 'admin') {
-          navigate("/admin/overview");
-        }
-      } catch (error) {
-        console.error('Error parsing user data:', error);
+      const userData = JSON.parse(user);
+      if (userData.role === 'admin') {
+        navigate("/admin/overview");
       }
     }
   }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
     try {
-      const success = await login(email, password);
-      if (success) {
-        // Check if the logged in user is admin
-        const user = localStorage.getItem("furniture_user");
-        if (user) {
-          const userData = JSON.parse(user);
-          if (userData.role === 'admin') {
-            navigate("/admin/overview");
-          } else {
-            alert("Access denied. Admin privileges required.");
-            // Logout non-admin user
-            localStorage.removeItem("furniture_user");
-          }
-        }
+      const result = await login(email, password, 'admin');
+      if (result && result.success && result.role === 'admin') {
+        navigate("/admin/dashboard");
       } else {
-        alert("Login failed. Please check your credentials.");
+        alert("Login failed. Please check your credentials or ensure you have admin access.");
       }
     } catch (err) {
       console.error("Login error:", err);
@@ -58,6 +42,7 @@ const AdminLoginPage = () => {
     } finally {
       setLoading(false);
     }
+
   };
 
   return (
