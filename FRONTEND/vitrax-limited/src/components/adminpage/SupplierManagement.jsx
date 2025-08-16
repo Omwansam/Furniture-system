@@ -1,6 +1,6 @@
 import React from 'react'
 
-function SupplierManagement() {
+const SupplierManagement = () => {
   return (
     <div>
       

@@ -33,7 +33,7 @@ export const ProtectedRoute = ({ children, roles = [] }) => {
   if (roles.length && !roles.includes(user.role)) {
     // If user doesn't have the required role, redirect appropriately
     if (user.role === 'admin') {
-      return <Navigate to="/admin/dashboard" replace />;
+      return <Navigate to="/admin/dashboard/overview" replace />;
     } else {
       return <Navigate to="/" replace />;
     }

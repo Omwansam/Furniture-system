@@ -22,7 +22,7 @@ const AdminLoginPage = () => {
     if (user) {
       const userData = JSON.parse(user);
       if (userData.role === 'admin') {
-        navigate("/admin/dashboard");
+        navigate("/admin/dashboard/overview");
       }
     }
   }, [navigate]);
@@ -35,7 +35,7 @@ const AdminLoginPage = () => {
     try {
       const result = await login(email, password, 'admin');
       if (result && result.success && result.role === 'admin') {
-        navigate("/admin/dashboard");
+        navigate("/admin/dashboard/overview");
       } else {
         setError(result?.error || "Login failed. Please check your credentials or ensure you have admin access.");
       }
@@ -120,7 +120,19 @@ const AdminLoginPage = () => {
         
         <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#e3f2fd', borderRadius: '5px', fontSize: '14px', border: '1px solid #2196f3' }}>
           <strong>💡 Demo Info:</strong><br />
-          To test admin functionality, create an admin user through the backend or use existing admin credentials.
+          <strong>Admin Credentials:</strong><br />
+          Email: admin2@example.com<br />
+          Password: securepassword1234<br />
+          <br />
+          <strong>Or register a new admin:</strong><br />
+          Username: admin2_user<br />
+          Email: admin2@example.com<br />
+          Password: securepassword1234<br />
+          is_admin: true
+        </div>
+        
+        <div style={{ marginTop: '20px', textAlign: 'center' }}>
+          <p>Don't have an admin account? <a href="/admin/register" style={{ color: '#2563eb' }}>Register here</a></p>
         </div>
       </div>
     </div>

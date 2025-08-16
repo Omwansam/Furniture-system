@@ -2,12 +2,14 @@
   font-family: Arial, sans-serif;
   padding: 2rem;
   background-color: #f9f9f9;
+  min-height: 100vh;
+  width: 100%;
 }
 
 .header-section {
   margin-bottom: 1rem;
 }
-s
+
 .title {
   font-size: 2rem;
   font-weight: bold;
@@ -431,6 +433,21 @@ select {
   background: blue;
 }
 
+/* Grid Layout */
+.grid-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .action-buttons {
@@ -439,6 +456,10 @@ select {
   }
 
   .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .grid-layout {
     grid-template-columns: 1fr;
   }
 }

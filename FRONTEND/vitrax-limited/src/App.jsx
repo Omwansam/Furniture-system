@@ -20,6 +20,7 @@ import Dashboard from "./components/adminpage/Dashboard";
 import AdminLoginPage from "./auth/AdminLoginPage";
 
 
+
 const Layout = ({ children }) => {
   const location = useLocation();
   const hideLayout = location.pathname.startsWith("/admin") || location.pathname === "/login";
@@ -71,7 +72,7 @@ function App() {
             <Route path="/admin" element={<AdminLoginPage />} />
             
             <Route
-              path="/admin/*"
+              path="/admin/dashboard/*"
               element={
                 <ProtectedRoute roles={["admin"]}>
                   <Dashboard />

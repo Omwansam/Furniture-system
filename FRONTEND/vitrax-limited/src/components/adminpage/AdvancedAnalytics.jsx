@@ -1,6 +1,5 @@
 import React from 'react'
 
-
 const AdvancedAnalytics = () => {
   return (
     <div>
@@ -10,4 +9,3 @@ const AdvancedAnalytics = () => {
 }
 
 export default AdvancedAnalytics
-

@@ -1,5 +1,3 @@
-
-
 import React from 'react'
 
 const Settings = () => {
@@ -11,3 +9,4 @@ const Settings = () => {
 }
 
 export default Settings
+

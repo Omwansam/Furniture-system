@@ -30,7 +30,7 @@ const Dashboard = () => {
 
         <main className="main-content">
           <Routes>
-            <Route index element={<Navigate to="overview" replace />} /> 
+            <Route index element={<Navigate to="overview" replace />} />
             <Route path="overview" element={<DashboardOverview />} />
             <Route path="analytics" element={<AdvancedAnalytics />} />
             <Route path="products" element={<ProductManagement />} />
