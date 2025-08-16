@@ -1,13 +1,22 @@
 import React, { useState } from 'react';
 import { FaBell, FaSearch } from 'react-icons/fa';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from '../../context/AuthContext';
 import './Header.css'
 
 const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
   const closeDropdown = () => setIsDropdownOpen(false);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/admin/login');
+    closeDropdown();
+  };
 
   return (
     <header className="header">
@@ -38,8 +47,8 @@ const Header = () => {
             {isDropdownOpen && (
               <div className="dropdown-menu" onMouseLeave={closeDropdown}>
                 <div className="dropdown-header">
-                  <p className="name">Admin User</p>
-                  <p className="email">admin@furniture.com</p>
+                  <p className="name">{user?.username || 'Admin User'}</p>
+                  <p className="email">{user?.email || 'admin@furniture.com'}</p>
                 </div>
                 <hr />
                 <ul className="dropdown-list">
@@ -47,7 +56,7 @@ const Header = () => {
                   <li><Link to="/settings" onClick={closeDropdown}>Settings</Link></li>
                   <li><Link to="/support" onClick={closeDropdown}>Support</Link></li>
                   <hr />
-                  <li><Link to="/logout" onClick={closeDropdown}>Log out</Link></li>
+                  <li><button onClick={handleLogout} className="logout-button">Log out</button></li>
                 </ul>
               </div>
             )}
@@ -59,4 +68,5 @@ const Header = () => {
 };
 
 export default Header;
+
 

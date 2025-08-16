@@ -12,6 +12,7 @@ const AdminLoginPage = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -21,28 +22,29 @@ const AdminLoginPage = () => {
     if (user) {
       const userData = JSON.parse(user);
       if (userData.role === 'admin') {
-        navigate("/admin/overview");
+        navigate("/admin/dashboard");
       }
     }
   }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
       const result = await login(email, password, 'admin');
       if (result && result.success && result.role === 'admin') {
         navigate("/admin/dashboard");
       } else {
-        alert("Login failed. Please check your credentials or ensure you have admin access.");
+        setError(result?.error || "Login failed. Please check your credentials or ensure you have admin access.");
       }
     } catch (err) {
       console.error("Login error:", err);
-      alert("Something went wrong. Please try again.");
+      setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
-
   };
 
   return (
@@ -93,6 +95,19 @@ const AdminLoginPage = () => {
               </button>
             </div>
           </div>
+
+          {error && (
+            <div className="error-message" style={{ 
+              color: '#e74c3c', 
+              backgroundColor: '#fdf2f2', 
+              padding: '10px', 
+              borderRadius: '4px', 
+              marginBottom: '15px',
+              border: '1px solid #fecaca'
+            }}>
+              {error}
+            </div>
+          )}
 
           <div className="forgot-password">
             <a href="#">Forgot password?</a>

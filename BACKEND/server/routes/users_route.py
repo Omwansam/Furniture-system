@@ -90,7 +90,7 @@ def login():
             "email": user.email,
             "username": user.username,
             "is_admin": user.is_admin,
-            "role": "admin" if user.is_admin else "user"
+            "role": "admin" if user.is_admin else "customer "
         }
     }), 200   
 

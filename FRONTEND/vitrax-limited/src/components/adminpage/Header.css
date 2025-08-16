@@ -170,4 +170,19 @@
 .dropdown-list li:hover {
   background-color: #f9f9f9;
 }
+
+.logout-button {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 0;
+  font-size: inherit;
+  cursor: pointer;
+  color: inherit;
+}
+
+.logout-button:hover {
+  color: #e74c3c;
+}
 */

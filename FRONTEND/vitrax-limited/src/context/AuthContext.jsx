@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }) => {
         return true;
       }
       return false;
-    } catch (error) {
+    } catch  {
       return false;
     }
   };
@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }) => {
           id: data.user.id.toString(),
           email: data.user.email,
           username: data.user.username,
-          role: data.user.role || (data.user.is_admin ? 'admin' : 'customer'),
+          role: data.user.role,
           access_token: data.access_token,
           refresh_token: data.refresh_token
         };
@@ -107,14 +107,14 @@ export const AuthProvider = ({ children }) => {
           localStorage.setItem('adminRefreshToken', data.refresh_token);
         }
         setLoading(false);
-        return true;
+        return { success: true, role: userData.role };
       }
 
       setLoading(false);
-      return false;
+      return { success: false, error: 'Invalid credentials' };
     } catch (error) {
       setLoading(false);
-      return false;
+      return { success: false, error: 'Network error' };
     }
   };
 
@@ -146,6 +146,13 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('furniture_user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminRefreshToken');
+  };
+
+  const isAdmin = () => {
+    return user?.role === 'admin';
   };
 
   return (
@@ -155,6 +162,7 @@ export const AuthProvider = ({ children }) => {
       signup,
       logout,
       loading,
+      isAdmin,
       refreshToken: async () => {
         if (!user?.refresh_token) return false;
         return refreshToken(user.refresh_token);
@@ -172,3 +180,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

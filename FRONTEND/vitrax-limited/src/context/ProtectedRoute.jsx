@@ -7,7 +7,19 @@ export const ProtectedRoute = ({ children, roles = [] }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        fontSize: '18px'
+      }}>
+        Loading...
+      </div>
+    );
+  }
 
   if (!user) {
     // If trying to access admin routes, redirect to admin login
@@ -19,7 +31,12 @@ export const ProtectedRoute = ({ children, roles = [] }) => {
   }
 
   if (roles.length && !roles.includes(user.role)) {
-    return <Navigate to="/unauthorized" replace />;
+    // If user doesn't have the required role, redirect appropriately
+    if (user.role === 'admin') {
+      return <Navigate to="/admin/dashboard" replace />;
+    } else {
+      return <Navigate to="/" replace />;
+    }
   }
 
   return children;

@@ -3,16 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const AdminRedirectHandler = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user?.role === 'admin') {
-      navigate("/admin/dashboard", { replace: true });
-    } else {
-      navigate("/admin/login", { replace: true });
+    if (!loading) {
+      if (user?.role === 'admin') {
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        navigate("/admin/login", { replace: true });
+      }
     }
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return null; // This component doesn't render anything
 };
