@@ -67,6 +67,8 @@ const CartPopup = ({ onClose, onCartUpdate }) => {
     }
   };
 
+
+
   if (loading) {
     return (
       <div className="cart-popup-overlay">
@@ -180,12 +182,25 @@ const CartPopup = ({ onClose, onCartUpdate }) => {
         </div>
 
         <div className="cart-pop-buttons">
-          <button className="view-cart-btn" onClick={() => navigate("/cart")}>
+          <button 
+            className="view-cart-btn" 
+            onClick={() => {
+              console.log("View Cart clicked");
+              onClose();
+              console.log("Navigating to /cart");
+              navigate("/cart");
+            }}
+          >
             View Cart
           </button>
           <button
             className="checkout-pop-btn"
-            onClick={() => navigate("/checkout")}
+            onClick={() => {
+              console.log("Checkout clicked");
+              onClose();
+              console.log("Navigating to /checkout");
+              navigate("/checkout");
+            }}
             disabled={cartItems.length === 0}
           >
             Checkout
@@ -197,55 +212,4 @@ const CartPopup = ({ onClose, onCartUpdate }) => {
 };
 
 export default CartPopup;
-
-
-
-
-{/**import React from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import { FiX } from "react-icons/fi";
-import "./CartPopup.css";
-
-const CartPopup = ({ product, quantity, onClose }) => {
-  const navigate = useNavigate(); // Hook for navigation
-
-  if (!product) return null;
-
-  return (
-    <div className="cart-popup-overlay">
-      <div className="cart-popup">
-        <h2>Shopping Cart</h2>
-        <button className="close-btn" onClick={onClose}>
-          <FiX />
-        </button>
-
-        <div className="cart-item">
-        <img
-            src={`http://127.0.0.1:5000${product.images[0].image_url}`}
-            alt={product.product_name}
-            className="cart-item-img"
-          />
-          <div className="cart-item-details">
-            <h3>{product.name}</h3>
-            <p>Quantity: {quantity}</p>
-            <p className="cart-price">Rs. {product.product_price.toLocaleString()}</p>
-          </div>
-        </div>
-
-        <div className="cart-subtotal">
-          <p><strong>Subtotal:</strong> Rs. {(product.product_price * quantity).toLocaleString()}</p>
-        </div>
-
-        <div className="cart-pop-buttons">
-          <button className="view-cart-btn" onClick={() => navigate("/cart")}>View Cart</button>
-          <button className="checkout-pop-btn" onClick={() => navigate("/checkout")}>
-            Checkout
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default CartPopup; **/}
 

@@ -47,21 +47,22 @@ const BillingForm = () => {
 
   const createOrder = async (billingData) => {
     try {
-      const response = await fetch("http://localhost:5000/orders", {
+      const response = await fetch("http://localhost:5000/orders/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({
-          total_amount: cartData.total_price,
           shipping_address: `${billingData.street_address}, ${billingData.city}, ${billingData.province}, ${billingData.country}`,
+          payment_method: paymentMethod,
           billing_details: billingData
         })
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create order');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create order');
       }
 
       const orderData = await response.json();
@@ -88,7 +89,8 @@ const BillingForm = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Payment initiation failed');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Payment initiation failed');
       }
 
       const paymentData = await response.json();
@@ -114,21 +116,26 @@ const BillingForm = () => {
       // Create order
       const orderId = await createOrder(formData);
       
-      // Initiate payment
+      // Initiate payment based on method
       if (paymentMethod === "mpesa") {
-        const paymentResult = await initiatePayment(orderId, parseFloat(cartData.total_price));
-        
-        if (paymentResult.success) {
-          alert("Payment initiated successfully! Please check your phone for the M-Pesa prompt.");
-          // Clear cart after successful order creation
-          await cartService.clearCart();
-          // Redirect to order confirmation
-          window.location.href = `/order-confirmation/${orderId}`;
-        } else {
-          alert("Payment initiation failed. Please try again.");
+        try {
+          const paymentResult = await initiatePayment(orderId, parseFloat(cartData.total_price));
+          
+          if (paymentResult.CheckoutRequestID) {
+            alert("Payment initiated successfully! Please check your phone for the M-Pesa prompt.");
+            // Clear cart after successful order creation
+            await cartService.clearCart();
+            // Redirect to order confirmation
+            window.location.href = `/order-confirmation/${orderId}`;
+          } else {
+            alert("Payment initiation failed. Please try again.");
+          }
+        } catch (paymentError) {
+          console.error("Payment error:", paymentError);
+          alert(`Payment initiation failed: ${paymentError.message}`);
         }
       } else {
-        // For other payment methods, just create order
+        // For bank transfer and other methods, order is already created
         alert("Order created successfully! You will be contacted for payment details.");
         await cartService.clearCart();
         window.location.href = `/order-confirmation/${orderId}`;

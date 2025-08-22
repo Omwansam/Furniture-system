@@ -146,14 +146,21 @@ def checkout():
         
         # Process payment
         # Create payment to match current Payment model schema
-        payment_method_id = data.get('payment_method_id') or data.get('payment_method')
+        payment_method = data.get('payment_method', 'mpesa')
+        
+        # Set payment status based on payment method
+        if payment_method == 'mpesa':
+            payment_status = PaymentStatus.PENDING  # Will be updated when payment is confirmed
+        else:
+            payment_status = PaymentStatus.COMPLETED  # For bank transfer, mark as completed
+            
         payment = Payment(
             order_id=new_order.order_id,
             user_id=user_id,
             payment_amount=f"{total_amount:.2f}",
             transaction_id=f"txn_{datetime.now().strftime('%Y%m%d%H%M%S')}",
-            payment_status=PaymentStatus.COMPLETED,
-            payment_method_id=int(payment_method_id) if payment_method_id is not None else 1,
+            payment_status=payment_status,
+            payment_method_id=1,  # Default to 1 for now
             payment_date=db.func.current_timestamp()
         )
         db.session.add(payment)
@@ -180,7 +187,9 @@ def checkout():
             "shipping_cost": shipping_cost,
             "discount": f"{discount:.2f}",
             "total_amount": f"{total_amount:.2f}",
-            "coupon_applied": bool(coupon_code)
+            "coupon_applied": bool(coupon_code),
+            "payment_method": payment_method,
+            "payment_status": payment_status.value
         }), 201
         
     except SQLAlchemyError as e:

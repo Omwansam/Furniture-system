@@ -17,6 +17,7 @@ import BlogPost from "./components/BlogPost";
 import SingleProduct from "./pages/SingleProduct";
 import CheckOut from "./pages/CheckOut";
 import Cart from "./pages/Cart";
+import OrderConfirmation from "./pages/OrderConfirmation";
 import LoginPage from "./auth/LoginPage";
 import Dashboard from "./components/adminpage/Dashboard";
 import AdminLoginPage from "./auth/AdminLoginPage";
@@ -56,17 +57,17 @@ function App() {
                 {/* User Protected */}
                 <Route
                   path="/checkout"
-                  element={
-                    <ProtectedRoute roles={["user"]}>
-                      <CheckOut />
-                    </ProtectedRoute>
-                  }
+                  element={<CheckOut />}
                 />
                 <Route
                   path="/cart"
+                  element={<Cart />}
+                />
+                <Route
+                  path="/order-confirmation/:orderId"
                   element={
                     <ProtectedRoute roles={["user"]}>
-                      <Cart />
+                      <OrderConfirmation />
                     </ProtectedRoute>
                   }
                 />
