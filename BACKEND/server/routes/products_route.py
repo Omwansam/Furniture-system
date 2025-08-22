@@ -1,8 +1,9 @@
 from flask import Blueprint, request, jsonify,url_for, current_app
 from utils.images import save_product_image, delete_image_file
-from models import Product, ProductImage
+from models import Product, ProductImage, OrderItem, Review
 from flask_jwt_extended import jwt_required
 import os
+from sqlalchemy import func, desc
 
 from extensions import db
 
@@ -10,6 +11,94 @@ from extensions import db
 product_bp = Blueprint('products', __name__)
 
 MAX_IMAGES_PER_PRODUCT = 10 
+
+# Get best sellers (products with most orders and highest ratings) - Using different path to avoid conflicts
+@product_bp.route('/bestsellers', methods=['GET'])
+def get_best_sellers():
+    """Retrieve best selling products based on order frequency and ratings."""
+    try:
+        # Get products with their order counts and average ratings
+        best_sellers = db.session.query(
+            Product,
+            func.count(OrderItem.order_item_id).label('order_count'),
+            func.avg(Review.rating).label('avg_rating')
+        ).outerjoin(OrderItem, Product.product_id == OrderItem.product_id)\
+         .outerjoin(Review, Product.product_id == Review.product_id)\
+         .group_by(Product.product_id)\
+         .order_by(desc('order_count'), desc('avg_rating'))\
+         .limit(8)\
+         .all()
+        
+        result = []
+        for product, order_count, avg_rating in best_sellers:
+            # Get primary image for the product
+            primary_image = ProductImage.query.filter_by(
+                product_id=product.product_id, 
+                is_primary=True
+            ).first()
+            
+            product_data = {
+                'product_id': product.product_id,
+                'product_name': product.product_name,
+                'product_description': product.product_description,
+                'product_price': product.product_price,
+                'stock_quantity': product.stock_quantity,
+                'category_id': product.category_id,
+                'order_count': order_count or 0,
+                'avg_rating': float(avg_rating) if avg_rating else 0.0,
+                'primary_image': url_for('static', filename=primary_image.image_url, _external=True) if primary_image else None,
+                'all_images': [{
+                    'image_id': img.image_id,
+                    'image_url': url_for('static', filename=img.image_url, _external=True),
+                    'is_primary': img.is_primary
+                } for img in product.images]
+            }
+            result.append(product_data)
+        
+        return jsonify(result), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Error fetching best sellers: {str(e)}'}), 500
+
+# Get recent products (newest first)
+@product_bp.route('/recent', methods=['GET'])
+def get_recent_products():
+    """Retrieve the most recently added products."""
+    try:
+        limit = request.args.get('limit', 5, type=int)
+        
+        # Get products ordered by creation date (newest first)
+        recent_products = Product.query.order_by(desc(Product.created_at)).limit(limit).all()
+        
+        result = []
+        for product in recent_products:
+            # Get primary image for the product
+            primary_image = ProductImage.query.filter_by(
+                product_id=product.product_id, 
+                is_primary=True
+            ).first()
+            
+            product_data = {
+                'product_id': product.product_id,
+                'product_name': product.product_name,
+                'product_description': product.product_description,
+                'product_price': product.product_price,
+                'stock_quantity': product.stock_quantity,
+                'category_id': product.category_id,
+                'created_at': product.created_at.isoformat() if product.created_at else None,
+                'primary_image': url_for('static', filename=primary_image.image_url, _external=True) if primary_image else None,
+                'all_images': [{
+                    'image_id': img.image_id,
+                    'image_url': url_for('static', filename=img.image_url, _external=True),
+                    'is_primary': img.is_primary
+                } for img in product.images]
+            }
+            result.append(product_data)
+        
+        return jsonify(result), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Error fetching recent products: {str(e)}'}), 500
 
 # Create a new product with images
 @product_bp.route('/product', methods=['POST'])

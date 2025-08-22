@@ -14,6 +14,7 @@ from routes.cart_route import cart_bp
 from routes.order_route import order_bp
 from routes.payment_route import payment_bp
 from routes.payment_methods import payment_methods_bp
+from routes.social_media_route import social_media_bp
 #from routes.stripe_route import stripe_bp
 
 import os
@@ -53,6 +54,7 @@ app.register_blueprint(order_bp, url_prefix = '/orders')
 # Register all payment blueprints
 app.register_blueprint(payment_bp, url_prefix = '/payments')
 app.register_blueprint(payment_methods_bp, url_prefix = '/methods')
+app.register_blueprint(social_media_bp, url_prefix = '/social')
  # app.register_blueprint(stripe_bp, url_prefix = '/stripe')
 
 if __name__ == '__main__':

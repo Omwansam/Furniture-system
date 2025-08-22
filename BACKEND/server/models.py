@@ -429,25 +429,85 @@ class NewsletterSubscriber(db.Model):
     is_active = db.Column(db.Boolean, default=True)
         
 class BlogPost(db.Model):
-    
+    """Blog Posts Table"""
     __tablename__ = 'blog_posts'
 
-    id = db.Column(db.Integer, primary_key = True)
-    title = db.Column(db.String(150), nullable=False)
-    description = db.Column(db.Text, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    slug = db.Column(db.String(250), unique=True, nullable=False)
+    excerpt = db.Column(db.Text, nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    author = db.Column(db.String(100), default='Admin')
+    category = db.Column(db.String(50), nullable=False)
+    tags = db.Column(db.String(200))  # Comma-separated tags
+    featured_image = db.Column(db.String(500))
+    is_published = db.Column(db.Boolean, default=True)
+    is_featured = db.Column(db.Boolean, default=False)
+    view_count = db.Column(db.Integer, default=0)
     date_posted = db.Column(db.DateTime, server_default=db.func.current_timestamp())
     updated_at = db.Column(db.DateTime, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+    # Relationship with images
+    images = db.relationship('BlogImage', back_populates='blog_post', cascade='all, delete-orphan')
+
+    def __repr__(self):
+        return f'<BlogPost {self.title}>'
 
 
 class BlogImage(db.Model):
     """Blog Images Table"""
-    __tablename__ = 'Blog_images'
+    __tablename__ = 'blog_images'
 
     image_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    blog_post_id = db.Column(db.Integer, db.ForeignKey('blog_posts.id'), nullable=False)
     filename = db.Column(db.String(200), nullable=False)
+    image_url = db.Column(db.String(500), nullable=False)
     is_primary = db.Column(db.Boolean, default=False)
+    alt_text = db.Column(db.String(200))
     created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
-    updated_at = db.Column(db.DateTime, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())    
+    updated_at = db.Column(db.DateTime, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+    # Relationship with blog post
+    blog_post = db.relationship('BlogPost', back_populates='images')
+
+    def __repr__(self):
+        return f'<BlogImage {self.filename}>'    
+
+################################################################################################################################################################################################
+#dded today
+class SocialMediaPost(db.Model):
+    """Social Media Posts Table"""
+    __tablename__ = 'social_media_posts'
+
+    post_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    platform = db.Column(db.String(50), nullable=False)  # 'instagram', 'facebook', 'twitter', etc.
+    post_url = db.Column(db.String(500), nullable=False)
+    image_url = db.Column(db.String(500), nullable=False)
+    caption = db.Column(db.Text)
+    likes_count = db.Column(db.Integer, default=0)
+    comments_count = db.Column(db.Integer, default=0)
+    posted_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
+    is_featured = db.Column(db.Boolean, default=False)
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+    def __repr__(self):
+        return f'<SocialMediaPost {self.post_id}>'
+
+class SocialMediaStats(db.Model):
+    """Social Media Statistics Table"""
+    __tablename__ = 'social_media_stats'
+
+    stat_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    platform = db.Column(db.String(50), nullable=False)
+    followers_count = db.Column(db.Integer, default=0)
+    posts_count = db.Column(db.Integer, default=0)
+    engagement_rate = db.Column(db.Float, default=0.0)
+    last_updated = db.Column(db.DateTime, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+    def __repr__(self):
+        return f'<SocialMediaStats {self.platform}>'
 
 ################################################################################################################################################################################################
 class Refund(db.Model):
