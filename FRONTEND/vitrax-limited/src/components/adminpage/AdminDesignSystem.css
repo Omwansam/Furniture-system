@@ -1,0 +1,281 @@
+/* ========================================
+   FURNITURE ADMIN DASHBOARD DESIGN SYSTEM
+   Professional, World-Class Color Palette & Design Tokens
+   ======================================== */
+
+/* ========================================
+   COLOR PALETTE - NATURAL WOODS & MODERN SOPHISTICATION
+   ======================================== */
+
+:root {
+  /* ========================================
+     PRIMARY COLORS - Warm Earthy Neutrals
+     ======================================== */
+  
+  /* Primary Brand - Rich Walnut Brown */
+  --primary-50: #faf8f6;
+  --primary-100: #f3f0ed;
+  --primary-200: #e8e2dd;
+  --primary-300: #d4c9c1;
+  --primary-400: #b8a99c;
+  --primary-500: #9c8a7a;  /* Main Primary */
+  --primary-600: #8a7a6b;
+  --primary-700: #72655a;
+  --primary-800: #5d5249;
+  --primary-900: #4a413a;
+  --primary-950: #2a231f;
+
+  /* ========================================
+     SECONDARY COLORS - Natural Stone & Fabric
+     ======================================== */
+  
+  /* Secondary - Warm Stone Gray */
+  --secondary-50: #f8f7f6;
+  --secondary-100: #f0eeec;
+  --secondary-200: #e1ddd9;
+  --secondary-300: #c9c3bd;
+  --secondary-400: #a8a19a;
+  --secondary-500: #8a827a;  /* Main Secondary */
+  --secondary-600: #7a726b;
+  --secondary-700: #655e58;
+  --secondary-800: #534d48;
+  --secondary-900: #45403c;
+  --secondary-950: #25221f;
+
+  /* ========================================
+     ACCENT COLORS - Modern Highlights
+     ======================================== */
+  
+  /* Accent - Sophisticated Teal */
+  --accent-50: #f0fdfa;
+  --accent-100: #ccfbf1;
+  --accent-200: #99f6e4;
+  --accent-300: #5eead4;
+  --accent-400: #2dd4bf;
+  --accent-500: #14b8a6;  /* Main Accent */
+  --accent-600: #0d9488;
+  --accent-700: #0f766e;
+  --accent-800: #115e59;
+  --accent-900: #134e4a;
+  --accent-950: #042f2e;
+
+  /* Success - Deep Forest Green */
+  --success-50: #f0fdf4;
+  --success-100: #dcfce7;
+  --success-200: #bbf7d0;
+  --success-300: #86efac;
+  --success-400: #4ade80;
+  --success-500: #22c55e;  /* Main Success */
+  --success-600: #16a34a;
+  --success-700: #15803d;
+  --success-800: #166534;
+  --success-900: #14532d;
+  --success-950: #052e16;
+
+  /* Warning - Muted Gold */
+  --warning-50: #fffbeb;
+  --warning-100: #fef3c7;
+  --warning-200: #fde68a;
+  --warning-300: #fcd34d;
+  --warning-400: #fbbf24;
+  --warning-500: #f59e0b;  /* Main Warning */
+  --warning-600: #d97706;
+  --warning-700: #b45309;
+  --warning-800: #92400e;
+  --warning-900: #78350f;
+  --warning-950: #451a03;
+
+  /* Error - Warm Red */
+  --error-50: #fef2f2;
+  --error-100: #fee2e2;
+  --error-200: #fecaca;
+  --error-300: #fca5a5;
+  --error-400: #f87171;
+  --error-500: #ef4444;  /* Main Error */
+  --error-600: #dc2626;
+  --error-700: #b91c1c;
+  --error-800: #991b1b;
+  --error-900: #7f1d1d;
+  --error-950: #450a0a;
+
+  /* ========================================
+     BACKGROUND COLORS - Layered Neutrals
+     ======================================== */
+  
+  /* Background - Warm Off-White */
+  --bg-50: #fefefe;
+  --bg-100: #fdfcfb;
+  --bg-200: #faf8f6;
+  --bg-300: #f5f2ef;
+  --bg-400: #ede9e5;
+  --bg-500: #e5dfd9;  /* Main Background */
+  --bg-600: #d4cdc6;
+  --bg-700: #b8b0a8;
+  --bg-800: #9a9188;
+  --bg-900: #7d746a;
+  --bg-950: #4a413a;
+
+  /* ========================================
+     SURFACE COLORS - Card & Container Backgrounds
+     ======================================== */
+  
+  /* Surface - Pure White */
+  --surface-0: #ffffff;
+  --surface-50: #fefefe;
+  --surface-100: #fdfcfb;
+  --surface-200: #faf8f6;
+  --surface-300: #f5f2ef;
+  --surface-400: #ede9e5;
+  --surface-500: #e5dfd9;
+
+  /* ========================================
+     TEXT COLORS - High Contrast & Readability
+     ======================================== */
+  
+  /* Text - Rich Dark */
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a413a;
+  --text-tertiary: #7d746a;
+  --text-quaternary: #b8b0a8;
+  --text-disabled: #d4cdc6;
+  --text-inverse: #ffffff;
+
+  /* ========================================
+     BORDER COLORS - Subtle Separation
+     ======================================== */
+  
+  /* Borders - Soft Separation */
+  --border-light: #f5f2ef;
+  --border-medium: #ede9e5;
+  --border-strong: #d4cdc6;
+  --border-focus: #14b8a6;
+
+  /* ========================================
+     SHADOW SYSTEM - Depth & Elevation
+     ======================================== */
+  
+  /* Shadows - Natural Depth */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+  /* ========================================
+     TYPOGRAPHY SYSTEM - Professional Hierarchy
+     ======================================== */
+  
+  /* Font Sizes */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem;  /* 30px */
+  --text-4xl: 2.25rem;   /* 36px */
+  --text-5xl: 3rem;      /* 48px */
+
+  /* Font Weights */
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-extrabold: 800;
+
+  /* Line Heights */
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+
+  /* ========================================
+     SPACING SYSTEM - Consistent Rhythm
+     ======================================== */
+  
+  /* Spacing Scale */
+  --space-0: 0;
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+
+  /* ========================================
+     BORDER RADIUS - Organic & Modern
+     ======================================== */
+  
+  --radius-none: 0;
+  --radius-sm: 0.125rem;   /* 2px */
+  --radius-md: 0.375rem;   /* 6px */
+  --radius-lg: 0.5rem;     /* 8px */
+  --radius-xl: 0.75rem;    /* 12px */
+  --radius-2xl: 1rem;      /* 16px */
+  --radius-3xl: 1.5rem;    /* 24px */
+  --radius-full: 9999px;
+
+  /* ========================================
+     TRANSITIONS - Smooth Interactions
+     ======================================== */
+  
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+  --transition-bounce: 250ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* ========================================
+     Z-INDEX SYSTEM - Layering
+     ======================================== */
+  
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
+}
+
+/* ========================================
+   DESIGN MOOD & PHILOSOPHY
+   ======================================== */
+
+/*
+DESIGN MOOD: "Timeless Sophistication with Natural Warmth"
+
+This design system creates a professional admin dashboard that feels:
+- TRUSTWORTHY: Through consistent, reliable color usage
+- PROFESSIONAL: Via clean typography and structured layouts
+- CREATIVE: With thoughtful accent colors and organic shapes
+- ACCESSIBLE: Ensuring high contrast and clear hierarchy
+- MODERN: Using contemporary spacing and interaction patterns
+
+The palette draws inspiration from:
+- Natural wood grains (primary browns)
+- Stone textures (secondary grays)
+- Modern furniture finishes (accent teals)
+- Professional office environments (neutral backgrounds)
+
+Color Psychology:
+- Primary Browns: Stability, reliability, craftsmanship
+- Secondary Grays: Professionalism, balance, sophistication
+- Accent Teal: Innovation, trust, modern thinking
+- Success Green: Growth, prosperity, positive outcomes
+- Warning Gold: Attention, quality, premium feel
+- Error Red: Clarity, urgency, immediate action needed
+
+This system balances the traditional values of the furniture industry
+with modern digital design principles, creating an interface that feels
+both familiar and forward-thinking.
+*/

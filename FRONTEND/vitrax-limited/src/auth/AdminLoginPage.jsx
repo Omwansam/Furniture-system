@@ -20,12 +20,17 @@ const AdminLoginPage = () => {
   useEffect(() => {
     const user = localStorage.getItem("furniture_user");
     if (user) {
-      const userData = JSON.parse(user);
-      if (userData.role === 'admin') {
-        navigate("/admin/dashboard/overview");
+      try {
+        const userData = JSON.parse(user);
+        if (userData.role === 'admin') {
+          navigate("/admin/dashboard/overview");
+        }
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+        localStorage.removeItem("furniture_user");
       }
     }
-  }, [navigate]);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -119,16 +124,12 @@ const AdminLoginPage = () => {
         </form>
         
         <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#e3f2fd', borderRadius: '5px', fontSize: '14px', border: '1px solid #2196f3' }}>
-          <strong>💡 Demo Info:</strong><br />
-          <strong>Admin Credentials:</strong><br />
-          Email: admin2@example.com<br />
-          Password: securepassword1234<br />
+          <strong>💡 Admin Credentials:</strong><br />
+          <strong>Email:</strong> admin@furniture.com<br />
+          <strong>Password:</strong> admin123<br />
           <br />
-          <strong>Or register a new admin:</strong><br />
-          Username: admin2_user<br />
-          Email: admin2@example.com<br />
-          Password: securepassword1234<br />
-          is_admin: true
+          <strong>Backend API:</strong> http://localhost:5000<br />
+          <strong>Login Endpoint:</strong> /auth/login
         </div>
         
         <div style={{ marginTop: '20px', textAlign: 'center' }}>
