@@ -4,12 +4,16 @@ import { Link } from "react-router-dom";
 import { FaUser, FaSearch, FaHeart, FaShoppingCart } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { useFavorites } from '../context/FavoritesContext';
 import CartPopup from './CartPopup';
+import FavoritesPopup from './FavoritesPopup';
 
 const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false); // Toggle visibility of the search input
+  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false); // Toggle visibility of favorites popup
   const { user } = useAuth();
   const { itemsCount, isCartOpen, openCart, closeCart, cartItems } = useCart();
+  const { favoritesCount } = useFavorites();
 
   return (
     <nav className="navbar">
@@ -41,8 +45,11 @@ const Navbar = () => {
           {isSearchOpen && <input type="text" placeholder="Search......." className="search-input" />}
 
           {/* Favourites Icon */}
-          <button className="icon-btn">
+          <button className="icon-btn favorites-icon" onClick={() => setIsFavoritesOpen(true)}>
             <FaHeart className="icon" />
+            {favoritesCount > 0 && (
+              <span className="favorites-badge">{favoritesCount}</span>
+            )}
           </button>
 
           {/* Shopping Cart Icon */}
@@ -60,6 +67,13 @@ const Navbar = () => {
         <CartPopup 
           cartItems={cartItems} 
           onClose={closeCart} 
+        />
+      )}
+
+      {/* Favorites Popup */}
+      {isFavoritesOpen && (
+        <FavoritesPopup 
+          onClose={() => setIsFavoritesOpen(false)} 
         />
       )}
     </nav>

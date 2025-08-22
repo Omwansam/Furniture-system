@@ -62,7 +62,8 @@
     position: relative;
 }
 
-.cart-badge {
+.cart-badge,
+.favorites-badge {
     position: absolute;
     top: -8px;
     right: -8px;
@@ -78,6 +79,10 @@
     font-weight: bold;
     min-width: 20px;
     animation: bounce 0.3s ease;
+}
+
+.favorites-badge {
+    background: #ec4899;
 }
 
 @keyframes bounce {

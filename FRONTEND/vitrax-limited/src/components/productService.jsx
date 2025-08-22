@@ -12,6 +12,28 @@ export const getProducts = async () => {
   }
 };
 
+export const getBestSellers = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/api/bestsellers');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching best sellers:', error);
+    throw error;
+  }
+};
+
+export const getRecentProducts = async (limit = 5) => {
+  try {
+    const response = await axios.get(`${API_URL}/recent`, {
+      params: { limit }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching recent products:', error);
+    throw error;
+  }
+};
+
 export const getProductById = async (id) => {
   try {
     const response = await axios.get(`${API_URL}/${id}`);
