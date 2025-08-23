@@ -52,8 +52,8 @@ def create_sample_data():
             
             # Admin user
             admin_user = User(
-                username="admin_user",
-                email="admin@furniture.com",
+                username="admin",
+                email="admin@vitrax.com",
                 password_hash=generate_password_hash("admin123"),
                 is_admin=True
             )
@@ -61,28 +61,44 @@ def create_sample_data():
             
             # Regular users
             user1 = User(
-                username="john_doe",
-                email="john@example.com",
+                username="user1",
+                email="user1@example.com",
                 password_hash=generate_password_hash("password123"),
                 is_admin=False
             )
             users.append(user1)
             
             user2 = User(
-                username="jane_smith",
-                email="jane@example.com",
+                username="user2",
+                email="user2@example.com",
                 password_hash=generate_password_hash("password123"),
                 is_admin=False
             )
             users.append(user2)
             
             user3 = User(
-                username="bob_wilson",
-                email="bob@example.com",
+                username="user3",
+                email="user3@example.com",
                 password_hash=generate_password_hash("password123"),
                 is_admin=False
             )
             users.append(user3)
+            
+            user4 = User(
+                username="user4",
+                email="user4@example.com",
+                password_hash=generate_password_hash("password123"),
+                is_admin=False
+            )
+            users.append(user4)
+            
+            user5 = User(
+                username="user5",
+                email="user5@example.com",
+                password_hash=generate_password_hash("password123"),
+                is_admin=False
+            )
+            users.append(user5)
             
             for user in users:
                 db.session.add(user)
@@ -90,10 +106,12 @@ def create_sample_data():
             print(f"✅ Created {len(users)} users")
         else:
             print("✅ Users already exist, skipping user creation")
-            user1 = User.query.filter_by(email="john@example.com").first()
-            user2 = User.query.filter_by(email="jane@example.com").first()
-            user3 = User.query.filter_by(email="bob@example.com").first()
-            users = [user1, user2, user3] if all([user1, user2, user3]) else []
+            user1 = User.query.filter_by(email="user1@example.com").first()
+            user2 = User.query.filter_by(email="user2@example.com").first()
+            user3 = User.query.filter_by(email="user3@example.com").first()
+            user4 = User.query.filter_by(email="user4@example.com").first()
+            user5 = User.query.filter_by(email="user5@example.com").first()
+            users = [user1, user2, user3, user4, user5] if all([user1, user2, user3, user4, user5]) else []
         
         # Create sample categories if they don't exist
         existing_categories = Category.query.count()
@@ -102,11 +120,12 @@ def create_sample_data():
             categories = []
             
             category_data = [
-                {"name": "Living Room", "description": "Comfortable furniture for your living space"},
-                {"name": "Dining Room", "description": "Elegant dining furniture and accessories"},
-                {"name": "Bedroom", "description": "Cozy bedroom furniture and bedding"},
-                {"name": "Office", "description": "Professional office furniture and accessories"},
-                {"name": "Outdoor", "description": "Durable outdoor furniture and garden accessories"}
+                {"name": "Living Room", "description": "Comfortable furniture for your living space including sofas, coffee tables, and entertainment units"},
+                {"name": "Dining Room", "description": "Elegant dining furniture including tables, chairs, and buffets for formal dining experiences"},
+                {"name": "Bedroom", "description": "Restful bedroom furniture including beds, wardrobes, and bedside tables"},
+                {"name": "Office", "description": "Professional office furniture including desks, chairs, and storage solutions"},
+                {"name": "Storage", "description": "Practical storage solutions including bookshelves, cabinets, and organizers"},
+                {"name": "Outdoor", "description": "Durable outdoor furniture for patios, gardens, and balconies"}
             ]
             
             for cat_data in category_data:
@@ -130,69 +149,149 @@ def create_sample_data():
             products = []
             
             product_data = [
+                # Living Room Products
                 {
-                    "name": "Trenton Modular Sofa",
-                    "description": "Comfortable modular sofa perfect for modern living rooms. Features premium fabric and ergonomic design.",
-                    "price": 25000.00,
+                    "name": "Modern L-Shaped Sofa",
+                    "description": "Contemporary L-shaped sofa with premium fabric upholstery, perfect for modern living rooms.",
+                    "price": 2499.99,
                     "stock": 15,
-                    "category": "Living Room",
-                    "image_files": ["product_1_Product1.jpg", "product_1_Product1.1.jpg", "product_1_Product1.2.jpg", "product_1_Product1.3.jpg", "product_1_Product1.4.jpg"]
+                    "category": "Living Room"
                 },
                 {
-                    "name": "Granite Dining Table with Chairs",
-                    "description": "Elegant granite dining table with 6 matching chairs. Perfect for family gatherings.",
-                    "price": 35000.00,
+                    "name": "Leather Recliner Chair",
+                    "description": "Premium leather recliner with massage function and USB charging port.",
+                    "price": 899.99,
+                    "stock": 0,  # Out of stock
+                    "category": "Living Room"
+                },
+                {
+                    "name": "Glass Coffee Table",
+                    "description": "Elegant glass coffee table with chrome legs, perfect for contemporary interiors.",
+                    "price": 299.99,
+                    "stock": 3,  # Low stock
+                    "category": "Living Room"
+                },
+                {
+                    "name": "TV Entertainment Unit",
+                    "description": "Large entertainment unit with multiple compartments for TV and media equipment.",
+                    "price": 599.99,
                     "stock": 8,
-                    "category": "Dining Room",
-                    "image_files": ["product_2_Mona1.jpg", "product_2_Mona2.jpg", "product_2_Mona3.jpg", "product_2_Mona4.jpg", "product_2_Mona5.jpg"]
+                    "category": "Living Room"
+                },
+                
+                # Dining Room Products
+                {
+                    "name": "Solid Oak Dining Table",
+                    "description": "Beautiful solid oak dining table for 6 people with natural finish.",
+                    "price": 1299.99,
+                    "stock": 5,  # Low stock
+                    "category": "Dining Room"
                 },
                 {
-                    "name": "Outdoor Bar Table and Stools",
-                    "description": "Weather-resistant outdoor bar table with 4 matching stools. Perfect for outdoor entertaining.",
-                    "price": 18000.00,
+                    "name": "Upholstered Dining Chairs",
+                    "description": "Set of 4 comfortable upholstered dining chairs with wooden legs.",
+                    "price": 399.99,
                     "stock": 12,
-                    "category": "Outdoor",
-                    "image_files": ["product_1_Product1.jpg"]
+                    "category": "Dining Room"
                 },
                 {
-                    "name": "Plain Console with Teak Mirror",
-                    "description": "Classic console table with teak mirror. Adds elegance to any entryway.",
-                    "price": 12000.00,
-                    "stock": 20,
-                    "category": "Living Room",
-                    "image_files": ["product_2_Mona1.jpg"]
+                    "name": "Buffet Sideboard",
+                    "description": "Elegant buffet sideboard with glass doors and ample storage.",
+                    "price": 799.99,
+                    "stock": 0,  # Out of stock
+                    "category": "Dining Room"
                 },
+                
+                # Bedroom Products
                 {
                     "name": "Queen Size Bed Frame",
-                    "description": "Modern queen size bed frame with upholstered headboard. Available in multiple colors.",
-                    "price": 28000.00,
-                    "stock": 10,
-                    "category": "Bedroom",
-                    "image_files": ["product_1_Product1.1.jpg"]
+                    "description": "Modern queen size bed frame with upholstered headboard.",
+                    "price": 699.99,
+                    "stock": 20,
+                    "category": "Bedroom"
                 },
+                {
+                    "name": "Wardrobe with Mirror",
+                    "description": "Large wardrobe with full-length mirror and multiple compartments.",
+                    "price": 899.99,
+                    "stock": 2,  # Low stock
+                    "category": "Bedroom"
+                },
+                {
+                    "name": "Bedside Table",
+                    "description": "Compact bedside table with drawer and shelf.",
+                    "price": 149.99,
+                    "stock": 25,
+                    "category": "Bedroom"
+                },
+                
+                # Office Products
                 {
                     "name": "Ergonomic Office Chair",
-                    "description": "Premium ergonomic office chair with adjustable features. Perfect for long work hours.",
-                    "price": 15000.00,
-                    "stock": 25,
-                    "category": "Office",
-                    "image_files": ["product_2_Mona2.jpg"]
-                },
-                {
-                    "name": "Coffee Table with Storage",
-                    "description": "Versatile coffee table with hidden storage compartment. Perfect for small spaces.",
-                    "price": 8500.00,
+                    "description": "High-quality ergonomic office chair with lumbar support and adjustable features.",
+                    "price": 299.99,
                     "stock": 18,
-                    "category": "Living Room",
-                    "image_files": ["product_1_Product1.2.jpg"]
+                    "category": "Office"
                 },
                 {
-                    "name": "Bookshelf with Drawers",
-                    "description": "Multi-functional bookshelf with built-in drawers. Great for organizing books and accessories.",
-                    "price": 9500.00,
-                    "stock": 14,
-                    "category": "Office",
-                    "image_files": ["product_2_Mona3.jpg"]
+                    "name": "L-Shaped Desk",
+                    "description": "Spacious L-shaped desk with cable management and storage compartments.",
+                    "price": 449.99,
+                    "stock": 1,  # Low stock
+                    "category": "Office"
+                },
+                {
+                    "name": "Filing Cabinet",
+                    "description": "4-drawer filing cabinet with lockable top drawer.",
+                    "price": 199.99,
+                    "stock": 0,  # Out of stock
+                    "category": "Office"
+                },
+                
+                # Storage Products
+                {
+                    "name": "Bookshelf Unit",
+                    "description": "5-tier wooden bookshelf unit with adjustable shelves.",
+                    "price": 599.99,
+                    "stock": 10,
+                    "category": "Storage"
+                },
+                {
+                    "name": "Storage Ottoman",
+                    "description": "Versatile storage ottoman with removable lid and fabric upholstery.",
+                    "price": 129.99,
+                    "stock": 30,
+                    "category": "Storage"
+                },
+                {
+                    "name": "Wall Mounted Shelves",
+                    "description": "Set of 3 wall mounted shelves for decorative storage.",
+                    "price": 89.99,
+                    "stock": 4,  # Low stock
+                    "category": "Storage"
+                },
+                
+                # Outdoor Products
+                {
+                    "name": "Patio Dining Set",
+                    "description": "Complete patio dining set with table and 4 chairs, weather-resistant.",
+                    "price": 799.99,
+                    "stock": 6,
+                    "category": "Outdoor"
+                },
+                {
+                    "name": "Garden Bench",
+                    "description": "Rustic wooden garden bench, perfect for outdoor seating.",
+                    "price": 249.99,
+                    "stock": 0,  # Out of stock
+                    "category": "Outdoor"
+                },
+                {
+                    "name": "Umbrella Stand",
+                    "description": "Heavy-duty umbrella stand for patio umbrellas.",
+                    "price": 79.99,
+                    "stock": 15,
+                    "category": "Outdoor"
                 }
             ]
             
@@ -221,28 +320,14 @@ def create_sample_data():
             existing_images = ProductImage.query.filter_by(product_id=product.product_id).count()
             
             if existing_images == 0:
-                # Use actual image files from uploads folder
-                image_files = [
-                    "product_1_Product1.jpg", "product_1_Product1.1.jpg", "product_1_Product1.2.jpg", 
-                    "product_1_Product1.3.jpg", "product_1_Product1.4.jpg",
-                    "product_2_Mona1.jpg", "product_2_Mona2.jpg", "product_2_Mona3.jpg", 
-                    "product_2_Mona4.jpg", "product_2_Mona5.jpg"
-                ]
-                
-                # Assign images based on product index
-                product_images = image_files[i % len(image_files):(i % len(image_files)) + 3]
-                if len(product_images) < 3:
-                    product_images.extend(image_files[:3 - len(product_images)])
-                
-                for j, image_file in enumerate(product_images[:3]):  # Limit to 3 images per product
-                    image = ProductImage(
-                        image_url=f"uploads/{image_file}",
-                        is_primary=(j == 0),  # First image is primary
-                        product_id=product.product_id
-                    )
-                    db.session.add(image)
-                
-                print(f"   Added {len(product_images[:3])} images to {product.product_name}")
+                # Create simple image records for each product
+                image = ProductImage(
+                    image_url=f"uploads/product_{product.product_id}.jpg",
+                    is_primary=True,
+                    product_id=product.product_id
+                )
+                db.session.add(image)
+                print(f"   Added image to {product.product_name}")
         
         db.session.commit()
         print("✅ Product images added")
@@ -365,12 +450,21 @@ def create_sample_data():
         print(f"   - Orders: {final_orders}")
         print(f"   - Reviews: {final_reviews}")
         
-        print("\n🔗 Test the BestSellers API:")
-        print("   curl http://localhost:5000/api/bestsellers")
+        print("\n🔗 Test the Admin API:")
+        print("   curl http://localhost:5000/api/products/product")
+        print("   curl http://localhost:5000/api/products/admin/stats")
         
         print("\n👤 Login Credentials:")
-        print("   Admin: admin@furniture.com / admin123")
-        print("   User: john@example.com / password123")
+        print("   Admin: admin@vitrax.com / admin123")
+        print("   Users: user1@example.com / password123")
+        
+        print("\n📊 Admin Test Data:")
+        print("   • 19 products across 6 categories")
+        print("   • Products with varying stock levels (active, low stock, out of stock)")
+        print("   • 10 sample orders with different statuses")
+        print("   • Multiple product reviews")
+        print("   • Ready for admin dashboard testing!")
 
 if __name__ == "__main__":
     create_sample_data()
+

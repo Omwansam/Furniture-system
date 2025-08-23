@@ -17,6 +17,9 @@ def get_mpesa_access_token():
     consumer_key = current_app.config['MPESA_CONSUMER_KEY']
     consumer_secret = current_app.config['MPESA_CONSUMER_SECRET']
 
+    logger.info(f"Getting M-Pesa access token from: {url}")
+    logger.info(f"Consumer key: {consumer_key[:10]}...")  # Log first 10 chars for security
+
     credentials = f"{consumer_key}:{consumer_secret}"
     encoded_credentials = base64.b64encode(credentials.encode()).decode()
 
@@ -28,15 +31,34 @@ def get_mpesa_access_token():
     try:
 
         response = requests.get(url, headers=headers)
-        response_data = response.json()
+        logger.info(f"M-Pesa auth response status: {response.status_code}")
+        logger.info(f"M-Pesa auth response headers: {dict(response.headers)}")
+        
+        # Check if response is JSON
+        content_type = response.headers.get('content-type', '')
+        if 'application/json' not in content_type:
+            logger.error(f"Expected JSON response but got: {content_type}")
+            logger.error(f"Response text: {response.text[:500]}")  # Log first 500 chars
+            raise Exception(f"M-Pesa API returned non-JSON response. Status: {response.status_code}")
+        
+        try:
+            response_data = response.json()
+            logger.info(f"M-Pesa auth response: {response_data}")
+        except Exception as json_error:
+            logger.error(f"Failed to parse JSON response: {response.text[:500]}")
+            raise Exception(f"Invalid JSON response from M-Pesa API: {str(json_error)}")
 
         if "access_token" in response_data:
+            logger.info("M-Pesa access token obtained successfully")
             return response_data["access_token"]
         else:
             error_msg = response_data.get('error_description', 'Unknown error')
             logger.error(f"Error obtaining access token: {error_msg}")
             raise Exception(f"Error obtaining access token: {error_msg}")
 
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Network error fetching M-pesa access token: {str(e)}")
+        raise Exception(f"Network error: {str(e)}")
     except Exception as e:
         logger.error(f"Error fetching M-pesa access token: {str(e)}")
         raise Exception(f"Error fetching M-pesa access token: {str(e)}")
@@ -71,6 +93,8 @@ def sanitize_phone_number(phone):
 def initiate_stk_push(phone_number, amount, order_id, description='Furniture Payment'):
 
     """ Initiates M-Pesa STK Push payment request"""  
+
+    logger.info(f"Starting STK push for order {order_id}, amount {amount}, phone {phone_number}")
 
     access_token = get_mpesa_access_token()
 
@@ -120,26 +144,45 @@ def initiate_stk_push(phone_number, amount, order_id, description='Furniture Pay
     
     # Make API request
     try:
+        stk_push_url = current_app.config.get('DARAJA_STK_PUSH_URL', current_app.config.get('MPESA_STK_PUSH_URL'))
+        logger.info(f"Making STK push request to: {stk_push_url}")
+        logger.info(f"STK push payload: {payload}")
+        
         response = requests.post(
-            # Use DARAJA_STK_PUSH_URL from config (alias MPESA_STK_PUSH_URL also provided)
-            current_app.config.get('DARAJA_STK_PUSH_URL', current_app.config.get('MPESA_STK_PUSH_URL')),
+            stk_push_url,
             json=payload,
             headers=headers,
             timeout=30
         )
-        response.raise_for_status()
-
-        response_data = response.json()
-        logger.info(f"stk push initiated successfully: {response_data}")
-        return response_data, 200
+        logger.info(f"STK push response status: {response.status_code}")
+        logger.info(f"STK push response headers: {dict(response.headers)}")
+        
+        # Check if response is JSON
+        content_type = response.headers.get('content-type', '')
+        if 'application/json' not in content_type:
+            logger.error(f"Expected JSON response but got: {content_type}")
+            logger.error(f"Response text: {response.text[:500]}")  # Log first 500 chars
+            return {"error": f"M-Pesa API returned non-JSON response. Status: {response.status_code}"}, 500
+        
+        try:
+            response_data = response.json()
+            logger.info(f"STK push initiated successfully: {response_data}")
+            return response_data, 200
+        except Exception as json_error:
+            logger.error(f"Failed to parse JSON response: {response.text[:500]}")
+            return {"error": f"Invalid JSON response from M-Pesa API: {str(json_error)}"}, 500
         
     except requests.exceptions.RequestException as e:
         logger.error(f"STK Push failed: {str(e)}")
-        try:
-            error_data = e.response.json()
-            return error_data, e.response.status_code
-        except:
-            return {"error": str(e)}, 500
+        if hasattr(e, 'response') and e.response is not None:
+            try:
+                error_data = e.response.json()
+                return error_data, e.response.status_code
+            except:
+                logger.error(f"Failed to parse error response: {e.response.text[:500]}")
+                return {"error": f"Network error: {str(e)}"}, 500
+        else:
+            return {"error": f"Network error: {str(e)}"}, 500
     except Exception as e:
         logger.error(f"Unexpected error in STK Push: {str(e)}")
         return {"error": "Internal server error"}, 500   

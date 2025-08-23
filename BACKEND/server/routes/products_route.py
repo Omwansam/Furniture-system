@@ -1,9 +1,10 @@
 from flask import Blueprint, request, jsonify,url_for, current_app
 from utils.images import save_product_image, delete_image_file
-from models import Product, ProductImage, OrderItem, Review
+from models import Product, ProductImage, OrderItem, Review, Category
 from flask_jwt_extended import jwt_required
 import os
 from sqlalchemy import func, desc
+from datetime import datetime
 
 from extensions import db
 
@@ -100,6 +101,46 @@ def get_recent_products():
     except Exception as e:
         return jsonify({'error': f'Error fetching recent products: {str(e)}'}), 500
 
+# Get recent products (alternative route for frontend compatibility)
+@product_bp.route('/product/recent', methods=['GET'])
+def get_recent_products_alt():
+    """Retrieve the most recently added products (alternative route)."""
+    try:
+        limit = request.args.get('limit', 5, type=int)
+        
+        # Get products ordered by creation date (newest first)
+        recent_products = Product.query.order_by(desc(Product.created_at)).limit(limit).all()
+        
+        result = []
+        for product in recent_products:
+            # Get primary image for the product
+            primary_image = ProductImage.query.filter_by(
+                product_id=product.product_id, 
+                is_primary=True
+            ).first()
+            
+            product_data = {
+                'product_id': product.product_id,
+                'product_name': product.product_name,
+                'product_description': product.product_description,
+                'product_price': product.product_price,
+                'stock_quantity': product.stock_quantity,
+                'category_id': product.category_id,
+                'created_at': product.created_at.isoformat() if product.created_at else None,
+                'primary_image': url_for('static', filename=primary_image.image_url, _external=True) if primary_image else None,
+                'all_images': [{
+                    'image_id': img.image_id,
+                    'image_url': url_for('static', filename=img.image_url, _external=True),
+                    'is_primary': img.is_primary
+                } for img in product.images]
+            }
+            result.append(product_data)
+        
+        return jsonify(result), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Error fetching recent products: {str(e)}'}), 500
+
 # Create a new product with images
 @product_bp.route('/product', methods=['POST'])
 @jwt_required()
@@ -149,24 +190,128 @@ def create_product():
     }), 201
 
 # Get all products
-# Get all products
-@product_bp.route('/product', methods=['GET'])
+@product_bp.route('/product', methods=['GET', 'OPTIONS'])
 def get_products():
     """Retrieve all products along with their images."""
-    products = Product.query.all()
-    return jsonify([{
-        'product_id': product.product_id,
-        'product_name': product.product_name,
-        'product_description': product.product_description,
-        'product_price': product.product_price,
-        'stock_quantity': product.stock_quantity,
-        'category_id': product.category_id,
-        'images': [{
-            'image_id': img.image_id, 
-            'image_url': url_for('static', filename=img.image_url, _external=True), 
-            'is_primary': img.is_primary
-            } for img in product.images]
-    } for product in products]), 200
+    if request.method == 'OPTIONS':
+        response = jsonify({'message': 'OK'})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
+        return response, 200
+    
+    try:
+        # Get query parameters for filtering and pagination
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 50, type=int)
+        category_id = request.args.get('category_id', type=int)
+        search = request.args.get('search', '').strip()
+        status = request.args.get('status', '').strip()
+        sort_by = request.args.get('sort_by', 'product_name')
+        sort_order = request.args.get('sort_order', 'asc')
+        
+        # Build query
+        query = Product.query
+        
+        # Apply filters
+        if category_id:
+            query = query.filter(Product.category_id == category_id)
+        
+        if search:
+            query = query.filter(
+                Product.product_name.ilike(f'%{search}%') |
+                Product.product_description.ilike(f'%{search}%')
+            )
+        
+        if status:
+            if status == 'out_of_stock':
+                query = query.filter(Product.stock_quantity == 0)
+            elif status == 'low_stock':
+                query = query.filter(Product.stock_quantity <= 5, Product.stock_quantity > 0)
+            elif status == 'in_stock':
+                query = query.filter(Product.stock_quantity > 5)
+        
+        # Apply sorting
+        if sort_by == 'product_price':
+            if sort_order == 'desc':
+                query = query.order_by(Product.product_price.desc())
+            else:
+                query = query.order_by(Product.product_price.asc())
+        elif sort_by == 'stock_quantity':
+            if sort_order == 'desc':
+                query = query.order_by(Product.stock_quantity.desc())
+            else:
+                query = query.order_by(Product.stock_quantity.asc())
+        elif sort_by == 'created_at':
+            if sort_order == 'desc':
+                query = query.order_by(Product.created_at.desc())
+            else:
+                query = query.order_by(Product.created_at.asc())
+        else:  # default sort by name
+            if sort_order == 'desc':
+                query = query.order_by(Product.product_name.desc())
+            else:
+                query = query.order_by(Product.product_name.asc())
+        
+        # Apply pagination
+        paginated_products = query.paginate(
+            page=page, 
+            per_page=per_page, 
+            error_out=False
+        )
+        
+        # Format response
+        products_data = []
+        for product in paginated_products.items:
+            # Get primary image
+            primary_image = ProductImage.query.filter_by(
+                product_id=product.product_id, 
+                is_primary=True
+            ).first()
+            
+            # Get category name
+            category_name = None
+            if product.category_id:
+                category = Category.query.get(product.category_id)
+                category_name = category.category_name if category else None
+            
+            product_data = {
+                'product_id': product.product_id,
+                'product_name': product.product_name,
+                'product_description': product.product_description,
+                'product_price': float(product.product_price),
+                'stock_quantity': product.stock_quantity,
+                'category_id': product.category_id,
+                'category_name': category_name,
+                'created_at': product.created_at.isoformat() if product.created_at else None,
+                'updated_at': product.updated_at.isoformat() if product.updated_at else None,
+                'primary_image': url_for('static', filename=primary_image.image_url, _external=True) if primary_image else None,
+                'images': [{
+                    'image_id': img.image_id, 
+                    'image_url': url_for('static', filename=img.image_url, _external=True), 
+                    'is_primary': img.is_primary
+                } for img in product.images]
+            }
+            products_data.append(product_data)
+        
+        response = jsonify({
+            'products': products_data,
+            'pagination': {
+                'total': paginated_products.total,
+                'pages': paginated_products.pages,
+                'current_page': paginated_products.page,
+                'per_page': paginated_products.per_page,
+                'has_next': paginated_products.has_next,
+                'has_prev': paginated_products.has_prev
+            }
+        })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
+        return response, 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Error fetching products: {str(e)}'}), 500
 
 # Get a specific product by ID
 @product_bp.route('/<int:product_id>', methods=['GET'])
@@ -303,4 +448,159 @@ def add_product_images(product_id):
         'new_image_count': uploaded_count,
         'total_images': current_count + uploaded_count
     }), 201
+
+
+# Admin-specific routes for product management
+
+@product_bp.route('/admin/stats', methods=['GET'])
+@jwt_required()
+def get_product_stats():
+    """Get product statistics for admin dashboard"""
+    try:
+        from sqlalchemy import func
+        
+        # Get basic counts
+        total_products = Product.query.count()
+        out_of_stock = Product.query.filter(Product.stock_quantity == 0).count()
+        low_stock = Product.query.filter(Product.stock_quantity <= 5, Product.stock_quantity > 0).count()
+        in_stock = Product.query.filter(Product.stock_quantity > 5).count()
+        
+        # Get total inventory value
+        total_value = db.session.query(func.sum(Product.product_price * Product.stock_quantity)).scalar() or 0
+        
+        # Get average price
+        avg_price = db.session.query(func.avg(Product.product_price)).scalar() or 0
+        
+        # Get products by category
+        category_stats = db.session.query(
+            Category.category_name,
+            func.count(Product.product_id).label('count')
+        ).join(Product, isouter=True).group_by(Category.category_id).all()
+        
+        return jsonify({
+            'total_products': total_products,
+            'out_of_stock': out_of_stock,
+            'low_stock': low_stock,
+            'in_stock': in_stock,
+            'total_value': float(total_value),
+            'average_price': float(avg_price),
+            'category_distribution': [
+                {'category': cat, 'count': count} 
+                for cat, count in category_stats
+            ]
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Error fetching product stats: {str(e)}'}), 500
+
+
+@product_bp.route('/admin/bulk-update', methods=['PUT'])
+@jwt_required()
+def bulk_update_products():
+    """Bulk update products (admin only)"""
+    try:
+        data = request.get_json()
+        product_ids = data.get('product_ids', [])
+        updates = data.get('updates', {})
+        
+        if not product_ids:
+            return jsonify({'error': 'No product IDs provided'}), 400
+        
+        # Update products
+        updated_count = 0
+        for product_id in product_ids:
+            product = Product.query.get(product_id)
+            if product:
+                for field, value in updates.items():
+                    if hasattr(product, field):
+                        setattr(product, field, value)
+                updated_count += 1
+        
+        db.session.commit()
+        
+        return jsonify({
+            'message': f'Successfully updated {updated_count} products',
+            'updated_count': updated_count
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Error in bulk update: {str(e)}'}), 500
+
+
+@product_bp.route('/admin/bulk-delete', methods=['DELETE'])
+@jwt_required()
+def bulk_delete_products():
+    """Bulk delete products (admin only)"""
+    try:
+        data = request.get_json()
+        product_ids = data.get('product_ids', [])
+        
+        if not product_ids:
+            return jsonify({'error': 'No product IDs provided'}), 400
+        
+        # Delete products and their images
+        deleted_count = 0
+        for product_id in product_ids:
+            product = Product.query.get(product_id)
+            if product:
+                # Delete associated images
+                images = ProductImage.query.filter_by(product_id=product_id).all()
+                for img in images:
+                    try:
+                        delete_image_file(img.image_url)
+                    except Exception as e:
+                        current_app.logger.error(f"Failed to delete image {img.image_url}: {str(e)}")
+                
+                # Delete image records
+                ProductImage.query.filter_by(product_id=product_id).delete()
+                
+                # Delete product
+                db.session.delete(product)
+                deleted_count += 1
+        
+        db.session.commit()
+        
+        return jsonify({
+            'message': f'Successfully deleted {deleted_count} products',
+            'deleted_count': deleted_count
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Error in bulk delete: {str(e)}'}), 500
+
+
+@product_bp.route('/admin/export', methods=['GET'])
+@jwt_required()
+def export_products():
+    """Export products to CSV (admin only)"""
+    try:
+        products = Product.query.all()
+        
+        csv_data = []
+        for product in products:
+            category_name = None
+            if product.category_id:
+                category = Category.query.get(product.category_id)
+                category_name = category.category_name if category else None
+            
+            csv_data.append({
+                'ID': product.product_id,
+                'Name': product.product_name,
+                'Description': product.product_description,
+                'Price': product.product_price,
+                'Stock': product.stock_quantity,
+                'Category': category_name,
+                'Created': product.created_at.isoformat() if product.created_at else '',
+                'Updated': product.updated_at.isoformat() if product.updated_at else ''
+            })
+        
+        return jsonify({
+            'csv_data': csv_data,
+            'filename': f'products_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Error exporting products: {str(e)}'}), 500
 

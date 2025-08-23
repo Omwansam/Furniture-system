@@ -5,7 +5,8 @@ const API_URL = 'http://localhost:5000/api/product'; // Backend URL
 export const getProducts = async () => {
   try {
     const response = await axios.get(API_URL);
-    return response.data;
+    // Handle the correct response format - return products array
+    return response.data.products || response.data;
   } catch (error) {
     console.error('Error fetching products:', error);
     throw error;

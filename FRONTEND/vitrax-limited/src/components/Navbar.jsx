@@ -53,7 +53,14 @@ const Navbar = () => {
           </button>
 
           {/* Shopping Cart Icon */}
-          <button className="icon-btn cart-icon" onClick={openCart}>
+          <button 
+            className="icon-btn cart-icon" 
+            onClick={() => {
+              console.log("Cart icon clicked, isCartOpen:", isCartOpen);
+              openCart();
+              console.log("After openCart, isCartOpen:", isCartOpen);
+            }}
+          >
             <FaShoppingCart className="icon" />
             {itemsCount > 0 && (
               <span className="cart-badge">{itemsCount}</span>
@@ -63,10 +70,14 @@ const Navbar = () => {
       </div>
 
       {/* Cart Popup */}
+      {console.log("Rendering cart popup, isCartOpen:", isCartOpen)}
       {isCartOpen && (
         <CartPopup 
-          cartItems={cartItems} 
           onClose={closeCart} 
+          onCartUpdate={() => {
+            // This will trigger a cart refresh
+            window.location.reload();
+          }}
         />
       )}
 

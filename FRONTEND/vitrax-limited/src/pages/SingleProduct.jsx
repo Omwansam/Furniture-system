@@ -5,6 +5,7 @@ import ProductDetails from '../components/ProductDetails';
 import RelatedProducts from '../components/RelatedProducts';
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
+import { requireAuth } from "../utils/authUtils";
 import "./SingleProduct.css";
 
 const API_BASE_URL = "http://localhost:5000/api";
@@ -70,14 +71,9 @@ const SingleProduct = () => {
     if (!product) return;
 
     // Check if user is authenticated
-    if (!user) {
-      setShowLoginPrompt(true);
-        setTimeout(() => {
-          setShowLoginPrompt(false);
-        navigate("/login", { state: { from: `/singleproduct/${productId}` } });
-      }, 2000);
-        return;
-      }
+    if (!requireAuth(navigate, `/singleproduct/${productId}`)) {
+      return;
+    }
 
     setAddingToCart(true);
     try {
@@ -88,10 +84,20 @@ const SingleProduct = () => {
         setShowSuccessPopup(true);
         setTimeout(() => setShowSuccessPopup(false), 3000);
       } else {
+        // If addToCart returns false, it might be due to authentication issues
+        if (!user) {
+          navigate("/login", { 
+            state: { 
+              from: `/singleproduct/${productId}`,
+              message: "Please login to add items to your cart"
+            } 
+          });
+          return;
+        }
         throw new Error("Failed to add item to cart");
       }
     } catch (err) {
-       setErrorMessage(err.message);
+      setErrorMessage(err.message);
       setShowErrorPopup(true);
       setTimeout(() => setShowErrorPopup(false), 3000);
     } finally {

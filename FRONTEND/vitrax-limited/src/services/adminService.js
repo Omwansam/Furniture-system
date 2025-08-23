@@ -80,15 +80,79 @@ export const userService = {
 
 // Product Management APIs
 export const productService = {
-  // Get all products
-  getAllProducts: async () => {
+  // Get all products with filtering and pagination
+  getAllProducts: async (params = {}) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/products/product`, {
+      const queryParams = new URLSearchParams();
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+          queryParams.append(key, params[key]);
+        }
+      });
+      
+      const response = await fetch(`${API_BASE_URL}/products/product?${queryParams}`, {
+        headers: getAuthHeaders()
+      });
+      const data = await handleResponse(response);
+      return data.products || data; // Handle both new and old response formats
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      throw error;
+    }
+  },
+
+  // Get product statistics
+  getProductStats: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/products/admin/stats`, {
         headers: getAuthHeaders()
       });
       return handleResponse(response);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error('Error fetching product stats:', error);
+      throw error;
+    }
+  },
+
+  // Bulk update products
+  bulkUpdateProducts: async (productIds, updates) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/products/admin/bulk-update`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ product_ids: productIds, updates })
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error bulk updating products:', error);
+      throw error;
+    }
+  },
+
+  // Bulk delete products
+  bulkDeleteProducts: async (productIds) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/products/admin/bulk-delete`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ product_ids: productIds })
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error bulk deleting products:', error);
+      throw error;
+    }
+  },
+
+  // Export products
+  exportProducts: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/products/admin/export`, {
+        headers: getAuthHeaders()
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error exporting products:', error);
       throw error;
     }
   },

@@ -57,6 +57,72 @@ def refresh_token():
     })
     return jsonify ({'access_token': new_access_token}), 200
 
+@users_bp.route('/users', methods=['GET', 'OPTIONS'])
+@jwt_required()
+def get_users():
+    """Get all users (admin only)"""
+    if request.method == 'OPTIONS':
+        response = jsonify({'message': 'OK'})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
+        return response, 200
+    
+    try:
+        # Check if current user is admin
+        current_user = get_current_user()
+        if not current_user or not current_user.is_admin:
+            return jsonify({'error': 'Admin access required'}), 403
+        
+        # Get query parameters for pagination and filtering
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 10, type=int)
+        search = request.args.get('search', '')
+        
+        # Build query
+        query = User.query
+        
+        # Add search filter if provided
+        if search:
+            query = query.filter(
+                User.username.contains(search) | 
+                User.email.contains(search)
+            )
+        
+        # Paginate results
+        pagination = query.paginate(
+            page=page, 
+            per_page=per_page, 
+            error_out=False
+        )
+        
+        users = []
+        for user in pagination.items:
+            users.append({
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'is_admin': user.is_admin,
+                'created_at': user.created_at.isoformat() if user.created_at else None
+            })
+        
+        response = jsonify({
+            'users': users,
+            'pagination': {
+                'page': page,
+                'per_page': per_page,
+                'total': pagination.total,
+                'pages': pagination.pages,
+                'has_next': pagination.has_next,
+                'has_prev': pagination.has_prev
+            }
+        })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 #####################################################################################USER LOGIN##################################################################################################
 @users_bp.route('/login', methods=['POST'])
 def login():

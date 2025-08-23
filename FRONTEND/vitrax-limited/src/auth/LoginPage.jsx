@@ -16,7 +16,8 @@ const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || "/";
+  const from = location.state?.from || "/";
+  const message = location.state?.message || "";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,6 +45,11 @@ const LoginPage = () => {
         <div className="auth-header">
           <h2>Login</h2>
           <p>Welcome back!</p>
+          {message && (
+            <div className="auth-message">
+              <p>{message}</p>
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">

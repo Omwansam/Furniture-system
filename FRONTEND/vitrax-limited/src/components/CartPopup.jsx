@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiX, FiPlus, FiMinus, FiTrash2 } from "react-icons/fi";
 import { cartService } from "./cartService";
+import { handleAuthError } from "../utils/authUtils";
 import "./CartPopup.css";
 
 const CartPopup = ({ onClose, onCartUpdate }) => {
@@ -10,7 +11,10 @@ const CartPopup = ({ onClose, onCartUpdate }) => {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState({});
 
+  console.log("CartPopup rendered with onClose:", onClose);
+
   useEffect(() => {
+    console.log("CartPopup useEffect triggered");
     fetchCart();
   }, []);
 
@@ -21,6 +25,10 @@ const CartPopup = ({ onClose, onCartUpdate }) => {
       setCartData(data);
     } catch (error) {
       console.error('Error fetching cart:', error);
+      if (error.message && error.message.includes('Authentication failed')) {
+        handleAuthError(window.location.pathname, navigate, "Please login to view your cart");
+        return;
+      }
       setCartData({ items: [], total_price: "0.00", items_count: 0 });
     } finally {
       setLoading(false);
@@ -37,6 +45,10 @@ const CartPopup = ({ onClose, onCartUpdate }) => {
       if (onCartUpdate) onCartUpdate();
     } catch (error) {
       console.error('Error updating quantity:', error);
+      if (error.message && error.message.includes('Authentication failed')) {
+        handleAuthError(window.location.pathname, navigate, "Please login to manage your cart");
+        return;
+      }
       alert('Failed to update quantity. Please try again.');
     } finally {
       setUpdating(prev => ({ ...prev, [itemId]: false }));
@@ -50,6 +62,10 @@ const CartPopup = ({ onClose, onCartUpdate }) => {
       if (onCartUpdate) onCartUpdate();
     } catch (error) {
       console.error('Error removing item:', error);
+      if (error.message && error.message.includes('Authentication failed')) {
+        handleAuthError(window.location.pathname, navigate, "Please login to manage your cart");
+        return;
+      }
       alert('Failed to remove item. Please try again.');
     }
   };
@@ -63,6 +79,10 @@ const CartPopup = ({ onClose, onCartUpdate }) => {
       if (onCartUpdate) onCartUpdate();
     } catch (error) {
       console.error('Error clearing cart:', error);
+      if (error.message && error.message.includes('Authentication failed')) {
+        handleAuthError(window.location.pathname, navigate, "Please login to manage your cart");
+        return;
+      }
       alert('Failed to clear cart. Please try again.');
     }
   };
@@ -73,6 +93,12 @@ const CartPopup = ({ onClose, onCartUpdate }) => {
     return (
       <div className="cart-popup-overlay">
         <div className="cart-popup">
+          <div className="cart-header">
+            <h2>Shopping Cart</h2>
+            <button className="close-btn" onClick={onClose}>
+              <FiX />
+            </button>
+          </div>
           <div className="loading-spinner">Loading cart...</div>
         </div>
       </div>

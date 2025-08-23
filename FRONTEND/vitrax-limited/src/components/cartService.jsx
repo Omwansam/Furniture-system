@@ -4,7 +4,15 @@ const API_URL = 'http://localhost:5000/cart';
 
 // Get auth token from localStorage
 const getAuthToken = () => {
-  return localStorage.getItem('token');
+  // Try multiple token storage locations
+  const token = localStorage.getItem('token') || 
+                (localStorage.getItem('furniture_user') ? JSON.parse(localStorage.getItem('furniture_user')).access_token : null);
+  
+  if (!token) {
+    throw new Error('No authentication token found. Please login.');
+  }
+  
+  return token;
 };
 
 // Add auth header to requests
@@ -26,6 +34,12 @@ export const cartService = {
       return response.data;
     } catch (error) {
       console.error('Error fetching cart:', error);
+      if (error.response && error.response.status === 401) {
+        // Clear invalid tokens
+        localStorage.removeItem('token');
+        localStorage.removeItem('furniture_user');
+        throw new Error('Authentication failed. Please login again.');
+      }
       throw error;
     }
   },
@@ -42,6 +56,12 @@ export const cartService = {
       return response.data;
     } catch (error) {
       console.error('Error adding to cart:', error);
+      if (error.response && error.response.status === 401) {
+        // Clear invalid tokens
+        localStorage.removeItem('token');
+        localStorage.removeItem('furniture_user');
+        throw new Error('Authentication failed. Please login again.');
+      }
       throw error;
     }
   },

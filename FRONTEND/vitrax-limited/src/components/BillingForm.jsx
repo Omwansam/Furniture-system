@@ -4,6 +4,8 @@ import { FaUser, FaBuilding, FaMapMarkerAlt, FaPhone, FaEnvelope, FaCreditCard }
 import { cartService } from "./cartService";
 import "./BillingForm.css";
 
+
+
 const BillingForm = () => {
   const [formData, setFormData] = useState({
     first_name: "",
@@ -56,7 +58,8 @@ const BillingForm = () => {
         body: JSON.stringify({
           shipping_address: `${billingData.street_address}, ${billingData.city}, ${billingData.province}, ${billingData.country}`,
           payment_method: paymentMethod,
-          billing_details: billingData
+          billing_details: billingData,
+          coupon_code: null // Optional coupon code
         })
       });
 
@@ -75,6 +78,12 @@ const BillingForm = () => {
 
   const initiatePayment = async (orderId, amount) => {
     try {
+      console.log("Sending M-Pesa STK push request:", {
+        phone_number: phoneNumber,
+        order_id: orderId,
+        amount: amount
+      });
+
       const response = await fetch("http://localhost:5000/payments/mpesa/stkpush", {
         method: "POST",
         headers: {
@@ -88,15 +97,74 @@ const BillingForm = () => {
         })
       });
 
+      console.log("M-Pesa response status:", response.status);
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Payment initiation failed');
+        let errorMessage = 'Payment initiation failed';
+        try {
+          const errorData = await response.json();
+          console.error("M-Pesa error response:", errorData);
+          errorMessage = errorData.error || errorData.message || 'Payment initiation failed';
+        } catch (jsonError) {
+          console.error("Failed to parse error response:", jsonError);
+          errorMessage = `Server error (${response.status}): ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
 
       const paymentData = await response.json();
+      console.log("M-Pesa success response:", paymentData);
       return paymentData;
     } catch (error) {
       console.error('Error initiating payment:', error);
+      throw error;
+    }
+  };
+
+  const initiateStripePayment = async (orderId, amount) => {
+    try {
+      // Create payment intent
+      const response = await fetch("http://localhost:5000/stripe/create-payment-intent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          amount: amount,
+          order_id: orderId
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create payment intent');
+      }
+
+      const { payment_intent_id } = await response.json();
+
+      // For now, we'll just confirm the payment intent without card details
+      // In a real implementation, you would use Stripe Elements for card input
+      const confirmResponse = await fetch("http://localhost:5000/stripe/confirm-payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          payment_intent_id: payment_intent_id
+        })
+      });
+
+      if (!confirmResponse.ok) {
+        const errorData = await confirmResponse.json();
+        throw new Error(errorData.error || 'Payment confirmation failed');
+      }
+
+      const confirmData = await confirmResponse.json();
+      return { success: true, paymentIntent: confirmData };
+    } catch (error) {
+      console.error('Error with Stripe payment:', error);
       throw error;
     }
   };
@@ -113,13 +181,25 @@ const BillingForm = () => {
         return;
       }
 
+      console.log("Creating order with data:", {
+        shipping_address: `${formData.street_address}, ${formData.city}, ${formData.province}, ${formData.country}`,
+        payment_method: paymentMethod,
+        billing_details: formData
+      });
+
       // Create order
       const orderId = await createOrder(formData);
+      console.log("Order created successfully with ID:", orderId);
       
       // Initiate payment based on method
       if (paymentMethod === "mpesa") {
         try {
+          console.log("Initiating M-Pesa payment for order:", orderId);
+          console.log("Payment amount:", parseFloat(cartData.total_price));
+          console.log("Phone number:", phoneNumber);
+          
           const paymentResult = await initiatePayment(orderId, parseFloat(cartData.total_price));
+          console.log("M-Pesa payment result:", paymentResult);
           
           if (paymentResult.CheckoutRequestID) {
             alert("Payment initiated successfully! Please check your phone for the M-Pesa prompt.");
@@ -134,8 +214,24 @@ const BillingForm = () => {
           console.error("Payment error:", paymentError);
           alert(`Payment initiation failed: ${paymentError.message}`);
         }
+      } else if (paymentMethod === "bank") {
+        // For Stripe credit card payment
+        try {
+          const paymentResult = await initiateStripePayment(orderId, parseFloat(cartData.total_price));
+          
+          if (paymentResult.success) {
+            alert("Payment processed successfully!");
+            await cartService.clearCart();
+            window.location.href = `/order-confirmation/${orderId}`;
+          } else {
+            alert("Payment failed. Please try again.");
+          }
+        } catch (paymentError) {
+          console.error("Stripe payment error:", paymentError);
+          alert(`Payment failed: ${paymentError.message}`);
+        }
       } else {
-        // For bank transfer and other methods, order is already created
+        // For other methods, order is already created
         alert("Order created successfully! You will be contacted for payment details.");
         await cartService.clearCart();
         window.location.href = `/order-confirmation/${orderId}`;
@@ -354,7 +450,7 @@ const BillingForm = () => {
                 onChange={(e) => setPaymentMethod(e.target.value)}
               />
               <FaCreditCard className="payment-icon" />
-              <span>Bank Transfer</span>
+              <span>Credit Card (Stripe)</span>
             </label>
           </div>
 

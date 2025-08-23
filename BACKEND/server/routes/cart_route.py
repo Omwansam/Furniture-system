@@ -31,7 +31,7 @@ def get_cart():
     cart = ShoppingCart.query.filter_by(user_id=user_id).first()
 
     if not cart:
-        return jsonify({
+        response = jsonify({
             'message': 'Your cart is empty',
             'shopping_cart_id': None,
             'user_id': user_id,
@@ -40,7 +40,9 @@ def get_cart():
             'created_at': None,
             'updated_at': None,
             'items': []
-        }), 200
+        })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 200
     
     cart_items = []
     for item in cart.cart_items:
@@ -68,7 +70,7 @@ def get_cart():
             'max_allowed': min(product.stock_quantity, 10)  # Example limit
         })
     
-    return jsonify({
+    response = jsonify({
         'shopping_cart_id': cart.shopping_cart_id,
         'user_id': cart.user_id,
         'total_price': cart.total_price,
@@ -76,7 +78,9 @@ def get_cart():
         'created_at': cart.created_at.isoformat() if cart.created_at else None,
         'updated_at': cart.updated_at.isoformat() if cart.updated_at else None,
         'items': cart_items
-    }), 200
+    })
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response, 200
     
 ####################################################################################################################################################
 

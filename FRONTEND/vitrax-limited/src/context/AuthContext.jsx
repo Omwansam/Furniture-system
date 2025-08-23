@@ -34,6 +34,8 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const verifyToken = async (token) => {
+    if (!token) return false;
+    
     try {
       const response = await fetch('http://localhost:5000/auth/protected', {
         headers: {
@@ -42,6 +44,7 @@ export const AuthProvider = ({ children }) => {
       });
       return response.ok;
     } catch (error) {
+      console.log('Token verification failed:', error);
       return false;
     }
   };

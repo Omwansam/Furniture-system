@@ -39,9 +39,13 @@ def mpesa_stk_push():
     user_id = _extract_user_id(identity)
     data = request.get_json()
     
+    logger.info(f"M-Pesa STK Push request received: {data}")
+    logger.info(f"User ID: {user_id}")
+    
     # Validate input
     required_fields = ['phone_number', 'order_id', 'amount']
     if not all(field in data for field in required_fields):
+        logger.error(f"Missing required fields. Received: {data}")
         return jsonify({"error": "Missing required fields"}), 400
     
     try:
@@ -61,7 +65,7 @@ def mpesa_stk_push():
         return jsonify({"error": "Order already has a completed payment"}), 400
     
     # Use the helper function to initiate STK Push
-    #Intiate stk push
+    logger.info(f"Initiating STK push for order {data['order_id']} with amount {data['amount']}")
     response, status_code = initiate_stk_push(
         phone_number=data['phone_number'],
         amount=data['amount'],
@@ -69,7 +73,10 @@ def mpesa_stk_push():
         description=f"Payment for order {data['order_id']}"
     )
     
+    logger.info(f"STK push response: {response}, status: {status_code}")
+    
     if status_code != 200:
+        logger.error(f"STK push failed with status {status_code}: {response}")
         return jsonify(response), status_code
     
     # Create or update payment record if STK Push was successful
@@ -118,6 +125,64 @@ def mpesa_stk_push():
 
 
 ######################################################################################################################################################################################
+
+@payment_bp.route('/test-mpesa-config', methods=['GET'])
+def test_mpesa_config():
+    """Test endpoint to verify M-Pesa configuration"""
+    try:
+        # Check if all required environment variables are set
+        required_vars = [
+            'MPESA_CONSUMER_KEY',
+            'MPESA_CONSUMER_SECRET', 
+            'MPESA_SHORTCODE',
+            'MPESA_PASSKEY',
+            'MPESA_CALLBACK_URL'
+        ]
+        
+        missing_vars = []
+        config_values = {}
+        
+        for var in required_vars:
+            value = current_app.config.get(var)
+            if not value:
+                missing_vars.append(var)
+            else:
+                # Mask sensitive values
+                if 'KEY' in var or 'SECRET' in var or 'PASSKEY' in var:
+                    config_values[var] = value[:10] + "..." if len(value) > 10 else "***"
+                else:
+                    config_values[var] = value
+        
+        if missing_vars:
+            return jsonify({
+                "success": False,
+                "error": f"Missing required environment variables: {', '.join(missing_vars)}",
+                "missing_vars": missing_vars,
+                "config": config_values
+            }), 400
+        
+        # Test access token generation
+        from utils.daraja_client import get_mpesa_access_token
+        
+        access_token = get_mpesa_access_token()
+        
+        return jsonify({
+            "success": True,
+            "message": "M-Pesa configuration is working",
+            "access_token": access_token[:20] + "..." if access_token else None,
+            "config": config_values
+        }), 200
+    except Exception as e:
+        logger.error(f"M-Pesa config test failed: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "config": {
+                "auth_url": current_app.config.get('DARAJA_AUTH_URL'),
+                "stk_push_url": current_app.config.get('DARAJA_STK_PUSH_URL'),
+                "environment": current_app.config.get('MPESA_ENVIRONMENT')
+            }
+        }), 500
 
 @payment_bp.route('/callback', methods=['POST'])
 def payment_callback():

@@ -10,7 +10,9 @@ const FeaturedProducts = () => {
     fetch('http://localhost:5000/api/product') 
       .then(res => res.json())
       .then(data => {
-        setProducts(data);
+        // Handle the correct response format - data.products is the array
+        const productsArray = data.products || data;
+        setProducts(productsArray);
         setIsLoading(false);
       })
       .catch(err => {
