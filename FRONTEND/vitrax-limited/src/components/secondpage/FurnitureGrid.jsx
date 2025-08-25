@@ -6,27 +6,10 @@ import { getProducts } from '../productService'
 
 
 
-const FurnitureGrid = () => {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+const FurnitureGrid = ({ products = [], loading = false, error = null, categoryName = '' }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(8);
     const [sortOrder, setSortOrder] = useState("default");
-
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const data = await getProducts();
-                setProducts(data);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchProducts();
-    }, []);
 
     const sortedProducts = [...products].sort((a, b) => {
         if (sortOrder === "priceLowToHigh") return a.product_price - b.product_price;
@@ -48,8 +31,15 @@ const FurnitureGrid = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const displayedProducts = sortedProducts.slice(startIndex, startIndex + itemsPerPage);
 
-    if (loading) return <div>Loading products...</div>;
-    if (error) return <div>Error: {error}</div>;
+    if (loading) return <div className="loading-message">Loading products...</div>;
+    if (error) return <div className="error-message">Error: {error}</div>;
+    if (products.length === 0) return (
+      <div className="no-products-message">
+        <h3>No products found</h3>
+        <p>There are no products available in this category at the moment.</p>
+        <Link to="/shop" className="back-to-shop-btn">Back to All Products</Link>
+      </div>
+    );
 
 
   return (

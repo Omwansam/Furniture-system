@@ -339,6 +339,83 @@ def get_product(product_id):
         ]
     }), 200
 
+# Get products by category name/slug
+@product_bp.route('/product/category/<category_slug>', methods=['GET'])
+def get_products_by_category(category_slug):
+    """Retrieve products by category name/slug."""
+    try:
+        # Map category slugs to category names
+        category_mapping = {
+            'sofas': 'Sofas & Couches',
+            'beds': 'Beds & Bedroom',
+            'chairs': 'Chairs & Seating',
+            'tables': 'Tables & Desks',
+            'lighting': 'Lighting',
+            'rugs': 'Rugs & Carpets',
+            'dining': 'Dining Room',
+            'office': 'Office Furniture',
+            'outdoor': 'Outdoor',
+            'storage': 'Storage'
+        }
+        
+        # Get category name from slug
+        category_name = category_mapping.get(category_slug)
+        if not category_name:
+            return jsonify({"error": "Category not found"}), 404
+        
+        # Find category by name
+        category = Category.query.filter_by(category_name=category_name).first()
+        if not category:
+            return jsonify({"error": "Category not found"}), 404
+        
+        # Get products in this category
+        products = Product.query.filter_by(category_id=category.category_id).all()
+        
+        # Format response
+        products_data = []
+        for product in products:
+            # Get primary image
+            primary_image = ProductImage.query.filter_by(
+                product_id=product.product_id, 
+                is_primary=True
+            ).first()
+            
+            product_data = {
+                'product_id': product.product_id,
+                'product_name': product.product_name,
+                'product_description': product.product_description,
+                'product_price': float(product.product_price),
+                'stock_quantity': product.stock_quantity,
+                'category_id': product.category_id,
+                'category_name': category.category_name,
+                'created_at': product.created_at.isoformat() if product.created_at else None,
+                'updated_at': product.updated_at.isoformat() if product.updated_at else None,
+                'primary_image': url_for('static', filename=primary_image.image_url, _external=True) if primary_image else None,
+                'images': [{
+                    'image_id': img.image_id, 
+                    'image_url': url_for('static', filename=img.image_url, _external=True), 
+                    'is_primary': img.is_primary
+                } for img in product.images]
+            }
+            products_data.append(product_data)
+        
+        response = jsonify({
+            'products': products_data,
+            'category': {
+                'category_id': category.category_id,
+                'category_name': category.category_name,
+                'category_description': category.category_description
+            },
+            'total_products': len(products_data)
+        })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
+        return response, 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Error fetching products by category: {str(e)}'}), 500
+
 # Update a product
 @product_bp.route('/<int:product_id>', methods=['PUT'])
 @jwt_required()

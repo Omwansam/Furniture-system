@@ -1,10 +1,12 @@
 .hero-header {
   position: relative;
-  height: 100vh;
+  min-height: calc(100vh - 200px);
+  height: auto;
   display: flex;
   align-items: center;
   overflow: hidden;
   transition: background-color 0.8s ease;
+  padding: 60px 0;
 }
 
 /* Background Pattern */
@@ -120,27 +122,29 @@
 
 .hero-container {
   width: 100%;
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 0 40px;
-  display: flex;
+  padding: 0 60px;
+  display: grid;
+  grid-template-columns: 2.5fr 1fr;
+  gap: 80px;
   align-items: center;
-  justify-content: space-between;
   position: relative;
   z-index: 2;
+  min-height: 600px;
 }
 
 /* Left Side - Text Content */
-.hero-text {
-  flex: 1;
-  max-width: 500px;
-  margin-right: 60px;
+.hero-content-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   opacity: 0;
   transform: translateX(-50px);
   transition: all 0.8s ease;
 }
 
-.hero-text.animate-in {
+.hero-content-text.animate-in {
   opacity: 1;
   transform: translateX(0);
 }
@@ -168,7 +172,7 @@
   font-size: 4rem;
   font-weight: 800;
   color: #333;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   line-height: 1.1;
   position: relative;
 }
@@ -196,20 +200,20 @@
 }
 
 .subtitle {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: 600;
   color: #666;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   opacity: 0;
   transform: translateY(20px);
   animation: fadeInUp 0.8s ease 0.3s forwards;
 }
 
 .description {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   color: #777;
-  line-height: 1.6;
-  margin-bottom: 40px;
+  line-height: 1.7;
+  margin-bottom: 45px;
   opacity: 0;
   transform: translateY(20px);
   animation: fadeInUp 0.8s ease 0.5s forwards;
@@ -233,17 +237,17 @@
   display: flex;
   align-items: center;
   gap: 15px;
-  padding: 18px 35px;
+  padding: 20px 40px;
   background: linear-gradient(135deg, #333, #555);
   color: white;
   text-decoration: none;
   border-radius: 50px;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 600;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
 }
 
 .shop-now-btn::before {
@@ -348,7 +352,9 @@
 
 /* Right Side - Image */
 .hero-image {
-  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
   opacity: 0;
   transform: translateX(50px);
@@ -363,23 +369,27 @@
 .image-container {
   position: relative;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
+  width: 100%;
+  height: 100%;
+  padding-left: 40px;
 }
 
 .main-image {
   width: 100%;
-  max-width: 600px;
+  max-width: 700px;
   height: auto;
   object-fit: contain;
-  filter: drop-shadow(20px 20px 40px rgba(0, 0, 0, 0.15));
+  filter: drop-shadow(30px 30px 60px rgba(0, 0, 0, 0.25));
   transition: all 0.5s ease;
-  animation: imageFloat 6s ease-in-out infinite;
+  animation: imageFloat 8s ease-in-out infinite;
+  z-index: 2;
 }
 
 @keyframes imageFloat {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-10px) rotate(1deg); }
+  0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+  50% { transform: translateY(-15px) rotate(1deg) scale(1.02); }
 }
 
 .image-overlay {
@@ -506,12 +516,47 @@
 
 /* Responsive Design */
 @media (max-width: 1200px) {
+  .hero-header {
+    min-height: calc(100vh - 220px);
+  }
+  
   .hero-container {
-    padding: 0 30px;
+    padding: 0 40px;
+    min-height: 500px;
+    gap: 60px;
+    grid-template-columns: 2fr 1fr;
   }
   
   .heading {
     font-size: 3.5rem;
+  }
+  
+  .main-image {
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero-container {
+    grid-template-columns: 1fr;
+    gap: 50px;
+    padding: 0 30px;
+  }
+  
+  .hero-content-text {
+    order: 2;
+  }
+  
+  .hero-image {
+    order: 1;
+  }
+  
+  .heading {
+    font-size: 3rem;
+  }
+  
+  .subtitle {
+    font-size: 1.5rem;
   }
   
   .main-image {
@@ -521,21 +566,28 @@
 
 @media (max-width: 768px) {
   .hero-header {
-    height: 100vh;
+    min-height: calc(100vh - 180px);
+    height: auto;
     flex-direction: column;
     justify-content: center;
+    padding: 40px 0;
   }
   
   .hero-container {
-    flex-direction: column;
+    grid-template-columns: 1fr;
+    gap: 40px;
     text-align: center;
     padding: 0 20px;
+    min-height: 400px;
   }
   
-  .hero-text {
-    margin-right: 0;
-    margin-bottom: 40px;
-    max-width: 100%;
+  .hero-content-text {
+    order: 2;
+    margin-bottom: 0;
+  }
+  
+  .hero-image {
+    order: 1;
   }
   
   .heading {
@@ -572,6 +624,11 @@
 }
 
 @media (max-width: 480px) {
+  .hero-header {
+    min-height: calc(100vh - 160px);
+    padding: 30px 0;
+  }
+  
   .heading {
     font-size: 2rem;
   }

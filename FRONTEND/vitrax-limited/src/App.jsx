@@ -7,6 +7,8 @@ import { FavoritesProvider } from "./context/FavoritesContext";
 import { ProtectedRoute } from "./context/ProtectedRoute";
 
 import Navbar from "./components/Navbar";
+import SmallHeader from "./components/SmallHeader";
+import CategoryHeader from "./components/CategoryHeader";
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import About from "./pages/About";
@@ -19,7 +21,14 @@ import CheckOut from "./pages/CheckOut";
 import Cart from "./pages/Cart";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import LoginPage from "./auth/LoginPage";
-import Dashboard from "./components/adminpage/Dashboard";
+import Dashboard from "./pages/Dashboard";
+import Orders from "./pages/Orders";
+import Downloads from "./pages/Downloads";
+import Addresses from "./pages/Addresses";
+import AccountDetails from "./pages/AccountDetails";
+import Coupons from "./pages/Coupons";
+import Wishlist from "./pages/Wishlist";
+import AdminDashboard from "./components/adminpage/Dashboard";
 import AdminLoginPage from "./auth/AdminLoginPage";
 
 
@@ -29,7 +38,9 @@ const Layout = ({ children }) => {
   const hideLayout = location.pathname.startsWith("/admin") || location.pathname === "/login";
   return (
     <>
-      {!hideLayout && <Navbar />}
+              {!hideLayout && <SmallHeader />}
+        {!hideLayout && <Navbar />}
+        {!hideLayout && <CategoryHeader />}
       {children}
       {!hideLayout && <Footer />}
     </>
@@ -48,6 +59,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/shop" element={<Shop />} />
+                <Route path="/shop/:category" element={<Shop />} />
                 <Route path="/singleproduct/:productId" element={<SingleProduct />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
@@ -65,12 +77,17 @@ function App() {
                 />
                 <Route
                   path="/order-confirmation/:orderId"
-                  element={
-                    <ProtectedRoute roles={["user"]}>
-                      <OrderConfirmation />
-                    </ProtectedRoute>
-                  }
+                  element={<OrderConfirmation />}
                 />
+                
+                {/* Account Routes - Temporarily without protection for testing */}
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/orders" element={<Orders />} />
+                <Route path="/downloads" element={<Downloads />} />
+                <Route path="/addresses" element={<Addresses />} />
+                <Route path="/account-details" element={<AccountDetails />} />
+                <Route path="/coupons" element={<Coupons />} />
+                <Route path="/wishlist" element={<Wishlist />} />
 
                 {/* Admin Routes */}
                 <Route path="/admin/login" element={<AdminLoginPage />} />
@@ -80,7 +97,7 @@ function App() {
                   path="/admin/dashboard/*"
                   element={
                     <ProtectedRoute roles={["admin"]}>
-                      <Dashboard />
+                      <AdminDashboard />
                     </ProtectedRoute>
                   }
                 />

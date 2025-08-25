@@ -120,12 +120,16 @@ def create_sample_data():
             categories = []
             
             category_data = [
-                {"name": "Living Room", "description": "Comfortable furniture for your living space including sofas, coffee tables, and entertainment units"},
+                {"name": "Sofas & Couches", "description": "Comfortable sofas, couches, and seating for your living space"},
+                {"name": "Beds & Bedroom", "description": "Restful bedroom furniture including beds, wardrobes, and bedside tables"},
+                {"name": "Chairs & Seating", "description": "Various chairs and seating options for different spaces"},
+                {"name": "Tables & Desks", "description": "Tables, desks, and work surfaces for home and office"},
+                {"name": "Lighting", "description": "Beautiful lighting solutions for every room"},
+                {"name": "Rugs & Carpets", "description": "Stylish rugs and carpets to enhance your floors"},
                 {"name": "Dining Room", "description": "Elegant dining furniture including tables, chairs, and buffets for formal dining experiences"},
-                {"name": "Bedroom", "description": "Restful bedroom furniture including beds, wardrobes, and bedside tables"},
-                {"name": "Office", "description": "Professional office furniture including desks, chairs, and storage solutions"},
-                {"name": "Storage", "description": "Practical storage solutions including bookshelves, cabinets, and organizers"},
-                {"name": "Outdoor", "description": "Durable outdoor furniture for patios, gardens, and balconies"}
+                {"name": "Office Furniture", "description": "Professional office furniture including desks, chairs, and storage solutions"},
+                {"name": "Outdoor", "description": "Durable outdoor furniture for patios, gardens, and balconies"},
+                {"name": "Storage", "description": "Practical storage solutions including bookshelves, cabinets, and organizers"}
             ]
             
             for cat_data in category_data:
@@ -149,34 +153,34 @@ def create_sample_data():
             products = []
             
             product_data = [
-                # Living Room Products
+                # Sofas & Couches Products
                 {
                     "name": "Modern L-Shaped Sofa",
                     "description": "Contemporary L-shaped sofa with premium fabric upholstery, perfect for modern living rooms.",
                     "price": 2499.99,
                     "stock": 15,
-                    "category": "Living Room"
+                    "category": "Sofas & Couches"
                 },
                 {
                     "name": "Leather Recliner Chair",
                     "description": "Premium leather recliner with massage function and USB charging port.",
                     "price": 899.99,
                     "stock": 0,  # Out of stock
-                    "category": "Living Room"
+                    "category": "Sofas & Couches"
                 },
                 {
                     "name": "Glass Coffee Table",
                     "description": "Elegant glass coffee table with chrome legs, perfect for contemporary interiors.",
                     "price": 299.99,
                     "stock": 3,  # Low stock
-                    "category": "Living Room"
+                    "category": "Tables & Desks"
                 },
                 {
                     "name": "TV Entertainment Unit",
                     "description": "Large entertainment unit with multiple compartments for TV and media equipment.",
                     "price": 599.99,
                     "stock": 8,
-                    "category": "Living Room"
+                    "category": "Storage"
                 },
                 
                 # Dining Room Products
@@ -202,50 +206,50 @@ def create_sample_data():
                     "category": "Dining Room"
                 },
                 
-                # Bedroom Products
+                # Beds & Bedroom Products
                 {
                     "name": "Queen Size Bed Frame",
                     "description": "Modern queen size bed frame with upholstered headboard.",
                     "price": 699.99,
                     "stock": 20,
-                    "category": "Bedroom"
+                    "category": "Beds & Bedroom"
                 },
                 {
                     "name": "Wardrobe with Mirror",
                     "description": "Large wardrobe with full-length mirror and multiple compartments.",
                     "price": 899.99,
                     "stock": 2,  # Low stock
-                    "category": "Bedroom"
+                    "category": "Beds & Bedroom"
                 },
                 {
                     "name": "Bedside Table",
                     "description": "Compact bedside table with drawer and shelf.",
                     "price": 149.99,
                     "stock": 25,
-                    "category": "Bedroom"
+                    "category": "Beds & Bedroom"
                 },
                 
-                # Office Products
+                # Office Furniture Products
                 {
                     "name": "Ergonomic Office Chair",
                     "description": "High-quality ergonomic office chair with lumbar support and adjustable features.",
                     "price": 299.99,
                     "stock": 18,
-                    "category": "Office"
+                    "category": "Office Furniture"
                 },
                 {
                     "name": "L-Shaped Desk",
                     "description": "Spacious L-shaped desk with cable management and storage compartments.",
                     "price": 449.99,
                     "stock": 1,  # Low stock
-                    "category": "Office"
+                    "category": "Office Furniture"
                 },
                 {
                     "name": "Filing Cabinet",
                     "description": "4-drawer filing cabinet with lockable top drawer.",
                     "price": 199.99,
                     "stock": 0,  # Out of stock
-                    "category": "Office"
+                    "category": "Office Furniture"
                 },
                 
                 # Storage Products

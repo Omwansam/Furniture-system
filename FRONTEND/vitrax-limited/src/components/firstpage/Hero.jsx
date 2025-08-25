@@ -104,8 +104,26 @@ const Hero = () => {
       </div>
 
       <div className='hero-container'>
-        {/* Left Side - Text Content */}
-        <div className={`hero-text ${isVisible ? 'animate-in' : ''}`}>
+        {/* Left Side - Image */}
+        <div className={`hero-image ${isVisible ? 'animate-in' : ''}`}>
+          <div className="image-container">
+            <img 
+              src={currentSlideData.image} 
+              alt={currentSlideData.title}
+              className="main-image"
+            />
+            <div className="image-overlay"></div>
+            <div className="image-shadow"></div>
+          </div>
+          
+          {/* Background Image */}
+          <div className="background-image">
+            <img src={currentSlideData.background} alt="Background" />
+          </div>
+        </div>
+
+        {/* Right Side - Text Content */}
+        <div className={`hero-content-text ${isVisible ? 'animate-in' : ''}`}>
           <div className="slide-indicator">
             <span className="current-slide">{String(currentSlide + 1).padStart(2, '0')}</span>
             <span className="total-slides">/{String(heroSlides.length).padStart(2, '0')}</span>
@@ -146,24 +164,6 @@ const Hero = () => {
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}
-          </div>
-        </div>
-
-        {/* Right Side - Image */}
-        <div className={`hero-image ${isVisible ? 'animate-in' : ''}`}>
-          <div className="image-container">
-            <img 
-              src={currentSlideData.image} 
-              alt={currentSlideData.title}
-              className="main-image"
-            />
-            <div className="image-overlay"></div>
-            <div className="image-shadow"></div>
-          </div>
-          
-          {/* Background Image */}
-          <div className="background-image">
-            <img src={currentSlideData.background} alt="Background" />
           </div>
         </div>
       </div>

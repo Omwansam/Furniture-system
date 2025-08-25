@@ -13,6 +13,16 @@ export const getProducts = async () => {
   }
 };
 
+export const getProductsByCategory = async (category) => {
+  try {
+    const response = await axios.get(`${API_URL}/category/${category}`);
+    return response.data.products || response.data;
+  } catch (error) {
+    console.error('Error fetching products by category:', error);
+    throw error;
+  }
+};
+
 export const getBestSellers = async () => {
   try {
     const response = await axios.get('http://localhost:5000/api/bestsellers');
