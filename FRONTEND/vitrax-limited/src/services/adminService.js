@@ -868,6 +868,99 @@ export const reportsService = {
   }
 };
 
+// Settings Service
+export const settingsService = {
+  // Get all settings grouped by category
+  async getAllSettings() {
+    const response = await fetch(`${API_BASE_URL}/settings/admin/settings`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  // Get settings for a specific category
+  async getSettingsByCategory(category) {
+    const response = await fetch(`${API_BASE_URL}/settings/admin/settings/${category}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  // Get a specific setting
+  async getSetting(category, settingKey) {
+    const response = await fetch(`${API_BASE_URL}/settings/admin/settings/${category}/${settingKey}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  // Update a setting
+  async updateSetting(category, settingKey, value) {
+    const response = await fetch(`${API_BASE_URL}/settings/admin/settings/${category}/${settingKey}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ value }),
+    });
+    return handleResponse(response);
+  },
+
+  // Create a new setting
+  async createSetting(category, settingData) {
+    const response = await fetch(`${API_BASE_URL}/settings/admin/settings/${category}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(settingData),
+    });
+    return handleResponse(response);
+  },
+
+  // Delete a setting
+  async deleteSetting(category, settingKey) {
+    const response = await fetch(`${API_BASE_URL}/settings/admin/settings/${category}/${settingKey}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  // Bulk update multiple settings
+  async bulkUpdateSettings(updates) {
+    const response = await fetch(`${API_BASE_URL}/settings/admin/settings/bulk-update`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ updates }),
+    });
+    return handleResponse(response);
+  },
+
+  // Reset settings for a category
+  async resetCategorySettings(category) {
+    const response = await fetch(`${API_BASE_URL}/settings/admin/settings/reset/${category}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  // Export all settings
+  async exportSettings() {
+    const response = await fetch(`${API_BASE_URL}/settings/admin/settings/export`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  // Import settings
+  async importSettings(settingsData) {
+    const response = await fetch(`${API_BASE_URL}/settings/admin/settings/import`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ settings: settingsData }),
+    });
+    return handleResponse(response);
+  }
+};
+
 // Export all services
 export default {
   userService,
@@ -880,5 +973,6 @@ export default {
   paymentMethodService,
   suppliersService,
   usersManagementService,
-  reportsService
+  reportsService,
+  settingsService
 };

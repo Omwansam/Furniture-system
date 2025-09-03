@@ -100,6 +100,57 @@ class User(db.Model):
         return f'<User {self.username}>'
 
 
+class Settings(db.Model):
+    __tablename__ = 'settings'
+
+    id = db.Column(db.Integer, primary_key=True)
+    setting_key = db.Column(db.String(100), unique=True, nullable=False)
+    setting_value = db.Column(db.Text)
+    setting_type = db.Column(db.String(50), default='string')  # string, boolean, integer, json
+    category = db.Column(db.String(50), default='general')  # general, notifications, security, payments
+    description = db.Column(db.Text)
+    is_editable = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+    def __repr__(self):
+        return f'<Settings {self.setting_key}: {self.setting_value}>'
+
+    def get_value(self):
+        """Get the typed value based on setting_type"""
+        if self.setting_type == 'boolean':
+            return self.setting_value.lower() in ('true', '1', 'yes', 'on')
+        elif self.setting_type == 'integer':
+            try:
+                return int(self.setting_value)
+            except (ValueError, TypeError):
+                return 0
+        elif self.setting_type == 'json':
+            try:
+                import json
+                return json.loads(self.setting_value)
+            except (ValueError, TypeError):
+                return {}
+        else:
+            return self.setting_value
+
+    def set_value(self, value):
+        """Set the value and automatically determine type"""
+        if isinstance(value, bool):
+            self.setting_type = 'boolean'
+            self.setting_value = str(value).lower()
+        elif isinstance(value, int):
+            self.setting_type = 'integer'
+            self.setting_value = str(value)
+        elif isinstance(value, dict) or isinstance(value, list):
+            self.setting_type = 'json'
+            import json
+            self.setting_value = json.dumps(value)
+        else:
+            self.setting_type = 'string'
+            self.setting_value = str(value)
+
+
 
 #####################################################################################################################################################
 

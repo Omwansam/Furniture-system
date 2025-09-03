@@ -719,82 +719,28 @@ const ProductManagement = () => {
         )}
       </div>
 
-      {/* Enhanced Pagination with Numbered Pages */}
+      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="pagination-container">
-          <span className="pagination-info">
-            Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, sortedProducts.length)} of {sortedProducts.length} results • Page {currentPage} of {totalPages}
-          </span>
-          <div className="pagination-controls">
-            {/* Previous button - only show if not on first page */}
-            {currentPage > 1 && (
-              <button 
-                className="pagination-btn" 
-                onClick={() => setCurrentPage(currentPage - 1)}
-                title="Previous page"
-              >
-                ← Previous
-              </button>
-            )}
-            
-            {/* Page numbers */}
-            {[...Array(totalPages)].map((_, i) => {
-              const pageNum = i + 1;
-              
-              // Show all pages if total pages <= 7
-              if (totalPages <= 7) {
-                return (
-                  <button
-                    key={pageNum}
-                    className={`pagination-btn ${currentPage === pageNum ? "active" : ""}`}
-                    onClick={() => setCurrentPage(pageNum)}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              }
-              
-              // For more than 7 pages, show smart pagination
-              if (
-                pageNum === 1 || // Always show first page
-                pageNum === totalPages || // Always show last page
-                (pageNum >= currentPage - 1 && pageNum <= currentPage + 1) || // Show pages around current
-                (currentPage <= 3 && pageNum <= 5) || // Show first 5 pages when near start
-                (currentPage >= totalPages - 2 && pageNum >= totalPages - 4) // Show last 5 pages when near end
-              ) {
-                return (
-                  <button
-                    key={pageNum}
-                    className={`pagination-btn ${currentPage === pageNum ? "active" : ""}`}
-                    onClick={() => setCurrentPage(pageNum)}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              }
-              
-              // Show ellipsis
-              if (
-                (pageNum === 2 && currentPage > 4) ||
-                (pageNum === totalPages - 1 && currentPage < totalPages - 3)
-              ) {
-                return <span key={`ellipsis-${pageNum}`} className="pagination-ellipsis">...</span>;
-              }
-              
-              return null;
-            })}
-            
-            {/* Next button - only show if not on last page */}
-            {currentPage < totalPages && (
-              <button 
-                className="pagination-btn" 
-                onClick={() => setCurrentPage(currentPage + 1)}
-                title="Next page"
-              >
-                Next →
-              </button>
-            )}
+        <div className="pagination">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="pagination-btn"
+          >
+            Previous
+          </button>
+          
+          <div className="pagination-info">
+            Page {currentPage} of {totalPages}
           </div>
+          
+          <button
+            onClick={() => setCurrentPage(prev => prev + 1)}
+            disabled={currentPage === totalPages}
+            className="pagination-btn"
+          >
+            Next
+          </button>
         </div>
       )}
 

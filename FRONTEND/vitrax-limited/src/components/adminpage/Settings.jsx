@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { settingsService } from '../../services/adminService';
 import './Settings.css';
 
 const Settings = () => {
@@ -13,9 +14,72 @@ const Settings = () => {
     storeEmail: 'admin@vitrax.com',
     storePhone: '+254 700 000 000',
     storeAddress: 'Nairobi, Kenya',
-    currency: 'USD',
+    currency: 'KES',
     timezone: 'Africa/Nairobi'
   });
+
+  // Load settings from backend on component mount
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    try {
+      setLoading(true);
+      const response = await settingsService.getAllSettings();
+      if (response.success) {
+        const settings = response.settings;
+        
+        // Update general settings
+        if (settings.general) {
+          setGeneralSettings({
+            storeName: settings.general.store_name?.value || 'Vitrax Limited',
+            storeEmail: settings.general.store_email?.value || 'admin@vitrax.com',
+            storePhone: settings.general.store_phone?.value || '+254 700 000 000',
+            storeAddress: settings.general.store_address?.value || 'Nairobi, Kenya',
+            currency: settings.general.currency?.value || 'KES',
+            timezone: settings.general.timezone?.value || 'Africa/Nairobi'
+          });
+        }
+
+        // Update notification settings
+        if (settings.notifications) {
+          setNotificationSettings({
+            emailNotifications: settings.notifications.email_notifications?.value || true,
+            orderNotifications: settings.notifications.order_notifications?.value || true,
+            lowStockAlerts: settings.notifications.low_stock_alerts?.value || true,
+            newCustomerAlerts: settings.notifications.new_customer_alerts?.value || true,
+            marketingEmails: settings.notifications.marketing_emails?.value || false
+          });
+        }
+
+        // Update security settings
+        if (settings.security) {
+          setSecuritySettings({
+            twoFactorAuth: settings.security.two_factor_auth?.value || false,
+            sessionTimeout: settings.security.session_timeout?.value || 30,
+            passwordExpiry: settings.security.password_expiry?.value || 90,
+            loginAttempts: settings.security.login_attempts?.value || 5
+          });
+        }
+
+        // Update payment settings
+        if (settings.payments) {
+          setPaymentSettings({
+            stripeEnabled: settings.payments.stripe_enabled?.value || true,
+            paypalEnabled: settings.payments.paypal_enabled?.value || true,
+            mpesaEnabled: settings.payments.mpesa_enabled?.value || true,
+            bankTransferEnabled: settings.payments.bank_transfer_enabled?.value || false
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading settings:', error);
+      setError('Failed to load settings from server');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Notification Settings
   const [notificationSettings, setNotificationSettings] = useState({
@@ -48,11 +112,24 @@ const Settings = () => {
     setError(null);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setSuccess('General settings updated successfully!');
-      setTimeout(() => setSuccess(null), 3000);
-    } catch {
+      const updates = [
+        { category: 'general', setting_key: 'store_name', value: generalSettings.storeName },
+        { category: 'general', setting_key: 'store_email', value: generalSettings.storeEmail },
+        { category: 'general', setting_key: 'store_phone', value: generalSettings.storePhone },
+        { category: 'general', setting_key: 'store_address', value: generalSettings.storeAddress },
+        { category: 'general', setting_key: 'currency', value: generalSettings.currency },
+        { category: 'general', setting_key: 'timezone', value: generalSettings.timezone }
+      ];
+      
+      const response = await settingsService.bulkUpdateSettings(updates);
+      if (response.success) {
+        setSuccess('General settings updated successfully!');
+        setTimeout(() => setSuccess(null), 3000);
+      } else {
+        setError(response.error || 'Failed to update general settings');
+      }
+    } catch (error) {
+      console.error('Error updating general settings:', error);
       setError('Failed to update general settings');
     } finally {
       setLoading(false);
@@ -65,11 +142,23 @@ const Settings = () => {
     setError(null);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setSuccess('Notification settings updated successfully!');
-      setTimeout(() => setSuccess(null), 3000);
-    } catch {
+      const updates = [
+        { category: 'notifications', setting_key: 'email_notifications', value: notificationSettings.emailNotifications },
+        { category: 'notifications', setting_key: 'order_notifications', value: notificationSettings.orderNotifications },
+        { category: 'notifications', setting_key: 'low_stock_alerts', value: notificationSettings.lowStockAlerts },
+        { category: 'notifications', setting_key: 'new_customer_alerts', value: notificationSettings.newCustomerAlerts },
+        { category: 'notifications', setting_key: 'marketing_emails', value: notificationSettings.marketingEmails }
+      ];
+      
+      const response = await settingsService.bulkUpdateSettings(updates);
+      if (response.success) {
+        setSuccess('Notification settings updated successfully!');
+        setTimeout(() => setSuccess(null), 3000);
+      } else {
+        setError(response.error || 'Failed to update notification settings');
+      }
+    } catch (error) {
+      console.error('Error updating notification settings:', error);
       setError('Failed to update notification settings');
     } finally {
       setLoading(false);
@@ -82,11 +171,22 @@ const Settings = () => {
     setError(null);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setSuccess('Security settings updated successfully!');
-      setTimeout(() => setSuccess(null), 3000);
-    } catch {
+      const updates = [
+        { category: 'security', setting_key: 'two_factor_auth', value: securitySettings.twoFactorAuth },
+        { category: 'security', setting_key: 'session_timeout', value: securitySettings.sessionTimeout },
+        { category: 'security', setting_key: 'password_expiry', value: securitySettings.passwordExpiry },
+        { category: 'security', setting_key: 'login_attempts', value: securitySettings.loginAttempts }
+      ];
+      
+      const response = await settingsService.bulkUpdateSettings(updates);
+      if (response.success) {
+        setSuccess('Security settings updated successfully!');
+        setTimeout(() => setSuccess(null), 3000);
+      } else {
+        setError(response.error || 'Failed to update security settings');
+      }
+    } catch (error) {
+      console.error('Error updating security settings:', error);
       setError('Failed to update security settings');
     } finally {
       setLoading(false);
@@ -99,11 +199,22 @@ const Settings = () => {
     setError(null);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setSuccess('Payment settings updated successfully!');
-      setTimeout(() => setSuccess(null), 3000);
-    } catch {
+      const updates = [
+        { category: 'payments', setting_key: 'stripe_enabled', value: paymentSettings.stripeEnabled },
+        { category: 'payments', setting_key: 'paypal_enabled', value: paymentSettings.paypalEnabled },
+        { category: 'payments', setting_key: 'mpesa_enabled', value: paymentSettings.mpesaEnabled },
+        { category: 'payments', setting_key: 'bank_transfer_enabled', value: paymentSettings.bankTransferEnabled }
+      ];
+      
+      const response = await settingsService.bulkUpdateSettings(updates);
+      if (response.success) {
+        setSuccess('Payment settings updated successfully!');
+        setTimeout(() => setSuccess(null), 3000);
+      } else {
+        setError(response.error || 'Failed to update payment settings');
+      }
+    } catch (error) {
+      console.error('Error updating payment settings:', error);
       setError('Failed to update payment settings');
     } finally {
       setLoading(false);
@@ -131,6 +242,16 @@ const Settings = () => {
         <div className="header-content">
           <h1>Settings</h1>
           <p>Manage your store configuration and preferences</p>
+        </div>
+        <div className="header-actions">
+          <button 
+            onClick={loadSettings} 
+            className="btn btn-secondary"
+            disabled={loading}
+          >
+            <i className="fas fa-sync-alt"></i>
+            {loading ? 'Loading...' : 'Refresh'}
+          </button>
         </div>
       </div>
 
@@ -187,8 +308,15 @@ const Settings = () => {
 
       {/* Settings Content */}
       <div className="settings-content">
-        {/* General Settings */}
-        {activeTab === 'general' && (
+        {loading ? (
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Loading settings...</p>
+          </div>
+        ) : (
+          <>
+            {/* General Settings */}
+            {activeTab === 'general' && (
           <div className="settings-section">
             <div className="section-header">
               <h2>General Settings</h2>
@@ -551,6 +679,8 @@ const Settings = () => {
               </div>
             </form>
           </div>
+        )}
+          </>
         )}
       </div>
     </div>

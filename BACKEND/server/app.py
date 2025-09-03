@@ -22,6 +22,7 @@ from routes.payment_route import payment_bp
 from routes.payment_methods import payment_methods_bp
 from routes.social_media_route import social_media_bp
 from routes.stripe_route import stripe_bp
+from routes.settings_route import settings_bp
 
 import os
 
@@ -73,6 +74,9 @@ app.register_blueprint(payment_bp, url_prefix = '/payments')
 app.register_blueprint(payment_methods_bp, url_prefix = '/methods')
 app.register_blueprint(social_media_bp, url_prefix = '/social')
 app.register_blueprint(stripe_bp, url_prefix = '/stripe')
+
+# Register settings blueprint
+app.register_blueprint(settings_bp, url_prefix = '/settings')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
