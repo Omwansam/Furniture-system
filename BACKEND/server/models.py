@@ -37,6 +37,12 @@ class RefundStatus(Enum):
     REJECTED = 'rejected'
     PROCESSED = 'processed'    
 
+class UserRole(Enum):
+    USER = 'user'
+    ADMIN = 'admin'
+    MANAGER = 'manager'
+    STAFF = 'staff'    
+
 ##################################################################################
   
 ##############################################################################################
@@ -47,8 +53,18 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
+    first_name = db.Column(db.String(80))
+    last_name = db.Column(db.String(80))
+    phone = db.Column(db.String(20))
+    address = db.Column(db.Text)
     # Role-based field for admin access
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
+    # Additional fields for user management
+    role = db.Column(db.Enum(UserRole), default=UserRole.USER)
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
+    last_login = db.Column(db.DateTime)
+    # last_logout = db.Column(db.DateTime)  # Temporarily commented until migration is run
 
 
     #Relationships mapping the user to the review
@@ -70,6 +86,16 @@ class User(db.Model):
     transactions = db.relationship('Transaction', back_populates='user')
 
 
+    @property
+    def password(self):
+        return self.password_hash
+    
+    @password.setter
+    def password(self, password):
+        # In a real application, you would hash the password here
+        # For now, we'll just store it directly (not recommended for production)
+        self.password_hash = password
+
     def __repr__(self):
         return f'<User {self.username}>'
 
@@ -84,6 +110,8 @@ class Category(db.Model):
     category_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     category_name = db.Column(db.String(100), nullable=False, unique=True )
     category_description = db.Column(db.Text, nullable=False)
+    # Additional field for category management
+    name = db.Column(db.String(100), nullable=False, unique=True)  # Alias for category_name
 
     #Relationship mapping the categories to products
     products = db.relationship('Product', back_populates="category", lazy='dynamic' )
@@ -105,8 +133,12 @@ class Product(db.Model):
 
     #Foreign Key To store categories id
     category_id = db.Column(db.Integer, db.ForeignKey('categories.category_id'))
+    #Foreign Key To store supplier id
+    supplier_id = db.Column(db.Integer, db.ForeignKey('suppliers.supplier_id'))
     #Relationship mapping the product to the related categories
     category = db.relationship('Category', back_populates="products")
+    #Relationship mapping the product to the related supplier
+    supplier = db.relationship('Supplier', back_populates="products")
     #Relationships mapping the product to multiple reviews
     reviews = db.relationship('Review', back_populates="product")
     #Relationship mapping products to multiple order items
@@ -127,6 +159,9 @@ class Order(db.Model):
     total_amount = db.Column(db.Float, nullable=False)
     order_status = db.Column(db.Enum(OrderStatus, name="order_status"), default=OrderStatus.PENDING, nullable=False)
     shipping_address = db.Column(db.Text, nullable=False)
+    # Additional fields for order management
+    status = db.Column(db.Enum(OrderStatus, name="status"), default=OrderStatus.PENDING, nullable=False)
+    payment_status = db.Column(db.Enum(PaymentStatus, name="payment_status"), default=PaymentStatus.PENDING, nullable=False)
 
 
     #Foreign Key To store user id
@@ -150,7 +185,7 @@ class OrderItem(db.Model):
     __tablename__ = 'order_items'
     order_item_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     quantity = db.Column(db.Integer, default=1)
-    price = db.Column(db.String(100), nullable=False)
+    price = db.Column(db.Float, nullable=False)  # Changed from String to Float
     discount = db.Column(db.String(100))
     shipping_cost = db.Column(db.String(100))
     tax = db.Column(db.String(100))
@@ -540,3 +575,30 @@ class Coupon(db.Model):
     max_discount_amount = db.Column(db.Float)
     usage_limit = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
+
+
+###############################################################################################################################################################################################################
+class Supplier(db.Model):
+    """Supplier Table"""
+    __tablename__ = 'suppliers'
+
+    supplier_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(100), nullable=False)
+    contact_person = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    phone = db.Column(db.String(20), nullable=False)
+    address = db.Column(db.Text, nullable=False)
+    website = db.Column(db.String(200))
+    rating = db.Column(db.Float, default=0.0)
+    status = db.Column(db.String(20), default='active')  # active, inactive, suspended
+    notes = db.Column(db.Text)
+    last_order_date = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+    # Relationships
+    products = db.relationship('Product', back_populates='supplier', lazy='dynamic')
+
+    def __repr__(self):
+        return f'<Supplier {self.name}>'

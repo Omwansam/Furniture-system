@@ -126,7 +126,7 @@ const AdvancedAnalytics = () => {
     );
   }
 
-  return (
+    return (
     <div className="advanced-analytics">
       {/* Header */}
       <div className="analytics-header">
@@ -137,8 +137,8 @@ const AdvancedAnalytics = () => {
         <div className="header-actions">
           <div className="time-filter">
             <FaFilter />
-            <select 
-              value={timeRange} 
+          <select 
+            value={timeRange} 
               onChange={(e) => setTimeRange(Number(e.target.value))}
               className="time-select"
             >
@@ -146,7 +146,7 @@ const AdvancedAnalytics = () => {
               <option value={30}>Last 30 days</option>
               <option value={90}>Last 90 days</option>
               <option value={365}>Last year</option>
-            </select>
+          </select>
           </div>
           <button className="btn btn-secondary" onClick={fetchAllAnalytics}>
             <FaRedo /> Refresh
@@ -251,55 +251,55 @@ const AdvancedAnalytics = () => {
       {/* Overview Tab */}
       {activeTab === 'overview' && dashboardData && (
         <div className="tab-content">
-          {/* Key Metrics */}
-          <div className="metrics-grid">
-            <div className="metric-card">
+      {/* Key Metrics */}
+      <div className="metrics-grid">
+        <div className="metric-card">
               <div className="metric-icon">
                 <FaShoppingCart />
-              </div>
-              <div className="metric-content">
+          </div>
+          <div className="metric-content">
                 <h3>{formatNumber(dashboardData.overview.total_orders)}</h3>
                 <p>Total Orders</p>
                 <span className="metric-period">Last {timeRange} days</span>
-              </div>
-            </div>
-            
-            <div className="metric-card">
+          </div>
+        </div>
+
+        <div className="metric-card">
               <div className="metric-icon">
                 <FaDollarSign />
-              </div>
-              <div className="metric-content">
+          </div>
+          <div className="metric-content">
                 <h3>{formatCurrency(dashboardData.overview.total_revenue)}</h3>
                 <p>Total Revenue</p>
                 <span className="metric-period">Last {timeRange} days</span>
-              </div>
-            </div>
-            
-            <div className="metric-card">
+          </div>
+        </div>
+
+        <div className="metric-card">
               <div className="metric-icon">
                 <FaUsers />
-              </div>
-              <div className="metric-content">
+          </div>
+          <div className="metric-content">
                 <h3>{formatNumber(dashboardData.overview.total_customers)}</h3>
                 <p>New Customers</p>
                 <span className="metric-period">Last {timeRange} days</span>
-              </div>
-            </div>
-            
-            <div className="metric-card">
+          </div>
+        </div>
+
+        <div className="metric-card">
               <div className="metric-icon">
                 <FaBox />
-              </div>
-              <div className="metric-content">
+          </div>
+          <div className="metric-content">
                 <h3>{formatNumber(dashboardData.overview.total_products)}</h3>
                 <p>Total Products</p>
                 <span className="metric-period">Current</span>
-              </div>
-            </div>
           </div>
+        </div>
+      </div>
 
           {/* Sales Trend Chart */}
-          <div className="chart-container">
+        <div className="chart-container">
             <h3>Sales Trend</h3>
             <ResponsiveContainer width="100%" height={300}>
               <ComposedChart data={dashboardData.sales_trend}>
@@ -366,8 +366,8 @@ const AdvancedAnalytics = () => {
                 <Bar dataKey="count" fill={colors.info} name="Customer Count" />
               </BarChart>
             </ResponsiveContainer>
+            </div>
           </div>
-        </div>
       )}
 
       {/* Sales Analytics Tab */}
@@ -385,8 +385,8 @@ const AdvancedAnalytics = () => {
                   <Area type="monotone" dataKey="revenue" stroke={colors.success} fill={colors.success} fillOpacity={0.3} />
                 </AreaChart>
               </ResponsiveContainer>
-            </div>
-          </div>
+                </div>
+              </div>
 
           <div className="charts-row">
             <div className="chart-container half">
@@ -400,7 +400,7 @@ const AdvancedAnalytics = () => {
                   <Bar dataKey="revenue" fill={colors.primary} name="Revenue" />
                 </BarChart>
               </ResponsiveContainer>
-            </div>
+              </div>
             
             <div className="chart-container half">
               <h3>Sales by Status</h3>
@@ -423,10 +423,10 @@ const AdvancedAnalytics = () => {
                   <Tooltip formatter={(value) => formatCurrency(value)} />
                 </PieChart>
               </ResponsiveContainer>
-            </div>
           </div>
+        </div>
 
-          <div className="chart-container">
+        <div className="chart-container">
             <h3>Average Order Value Trend</h3>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={salesData.aov_trend}>
@@ -437,9 +437,9 @@ const AdvancedAnalytics = () => {
                 <Line type="monotone" dataKey="avg_order_value" stroke={colors.warning} strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
-          </div>
-        </div>
-      )}
+                    </div>
+              </div>
+            )}
 
       {/* Customer Analytics Tab */}
       {activeTab === 'customers' && customerData && (
@@ -456,8 +456,8 @@ const AdvancedAnalytics = () => {
                   <Area type="monotone" dataKey="new_customers" stroke={colors.info} fill={colors.info} fillOpacity={0.3} />
                 </AreaChart>
               </ResponsiveContainer>
-            </div>
-          </div>
+        </div>
+      </div>
 
           <div className="chart-container">
             <h3>Top Customers by Lifetime Value</h3>
@@ -470,24 +470,24 @@ const AdvancedAnalytics = () => {
                 <Bar dataKey="total_spent" fill={colors.success} name="Total Spent" />
               </BarChart>
             </ResponsiveContainer>
-          </div>
+                </div>
 
           <div className="metrics-row">
             <div className="metric-card large">
               <div className="metric-icon">
                 <FaUsers />
-              </div>
+                  </div>
               <div className="metric-content">
                 <h3>{customerData.repeat_customer_rate}%</h3>
                 <p>Repeat Customer Rate</p>
                 <span className="metric-description">
                   Percentage of customers who made multiple purchases
                 </span>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          )}
 
       {/* Product Analytics Tab */}
       {activeTab === 'products' && productData && (
@@ -517,8 +517,8 @@ const AdvancedAnalytics = () => {
                   <Bar dataKey="revenue" fill={colors.secondary} name="Revenue" />
                 </BarChart>
               </ResponsiveContainer>
-            </div>
-          </div>
+        </div>
+      </div>
 
           <div className="chart-container">
             <h3>Inventory Turnover Analysis</h3>
@@ -535,7 +535,7 @@ const AdvancedAnalytics = () => {
               </ComposedChart>
             </ResponsiveContainer>
           </div>
-        </div>
+            </div>
       )}
 
       {/* Financial Analytics Tab */}
@@ -578,8 +578,8 @@ const AdvancedAnalytics = () => {
                   <Tooltip formatter={(value) => formatCurrency(value)} />
                 </PieChart>
               </ResponsiveContainer>
-            </div>
-            
+          </div>
+
             <div className="chart-container half">
               <h3>Key Financial Metrics</h3>
               <div className="metrics-grid compact">
@@ -594,14 +594,14 @@ const AdvancedAnalytics = () => {
                 <div className="metric-item">
                   <span className="metric-label">Profit Margin</span>
                   <span className="metric-value">{financialData.key_metrics.profit_margin}%</span>
-                </div>
+            </div>
                 <div className="metric-item">
                   <span className="metric-label">Avg Daily Revenue</span>
                   <span className="metric-value">{formatCurrency(financialData.key_metrics.avg_daily_revenue)}</span>
-                </div>
-              </div>
             </div>
           </div>
+        </div>
+      </div>
         </div>
       )}
     </div>

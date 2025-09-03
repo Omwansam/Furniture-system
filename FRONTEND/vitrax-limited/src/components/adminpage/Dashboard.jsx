@@ -10,7 +10,7 @@ import ProductManagement from './ProductManagement';
 import OrdersManagement from './OrdersManagement';
 import CustomerManagement from './CustomerManagement';
 import InventoryManagement from './InventoryManagement';
-import SupplierManagement from './SupplierManagement';
+import SuppliersManagement from './SuppliersManagement';
 import UserManagement from './UserManagement';
 import Reports from './Reports';
 import Settings from './Settings';
@@ -170,7 +170,7 @@ const Dashboard = () => {
             <Route path="orders" element={<OrdersManagement />} />
             <Route path="customers" element={<CustomerManagement />} />
             <Route path="inventory" element={<InventoryManagement />} />
-            <Route path="suppliers" element={<SupplierManagement />} />
+            <Route path="suppliers" element={<SuppliersManagement />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="reports" element={<Reports />} />
             <Route path="settings" element={<Settings />} />

@@ -10,8 +10,10 @@ from routes.billing_route import billing_bp
 from routes.category_route import category_bp
 from routes.analytics_route import analytics_bp
 from routes.customers_route import customers_bp
-from routes.analytics_route import analytics_bp
 from routes.dashboard_route import dashboard_bp
+from routes.suppliers_route import suppliers_bp
+from routes.reports_route import reports_bp
+from routes.user_management_route import user_management_bp
 
 from routes.blog_route import blog_bp
 from routes.cart_route import cart_bp
@@ -58,6 +60,9 @@ app.register_blueprint(category_bp,url_prefix = '/categories')
 app.register_blueprint(analytics_bp, url_prefix = '/analytics')
 app.register_blueprint(customers_bp, url_prefix = '/customers')
 app.register_blueprint(dashboard_bp, url_prefix = '/dashboard')
+app.register_blueprint(suppliers_bp, url_prefix = '/suppliers')
+app.register_blueprint(reports_bp, url_prefix = '/reports')
+app.register_blueprint(user_management_bp, url_prefix = '/user-management')
 
 app.register_blueprint(blog_bp, url_prefix = '/blog')
 app.register_blueprint(cart_bp, url_prefix = '/cart')

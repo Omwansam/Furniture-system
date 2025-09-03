@@ -2,11 +2,21 @@ const API_BASE_URL = 'http://localhost:5000';
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
-  const user = JSON.parse(localStorage.getItem('furniture_user') || '{}');
-  return {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${user.access_token || ''}`
-  };
+  const stored = localStorage.getItem('furniture_user');
+  let token = '';
+  if (stored) {
+    try {
+      const user = JSON.parse(stored);
+      // Support multiple token field names
+      token = user.access_token || user.token || user.jwt || '';
+    } catch {
+      // Also support raw token string stored directly
+      token = stored;
+    }
+  }
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return headers;
 };
 
 // Helper function to handle API responses
@@ -681,6 +691,183 @@ export const paymentMethodService = {
   }
 };
 
+// Suppliers Service
+export const suppliersService = {
+  async getAllSuppliers(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    const response = await fetch(`${API_BASE_URL}/suppliers/admin/suppliers?${queryString}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async getSupplier(id) {
+    const response = await fetch(`${API_BASE_URL}/suppliers/admin/suppliers/${id}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async createSupplier(supplierData) {
+    const response = await fetch(`${API_BASE_URL}/suppliers/admin/suppliers`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(supplierData),
+    });
+    return handleResponse(response);
+  },
+
+  async updateSupplier(id, supplierData) {
+    const response = await fetch(`${API_BASE_URL}/suppliers/admin/suppliers/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(supplierData),
+    });
+    return handleResponse(response);
+  },
+
+  async deleteSupplier(id) {
+    const response = await fetch(`${API_BASE_URL}/suppliers/admin/suppliers/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async getSupplierStats() {
+    const response = await fetch(`${API_BASE_URL}/suppliers/admin/suppliers/stats`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async exportSuppliers(format = 'csv') {
+    const response = await fetch(`${API_BASE_URL}/suppliers/admin/suppliers/export?format=${format}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  }
+};
+
+// Users Management Service
+export const usersManagementService = {
+  async getAllUsers(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    const response = await fetch(`${API_BASE_URL}/user-management/admin/users?${queryString}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async getUser(id) {
+    const response = await fetch(`${API_BASE_URL}/user-management/admin/users/${id}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async createUser(userData) {
+    const response = await fetch(`${API_BASE_URL}/user-management/admin/users`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(userData),
+    });
+    return handleResponse(response);
+  },
+
+  async updateUser(id, userData) {
+    const response = await fetch(`${API_BASE_URL}/user-management/admin/users/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(userData),
+    });
+    return handleResponse(response);
+  },
+
+  async deleteUser(id) {
+    const response = await fetch(`${API_BASE_URL}/user-management/admin/users/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async toggleUserStatus(id) {
+    const response = await fetch(`${API_BASE_URL}/user-management/admin/users/${id}/toggle-status`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async resetUserPassword(id) {
+    const response = await fetch(`${API_BASE_URL}/user-management/admin/users/${id}/reset-password`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async getUserStats() {
+    const response = await fetch(`${API_BASE_URL}/user-management/admin/users/stats`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async exportUsers(format = 'csv') {
+    const response = await fetch(`${API_BASE_URL}/user-management/admin/users/export?format=${format}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  }
+};
+
+// Reports Service
+export const reportsService = {
+  async getSalesReport(days = 30) {
+    const response = await fetch(`${API_BASE_URL}/reports/admin/reports/sales?days=${days}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async getInventoryReport() {
+    const response = await fetch(`${API_BASE_URL}/reports/admin/reports/inventory`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async getCustomerReport(days = 30) {
+    const response = await fetch(`${API_BASE_URL}/reports/admin/reports/customers?days=${days}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async getFinancialReport(days = 30) {
+    const response = await fetch(`${API_BASE_URL}/reports/admin/reports/financial?days=${days}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async exportReport(type, format = 'csv', days = 30) {
+    const response = await fetch(`${API_BASE_URL}/reports/admin/reports/export?type=${type}&format=${format}&days=${days}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async getReportsDashboard(days = 30) {
+    const response = await fetch(`${API_BASE_URL}/reports/admin/reports/dashboard?days=${days}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(response);
+  }
+};
+
 // Export all services
 export default {
   userService,
@@ -690,5 +877,8 @@ export default {
   dashboardService,
   analyticsService,
   inventoryService,
-  paymentMethodService
+  paymentMethodService,
+  suppliersService,
+  usersManagementService,
+  reportsService
 };

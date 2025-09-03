@@ -92,11 +92,12 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         const data = await response.json();
+        const normalizedRole = (data.user.role || '').toString().toLowerCase();
         const userData = {
           id: data.user.id.toString(),
           email: data.user.email,
           username: data.user.username,
-          role: data.user.role,
+          role: normalizedRole,
           access_token: data.access_token,
           refresh_token: data.refresh_token
         };
@@ -146,12 +147,28 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('furniture_user');
-    localStorage.removeItem('token');
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminRefreshToken');
+  const logout = async () => {
+    try {
+      // Call backend logout endpoint to record logout time - temporarily disabled until migration is run
+      // if (user?.access_token) {
+      //   await fetch('http://localhost:5000/auth/logout', {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //       'Authorization': `Bearer ${user.access_token}`
+      //     }
+      //   });
+      // }
+    } catch (error) {
+      console.error('Error recording logout:', error);
+    } finally {
+      // Always clear local state regardless of backend call success
+      setUser(null);
+      localStorage.removeItem('furniture_user');
+      localStorage.removeItem('token');
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminRefreshToken');
+    }
   };
 
   const isAdmin = () => {

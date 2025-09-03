@@ -397,7 +397,7 @@
   .advanced-analytics {
     padding: 16px;
   }
-  
+
   .analytics-header {
     padding: 24px;
   }
@@ -410,15 +410,15 @@
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .real-time-stats {
     grid-template-columns: 1fr;
   }
-  
+
   .metrics-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .analytics-tabs {
     flex-wrap: wrap;
   }

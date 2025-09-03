@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import  jwt_required, get_jwt_identity, create_access_token, create_refresh_token
+from datetime import datetime
 from extensions import db
 from models import User
 
@@ -138,14 +139,50 @@ def login():
     if not user or not check_password_hash(user.password_hash, password):
         return jsonify({"message": "Invalid email or password"}), 401
 
-    # Include is_admin in the JWT identity payload
-    identity_payload = {
-        "id": user.id,
-        "is_admin": user.is_admin
+    # Update last_login timestamp and ensure admin role is set correctly
+    try:
+        user.last_login = datetime.utcnow()
+        
+        # If user has is_admin=True but role is not ADMIN, update it
+        if user.is_admin and (not user.role or str(user.role) != 'ADMIN'):
+            user.role = 'ADMIN'
+            print(f"Updated user {user.email} role to ADMIN")
+        
+        db.session.commit()
+    except Exception as e:
+        print(f"Error updating user: {e}")
+        db.session.rollback()
+
+    # Build identity payload (kept minimal) and include admin claims
+    identity_payload = {"id": user.id}
+    
+    # Check if user is admin based on database role or is_admin flag
+    is_admin_flag = False
+    user_role = "USER"
+    
+    # Check the role enum first (primary method)
+    if hasattr(user, 'role') and user.role:
+        if str(user.role).upper() == 'ADMIN':
+            is_admin_flag = True
+            user_role = "ADMIN"
+        elif str(user.role).upper() == 'MANAGER':
+            is_admin_flag = True
+            user_role = "MANAGER"
+        elif str(user.role).upper() == 'STAFF':
+            user_role = "STAFF"
+    
+    # Fallback to is_admin boolean field if role enum is not set
+    if not is_admin_flag and user.is_admin:
+        is_admin_flag = True
+        user_role = "ADMIN"
+    
+    additional_claims = {
+        "role": user_role,
+        "is_admin": is_admin_flag
     }
 
-    access_token = create_access_token(identity=identity_payload)
-    refresh_token = create_refresh_token(identity=identity_payload)
+    access_token = create_access_token(identity=identity_payload, additional_claims=additional_claims)
+    refresh_token = create_refresh_token(identity=identity_payload, additional_claims=additional_claims)
 
     return jsonify({
         "access_token": access_token,
@@ -155,12 +192,88 @@ def login():
             "id": user.id,
             "email": user.email,
             "username": user.username,
-            "is_admin": user.is_admin,
-            "role": "admin" if user.is_admin else "customer "
+            "is_admin": is_admin_flag,
+            "role": user_role
         }
     }), 200   
 
 
+
+#####################################################################################LOGOUT##################################################################################################
+# @users_bp.route('/logout', methods=['POST'])
+# @jwt_required()
+# def logout():
+#     """Record logout time for the user - temporarily disabled until migration is run"""
+#     try:
+#         current_user_id = get_jwt_identity()
+#         if isinstance(current_user_id, dict):
+#             user_id = current_user_id.get('id')
+#         else:
+#             user_id = current_user_id
+#             
+#         if not user_id:
+#             return jsonify({"error": "Invalid user identity"}), 400
+#             
+#         user = User.query.get(user_id)
+#         if not user:
+#             return jsonify({"error": "User not found"}), 404
+#             
+#         # Record logout time
+#         # user.last_logout = datetime.utcnow()  # Temporarily commented until migration is run
+#         db.session.commit()
+#         
+#         return jsonify({"message": "Logout recorded successfully"}), 200
+#         
+#     except Exception as e:
+#         db.session.rollback()
+#         return jsonify({"error": f"Failed to record logout: {str(e)}"}), 500
+
+#####################################################################################ADMIN ROLE UPDATE##################################################################################################
+@users_bp.route('/admin/update-role', methods=['POST'])
+def update_admin_role():
+    """Update admin user role - for fixing existing admin users"""
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        new_role = data.get('role', 'ADMIN')
+        
+        if not email:
+            return jsonify({"error": "Email is required"}), 400
+            
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+            
+        # Update role
+        if new_role.upper() == 'ADMIN':
+            user.role = 'ADMIN'
+            user.is_admin = True
+        elif new_role.upper() == 'MANAGER':
+            user.role = 'MANAGER'
+            user.is_admin = True
+        elif new_role.upper() == 'STAFF':
+            user.role = 'STAFF'
+            user.is_admin = False
+        else:
+            user.role = 'USER'
+            user.is_admin = False
+            
+        db.session.commit()
+        
+        return jsonify({
+            "message": f"User role updated to {new_role}",
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "username": user.username,
+                "role": str(user.role),
+                "is_admin": user.is_admin
+            }
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Failed to update role: {str(e)}"}), 500
 
 #####################################################################################USER REGISTRATION##################################################################################################
 @users_bp.route('/register', methods=['POST'])
