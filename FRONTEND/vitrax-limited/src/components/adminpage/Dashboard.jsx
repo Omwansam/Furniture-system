@@ -7,7 +7,7 @@ import {
 import DashboardOverview from './DashboardOverview';
 import AdvancedAnalytics from './AdvancedAnalytics';
 import ProductManagement from './ProductManagement';
-import OrderManagement from './OrderManagement';
+import OrdersManagement from './OrdersManagement';
 import CustomerManagement from './CustomerManagement';
 import InventoryManagement from './InventoryManagement';
 import SupplierManagement from './SupplierManagement';
@@ -167,7 +167,7 @@ const Dashboard = () => {
             <Route path="overview" element={<DashboardOverview />} />
             <Route path="analytics" element={<AdvancedAnalytics />} />
             <Route path="products" element={<ProductManagement />} />
-            <Route path="orders" element={<OrderManagement />} />
+            <Route path="orders" element={<OrdersManagement />} />
             <Route path="customers" element={<CustomerManagement />} />
             <Route path="inventory" element={<InventoryManagement />} />
             <Route path="suppliers" element={<SupplierManagement />} />

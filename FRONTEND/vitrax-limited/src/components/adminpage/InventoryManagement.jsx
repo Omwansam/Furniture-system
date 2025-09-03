@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaSearch, FaPlus, FaEdit, FaTrash, FaExclamationTriangle, FaBox, FaWarehouse, FaTruck, FaDownload, FaFilter, FaEye, FaBarcode } from 'react-icons/fa';
 import './InventoryManagement.css';
+import { productService, categoryService } from '../../services/adminService';
 
 const InventoryManagement = () => {
   const [inventory, setInventory] = useState([]);
@@ -21,101 +22,65 @@ const InventoryManagement = () => {
     outOfStock: 0,
     totalValue: 0
   });
+  const [categories, setCategories] = useState([]);
+  const [saving, setSaving] = useState(false);
 
-  // Mock inventory data
-  const mockInventory = [
-    {
-      id: 1,
-      sku: 'MSS-001',
-      name: 'Modern Sofa Set',
-      category: 'Living Room',
-      currentStock: 15,
+  const mapProductToInventoryItem = (p) => {
+    return {
+      id: p.product_id,
+      sku: p.sku || `SKU-${p.product_id}`,
+      name: p.product_name,
+      category: p.category_name || 'Uncategorized',
+      currentStock: Number(p.stock_quantity || 0),
       minStock: 5,
-      maxStock: 50,
-      unitCost: 1200,
-      unitPrice: 2499,
-      supplier: 'Comfort Furniture Co.',
-      location: 'Warehouse A - Section 1',
-      lastRestocked: '2024-01-10',
-      status: 'In Stock'
-    },
-    {
-      id: 2,
-      sku: 'ODT-002',
-      name: 'Oak Dining Table',
-      category: 'Dining Room',
-      currentStock: 3,
-      minStock: 5,
-      maxStock: 25,
-      unitCost: 650,
-      unitPrice: 1299,
-      supplier: 'Wood Masters Ltd.',
-      location: 'Warehouse B - Section 2',
-      lastRestocked: '2024-01-05',
-      status: 'Low Stock'
-    },
-    {
-      id: 3,
-      sku: 'LR-003',
-      name: 'Leather Recliner',
-      category: 'Living Room',
-      currentStock: 0,
-      minStock: 5,
-      maxStock: 20,
-      unitCost: 450,
-      unitPrice: 899,
-      supplier: 'Luxury Seating Inc.',
-      location: 'Warehouse A - Section 3',
-      lastRestocked: '2023-12-20',
-      status: 'Out of Stock'
-    },
-    {
-      id: 4,
-      sku: 'CT-004',
-      name: 'Coffee Table',
-      category: 'Living Room',
-      currentStock: 25,
-      minStock: 10,
-      maxStock: 40,
-      unitCost: 150,
-      unitPrice: 399,
-      supplier: 'Modern Furniture Co.',
-      location: 'Warehouse A - Section 2',
-      lastRestocked: '2024-01-12',
-      status: 'In Stock'
-    },
-    {
-      id: 5,
-      sku: 'BS-005',
-      name: 'Bookshelf',
-      category: 'Office',
-      currentStock: 8,
-      minStock: 5,
-      maxStock: 30,
-      unitCost: 200,
-      unitPrice: 599,
-      supplier: 'Storage Solutions Ltd.',
-      location: 'Warehouse B - Section 1',
-      lastRestocked: '2024-01-08',
-      status: 'In Stock'
-    }
-  ];
+      maxStock: 100,
+      unitCost: Number(p.unit_cost || (Number(p.product_price || 0) * 0.6)),
+      unitPrice: Number(p.product_price || 0),
+      supplier: p.supplier || 'Default Supplier',
+      location: p.location || 'Main Warehouse',
+      lastRestocked: p.updated_at || p.created_at || new Date().toISOString(),
+      status: (p.stock_quantity === 0) ? 'Out of Stock' : (p.stock_quantity <= 5 ? 'Low Stock' : 'In Stock')
+    };
+  };
 
-  useEffect(() => {
+  const refreshInventory = async () => {
     setLoading(true);
-    setTimeout(() => {
-      setInventory(mockInventory);
-      
-      // Calculate stats
+    try {
+      const [productsRes, categoriesRes] = await Promise.all([
+        productService.getAllProducts({ per_page: 200 }),
+        categoryService.getAllCategories().catch(() => [])
+      ]);
+
+      const items = (Array.isArray(productsRes) ? productsRes : []).map(mapProductToInventoryItem);
+      setInventory(items);
+
       const stats = {
-        totalItems: mockInventory.length,
-        lowStock: mockInventory.filter(item => item.currentStock <= item.minStock && item.currentStock > 0).length,
-        outOfStock: mockInventory.filter(item => item.currentStock === 0).length,
-        totalValue: mockInventory.reduce((sum, item) => sum + (item.currentStock * item.unitCost), 0)
+        totalItems: items.length,
+        lowStock: items.filter(item => item.currentStock <= item.minStock && item.currentStock > 0).length,
+        outOfStock: items.filter(item => item.currentStock === 0).length,
+        totalValue: items.reduce((sum, item) => sum + (item.currentStock * item.unitCost), 0)
       };
       setInventoryStats(stats);
+
+      if (categoriesRes && Array.isArray(categoriesRes.categories)) {
+        setCategories(categoriesRes.categories);
+      } else if (Array.isArray(categoriesRes)) {
+        setCategories(categoriesRes);
+      } else {
+        setCategories([]);
+      }
+    } catch (e) {
+      console.error('Failed to load inventory:', e);
+      setInventory([]);
+      setCategories([]);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
+  };
+
+  useEffect(() => {
+    refreshInventory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filteredInventory = inventory.filter(item => {
@@ -142,9 +107,9 @@ const InventoryManagement = () => {
     }
     
     if (sortOrder === 'asc') {
-      return aValue.localeCompare(bValue);
+      return String(aValue).localeCompare(String(bValue));
     } else {
-      return bValue.localeCompare(aValue);
+      return String(bValue).localeCompare(String(aValue));
     }
   });
 
@@ -153,7 +118,7 @@ const InventoryManagement = () => {
     currentPage * itemsPerPage
   );
 
-  const totalPages = Math.ceil(sortedInventory.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedInventory.length / itemsPerPage) || 1;
 
   const getStatusBadge = (item) => {
     if (item.currentStock === 0) {
@@ -177,12 +142,98 @@ const InventoryManagement = () => {
     }).format(amount);
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+  const handleExport = async () => {
+    try {
+      const data = await productService.exportProducts();
+      const rows = data.csv_data || [];
+      if (!rows.length) return;
+      const headers = Object.keys(rows[0]);
+      const csv = [headers.join(','), ...rows.map(r => headers.map(h => JSON.stringify(r[h] ?? '')).join(','))].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = (data.filename || 'products_export.csv');
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Export failed:', e);
+    }
+  };
+
+  const handleDelete = async (item) => {
+    if (!window.confirm(`Delete product "${item.name}"? This cannot be undone.`)) return;
+    try {
+      await productService.deleteProduct(item.id);
+      await refreshInventory();
+    } catch (e) {
+      console.error('Delete failed:', e);
+    }
+  };
+
+  const handleRestock = async (item) => {
+    try {
+      const newQty = Math.max(item.minStock + 5, item.currentStock + 10);
+      await productService.updateProduct(item.id, { stock_quantity: newQty });
+      await refreshInventory();
+    } catch (e) {
+      console.error('Restock failed:', e);
+    }
+  };
+
+  const [formData, setFormData] = useState({
+    product_name: '',
+    product_description: '',
+    product_price: 0,
+    stock_quantity: 0,
+    category_id: ''
+  });
+
+  const openAddModal = () => {
+    setFormData({ product_name: '', product_description: '', product_price: 0, stock_quantity: 0, category_id: '' });
+    setShowAddModal(true);
+  };
+
+  const openEditModal = (item) => {
+    setSelectedItem(item);
+    setFormData({
+      product_name: item.name,
+      product_description: '',
+      product_price: item.unitPrice,
+      stock_quantity: item.currentStock,
+      category_id: ''
     });
+    setShowEditModal(true);
+  };
+
+  const submitAdd = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await productService.createProduct(formData);
+      setShowAddModal(false);
+      await refreshInventory();
+    } catch (err) {
+      console.error('Create failed:', err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const submitEdit = async (e) => {
+    e.preventDefault();
+    if (!selectedItem) return;
+    setSaving(true);
+    try {
+      await productService.updateProduct(selectedItem.id, formData);
+      setShowEditModal(false);
+      setSelectedItem(null);
+      await refreshInventory();
+    } catch (err) {
+      console.error('Update failed:', err);
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -203,14 +254,14 @@ const InventoryManagement = () => {
         <div className="header-actions">
           <button 
             className="btn btn-primary"
-            onClick={() => setShowAddModal(true)}
+            onClick={openAddModal}
           >
             <FaPlus /> Add Item
           </button>
-          <button className="btn btn-secondary">
+          <button className="btn btn-secondary" onClick={handleExport}>
             <FaDownload /> Export
           </button>
-          <button className="btn btn-secondary">
+          <button className="btn btn-secondary" onClick={refreshInventory}>
             <FaTruck /> Restock Orders
           </button>
         </div>
@@ -276,10 +327,11 @@ const InventoryManagement = () => {
             className="filter-select"
           >
             <option value="all">All Categories</option>
-            <option value="Living Room">Living Room</option>
-            <option value="Dining Room">Dining Room</option>
-            <option value="Bedroom">Bedroom</option>
-            <option value="Office">Office</option>
+            {categories.map((c) => (
+              <option key={c.category_id || c.id} value={c.category_name || c.name}>
+                {c.category_name || c.name}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -378,10 +430,7 @@ const InventoryManagement = () => {
                   <div className="action-buttons">
                     <button
                       className="btn-icon"
-                      onClick={() => {
-                        setSelectedItem(item);
-                        setShowEditModal(true);
-                      }}
+                      onClick={() => openEditModal(item)}
                       title="Edit Item"
                     >
                       <FaEdit />
@@ -389,7 +438,7 @@ const InventoryManagement = () => {
                     <button className="btn-icon" title="View Details">
                       <FaEye />
                     </button>
-                    <button className="btn-icon delete" title="Delete Item">
+                    <button className="btn-icon delete" title="Delete Item" onClick={() => handleDelete(item)}>
                       <FaTrash />
                     </button>
                   </div>
@@ -440,11 +489,105 @@ const InventoryManagement = () => {
                     <span className="current">{item.currentStock}</span>
                     <span className="min">Min: {item.minStock}</span>
                   </div>
-                  <button className="restock-btn">
+                  <button className="restock-btn" onClick={() => handleRestock(item)}>
                     <FaTruck /> Restock
                   </button>
                 </div>
               ))}
+          </div>
+        </div>
+      )}
+
+      {/* Add Modal */}
+      {showAddModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h3>Add Product</h3>
+              <button className="close-btn" onClick={() => setShowAddModal(false)}>×</button>
+            </div>
+            <form onSubmit={submitAdd} className="modal-body">
+              <div className="form-group">
+                <label>Name</label>
+                <input value={formData.product_name} onChange={(e) => setFormData({ ...formData, product_name: e.target.value })} required />
+              </div>
+              <div className="form-group">
+                <label>Description</label>
+                <textarea value={formData.product_description} onChange={(e) => setFormData({ ...formData, product_description: e.target.value })} />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Price</label>
+                  <input type="number" step="0.01" value={formData.product_price} onChange={(e) => setFormData({ ...formData, product_price: Number(e.target.value) })} required />
+                </div>
+                <div className="form-group">
+                  <label>Stock</label>
+                  <input type="number" value={formData.stock_quantity} onChange={(e) => setFormData({ ...formData, stock_quantity: Number(e.target.value) })} required />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Category</label>
+                <select value={formData.category_id} onChange={(e) => setFormData({ ...formData, category_id: Number(e.target.value) })}>
+                  <option value="">Select category</option>
+                  {categories.map(c => (
+                    <option key={c.category_id || c.id} value={c.category_id || c.id}>
+                      {c.category_name || c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowAddModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Saving...' : 'Create'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {showEditModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h3>Edit Product</h3>
+              <button className="close-btn" onClick={() => setShowEditModal(false)}>×</button>
+            </div>
+            <form onSubmit={submitEdit} className="modal-body">
+              <div className="form-group">
+                <label>Name</label>
+                <input value={formData.product_name} onChange={(e) => setFormData({ ...formData, product_name: e.target.value })} required />
+              </div>
+              <div className="form-group">
+                <label>Description</label>
+                <textarea value={formData.product_description} onChange={(e) => setFormData({ ...formData, product_description: e.target.value })} />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Price</label>
+                  <input type="number" step="0.01" value={formData.product_price} onChange={(e) => setFormData({ ...formData, product_price: Number(e.target.value) })} required />
+                </div>
+                <div className="form-group">
+                  <label>Stock</label>
+                  <input type="number" value={formData.stock_quantity} onChange={(e) => setFormData({ ...formData, stock_quantity: Number(e.target.value) })} required />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Category</label>
+                <select value={formData.category_id} onChange={(e) => setFormData({ ...formData, category_id: Number(e.target.value) })}>
+                  <option value="">Select category</option>
+                  {categories.map(c => (
+                    <option key={c.category_id || c.id} value={c.category_id || c.id}>
+                      {c.category_name || c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowEditModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Saving...' : 'Update'}</button>
+              </div>
+            </form>
           </div>
         </div>
       )}

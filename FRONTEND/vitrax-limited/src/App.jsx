@@ -20,6 +20,7 @@ import SingleProduct from "./pages/SingleProduct";
 import CheckOut from "./pages/CheckOut";
 import Cart from "./pages/Cart";
 import OrderConfirmation from "./pages/OrderConfirmation";
+import ImageTest from './components/ImageTest';
 import LoginPage from "./auth/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import Orders from "./pages/Orders";
@@ -79,6 +80,7 @@ function App() {
                   path="/order-confirmation/:orderId"
                   element={<OrderConfirmation />}
                 />
+                <Route path="/image-test" element={<ImageTest />} />
                 
                 {/* Account Routes - Temporarily without protection for testing */}
                 <Route path="/dashboard" element={<Dashboard />} />

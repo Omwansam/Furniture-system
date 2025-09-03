@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FiFilter } from "react-icons/fi";
 import "./FurntureGrid.css";
 import { getProducts } from '../productService'
+import { getPrimaryImageUrl, handleImageError } from '../../utils/imageUtils'
 
 
 
@@ -68,13 +69,11 @@ const FurnitureGrid = ({ products = [], loading = false, error = null, categoryN
             {displayedProducts.map((product) => (
                 <div key={product.product_id} className='essentials-card'>
                     <Link to={`/singleproduct/${product.product_id}`} className='essentials'>
-                        {product.images.length > 0 && (
-                            <img 
-                                src={product.images[0].image_url} 
-                                alt={product.product_name}
-                                onError={(e) => { e.target.src = '/placeholder-image.jpg'; }}
-                            />
-                        )}
+                        <img 
+                            src={getPrimaryImageUrl(product)} 
+                            alt={product.product_name}
+                            onError={(e) => handleImageError(e)}
+                        />
                         <h3>{product.product_name}</h3>
                         <p>Ksh: {product.product_price.toLocaleString()}</p>
                     </Link>

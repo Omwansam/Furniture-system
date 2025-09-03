@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/product'; // Backend URL
+const API_URL = 'http://localhost:5000/api'; // Backend URL
 
 export const getProducts = async () => {
   try {
-    const response = await axios.get(API_URL);
+    const response = await axios.get(`${API_URL}/product`);
     // Handle the correct response format - return products array
     return response.data.products || response.data;
   } catch (error) {
@@ -15,7 +15,7 @@ export const getProducts = async () => {
 
 export const getProductsByCategory = async (category) => {
   try {
-    const response = await axios.get(`${API_URL}/category/${category}`);
+    const response = await axios.get(`${API_URL}/product/category/${category}`);
     return response.data.products || response.data;
   } catch (error) {
     console.error('Error fetching products by category:', error);
@@ -25,7 +25,7 @@ export const getProductsByCategory = async (category) => {
 
 export const getBestSellers = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/bestsellers');
+    const response = await axios.get(`${API_URL}/bestsellers`);
     return response.data;
   } catch (error) {
     console.error('Error fetching best sellers:', error);
@@ -38,6 +38,7 @@ export const getRecentProducts = async (limit = 5) => {
     const response = await axios.get(`${API_URL}/recent`, {
       params: { limit }
     });
+    console.log('Recent products response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching recent products:', error);
@@ -68,7 +69,7 @@ export const createProduct = async (productData) => {
       }
     }
     
-    const response = await axios.post(API_URL, formData, {
+    const response = await axios.post(`${API_URL}/product`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
         'Authorization': `Bearer ${localStorage.getItem('token')}`

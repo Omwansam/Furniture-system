@@ -55,6 +55,18 @@
   border-radius: 8px;
 }
 
+.order-item-img-placeholder {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+}
+
 .order-item-details h4 {
   margin: 0 0 5px 0;
   color: #333;

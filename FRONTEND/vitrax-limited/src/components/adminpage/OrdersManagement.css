@@ -1,10 +1,10 @@
-.customer-management {
+.orders-management {
   padding: 20px;
   background-color: #f8f9fa;
   min-height: 100vh;
 }
 
-.customer-header {
+.orders-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -15,7 +15,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.customer-header h1 {
+.orders-header h1 {
   margin: 0;
   color: #2c3e50;
   font-size: 28px;
@@ -90,16 +90,16 @@
   background-color: #3498db;
 }
 
-.stat-icon.active {
+.stat-icon.revenue {
   background-color: #27ae60;
 }
 
-.stat-icon.new {
+.stat-icon.warning {
   background-color: #f39c12;
 }
 
-.stat-icon.inactive {
-  background-color: #95a5a6;
+.stat-icon.success {
+  background-color: #2ecc71;
 }
 
 .stat-info h3 {
@@ -115,97 +115,7 @@
   font-size: 14px;
 }
 
-.top-customers-section {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
-}
-
-.top-customers-section h3 {
-  margin: 0 0 20px 0;
-  color: #2c3e50;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.top-customers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 16px;
-}
-
-.top-customer-card {
-  background: #f8f9fa;
-  padding: 16px;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.rank-badge {
-  position: absolute;
-  top: -8px;
-  left: -8px;
-  background: #e74c3c;
-  color: white;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.customer-avatar {
-  width: 40px;
-  height: 40px;
-  background: #3498db;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 18px;
-}
-
-.customer-info h4 {
-  margin: 0 0 4px 0;
-  color: #2c3e50;
-  font-size: 16px;
-}
-
-.customer-email {
-  margin: 0 0 8px 0;
-  color: #7f8c8d;
-  font-size: 12px;
-}
-
-.customer-stats {
-  display: flex;
-  gap: 12px;
-}
-
-.spending {
-  color: #27ae60;
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.orders {
-  color: #7f8c8d;
-  font-size: 12px;
-}
-
-.customer-controls {
+.orders-controls {
   display: flex;
   gap: 16px;
   margin-bottom: 20px;
@@ -271,7 +181,7 @@
   border-color: #3498db;
 }
 
-.customers-table-container {
+.orders-table-container {
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -279,12 +189,12 @@
   margin-bottom: 20px;
 }
 
-.customers-table {
+.orders-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.customers-table th {
+.orders-table th {
   background-color: #f8f9fa;
   padding: 16px 12px;
   text-align: left;
@@ -293,38 +203,26 @@
   border-bottom: 1px solid #e9ecef;
 }
 
-.customers-table td {
+.orders-table td {
   padding: 16px 12px;
   border-bottom: 1px solid #e9ecef;
   vertical-align: top;
 }
 
-.customers-table tbody tr:hover {
+.orders-table tbody tr:hover {
   background-color: #f8f9fa;
+}
+
+.order-id {
+  font-weight: 600;
+  color: #3498db;
+  font-family: monospace;
 }
 
 .customer-info {
   display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.customer-avatar-small {
-  width: 32px;
-  height: 32px;
-  background: #3498db;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 14px;
-}
-
-.customer-details {
-  display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .customer-name {
@@ -337,7 +235,7 @@
   color: #7f8c8d;
 }
 
-.join-date {
+.order-date {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -345,17 +243,12 @@
   font-size: 14px;
 }
 
-.order-count {
-  color: #7f8c8d;
-  font-size: 14px;
-}
-
-.total-spent {
+.order-total {
   font-weight: 600;
   color: #27ae60;
 }
 
-.last-order {
+.items-count {
   color: #7f8c8d;
   font-size: 14px;
 }
@@ -371,14 +264,63 @@
   text-transform: uppercase;
 }
 
-.status-badge.active {
+.status-badge.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.processing {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.status-badge.shipped {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-badge.completed {
   background-color: #d4edda;
   color: #155724;
 }
 
-.status-badge.inactive {
+.status-badge.cancelled {
   background-color: #f8d7da;
   color: #721c24;
+}
+
+.status-badge.returned {
+  background-color: #e2e3e5;
+  color: #383d41;
+}
+
+.payment-status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.payment-status-badge.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.payment-status-badge.completed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.payment-status-badge.failed {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.payment-status-badge.refunded {
+  background-color: #e2e3e5;
+  color: #383d41;
 }
 
 .action-buttons {
@@ -404,6 +346,13 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+.btn-icon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .btn-icon:not(:disabled) {
   background-color: #f8f9fa;
   color: #6c757d;
@@ -414,8 +363,8 @@
   color: white;
 }
 
-.btn-icon.delete:not(:disabled) {
-  background-color: #dc3545;
+.btn-icon.success:not(:disabled) {
+  background-color: #28a745;
   color: white;
 }
 
@@ -468,7 +417,7 @@
   background: white;
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  max-width: 700px;
+  max-width: 600px;
   width: 90%;
   max-height: 80vh;
   overflow-y: auto;
@@ -511,7 +460,7 @@
   padding: 20px;
 }
 
-.customer-details {
+.order-details {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -532,85 +481,6 @@
 
 .detail-section strong {
   color: #34495e;
-}
-
-.recent-orders {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.order-item {
-  background: #f8f9fa;
-  padding: 12px;
-  border-radius: 6px;
-  border: 1px solid #e9ecef;
-}
-
-.order-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.order-id {
-  font-weight: 600;
-  color: #3498db;
-  font-family: monospace;
-}
-
-.order-date {
-  color: #7f8c8d;
-  font-size: 12px;
-}
-
-.order-amount {
-  font-weight: 600;
-  color: #27ae60;
-  margin-bottom: 4px;
-}
-
-.order-status {
-  font-size: 12px;
-  color: #7f8c8d;
-  text-transform: uppercase;
-}
-
-.payment-methods {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.payment-method {
-  background: #f8f9fa;
-  padding: 12px;
-  border-radius: 6px;
-  border: 1px solid #e9ecef;
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.card-type {
-  background: #3498db;
-  color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-}
-
-.card-number {
-  font-family: monospace;
-  color: #2c3e50;
-}
-
-.expiry {
-  color: #7f8c8d;
-  font-size: 12px;
 }
 
 .modal-footer {
@@ -646,7 +516,7 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .customer-controls {
+  .orders-controls {
     flex-direction: column;
     align-items: stretch;
   }
@@ -659,12 +529,12 @@
     justify-content: center;
   }
   
-  .customers-table {
+  .orders-table {
     font-size: 14px;
   }
   
-  .customers-table th,
-  .customers-table td {
+  .orders-table th,
+  .orders-table td {
     padding: 12px 8px;
   }
   
@@ -677,190 +547,5 @@
     width: 32px;
     height: 32px;
     font-size: 12px;
-  }
-  
-  .top-customers-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Table Action Buttons */
-.customers-table .action-buttons {
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.customers-table .btn-icon {
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 12px;
-  color: white;
-}
-
-.customers-table .btn-icon:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.customers-table .btn-icon:not(:disabled) {
-  background-color: #6c757d;
-}
-
-.customers-table .btn-icon.edit:not(:disabled) {
-  background-color: #17a2b8;
-}
-
-.customers-table .btn-icon.delete:not(:disabled) {
-  background-color: #dc3545;
-}
-
-.customers-table .btn-icon.edit:hover:not(:disabled) {
-  background-color: #138496;
-}
-
-.customers-table .btn-icon.delete:hover:not(:disabled) {
-  background-color: #c82333;
-}
-
-/* Edit Form Styles */
-.edit-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.form-group label {
-  font-weight: 600;
-  color: #2c3e50;
-  font-size: 14px;
-}
-
-.form-input {
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  transition: border-color 0.2s;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-}
-
-/* Delete Modal Styles */
-.delete-modal .modal-body {
-  text-align: center;
-}
-
-.delete-warning {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 20px 0;
-}
-
-.warning-icon {
-  font-size: 48px;
-  color: #dc3545;
-}
-
-.delete-warning h4 {
-  margin: 0;
-  color: #dc3545;
-  font-size: 18px;
-}
-
-.delete-warning p {
-  margin: 8px 0;
-  color: #2c3e50;
-}
-
-.warning-text {
-  color: #6c757d !important;
-  font-size: 14px;
-  max-width: 400px;
-  line-height: 1.5;
-}
-
-/* Button Styles */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-decoration: none;
-}
-
-.btn-primary {
-  background-color: #3498db;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #2980b9;
-}
-
-.btn-secondary {
-  background-color: #95a5a6;
-  color: white;
-}
-
-.btn-secondary:hover {
-  background-color: #7f8c8d;
-}
-
-.btn-danger {
-  background-color: #dc3545;
-  color: white;
-}
-
-.btn-danger:hover {
-  background-color: #c82333;
-}
-
-/* Responsive Design for Action Buttons */
-@media (max-width: 768px) {
-  .customers-table .action-buttons {
-    flex-direction: column;
-    gap: 4px;
-  }
-  
-  .customers-table .btn-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 11px;
-  }
-  
-  .modal-footer {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .modal-footer .btn {
-    justify-content: center;
   }
 }

@@ -9,6 +9,9 @@ from routes.productImage_route import product_image_bp
 from routes.billing_route import billing_bp
 from routes.category_route import category_bp
 from routes.analytics_route import analytics_bp
+from routes.customers_route import customers_bp
+from routes.analytics_route import analytics_bp
+from routes.dashboard_route import dashboard_bp
 
 from routes.blog_route import blog_bp
 from routes.cart_route import cart_bp
@@ -38,6 +41,11 @@ jwt.init_app(app)
 def home():
     return 'Hello, World!'
 
+# Serve static files (uploads)
+@app.route('/static/uploads/<path:filename>')
+def serve_upload(filename):
+    return send_from_directory('static/uploads', filename)
+
   
 
 #Register all blueprints
@@ -48,6 +56,8 @@ app.register_blueprint(product_bp,url_prefix = '/api')
 app.register_blueprint(billing_bp, url_prefix = '/billing')
 app.register_blueprint(category_bp,url_prefix = '/categories')
 app.register_blueprint(analytics_bp, url_prefix = '/analytics')
+app.register_blueprint(customers_bp, url_prefix = '/customers')
+app.register_blueprint(dashboard_bp, url_prefix = '/dashboard')
 
 app.register_blueprint(blog_bp, url_prefix = '/blog')
 app.register_blueprint(cart_bp, url_prefix = '/cart')

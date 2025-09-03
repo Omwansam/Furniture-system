@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiChevronLeft, FiChevronRight, FiStar, FiShoppingCart } from 'react-icons/fi';
 import { getRecentProducts } from '../productService';
+import { getPrimaryImageUrl } from '../../utils/imageUtils';
 import './NewArrivals.css';
 
 const NewArrivals = () => {
@@ -17,7 +18,9 @@ const NewArrivals = () => {
   const fetchRecentProducts = async () => {
     try {
       setLoading(true);
+      console.log('Fetching recent products...');
       const data = await getRecentProducts(5);
+      console.log('Recent products data:', data);
       setProducts(data);
     } catch (err) {
       console.error('Error fetching recent products:', err);
@@ -88,6 +91,7 @@ const NewArrivals = () => {
   };
 
   const currentProduct = products[currentSlide];
+  console.log('Current product:', currentProduct);
 
   if (loading) {
     return (
@@ -153,10 +157,19 @@ const NewArrivals = () => {
             {/* Product Image */}
             <div className="product-image-container">
               <img 
-                src={currentProduct?.primary_image} 
+                src={currentProduct?.primary_image || getPrimaryImageUrl(currentProduct)} 
                 alt={currentProduct?.product_name}
                 className="product-image"
                 loading="lazy"
+                onError={(e) => {
+                  console.error('Image failed to load for product:', currentProduct?.product_id, 'URL:', e.target.src);
+                  // Show placeholder on error
+                  e.target.style.display = 'none';
+                  const placeholder = document.createElement('div');
+                  placeholder.className = 'product-image-placeholder';
+                  placeholder.innerHTML = '<svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21,15 16,10 5,21"></polyline></svg>';
+                  e.target.parentNode.insertBefore(placeholder, e.target);
+                }}
               />
               <div className="image-overlay">
                 <div className="overlay-content">

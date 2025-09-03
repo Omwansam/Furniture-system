@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FiTrash2, FiPlus, FiMinus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { cartService } from "./cartService";
+import { getPrimaryImageUrl, handleImageError } from "../utils/imageUtils";
 import './SingleCart.css';
 
 const SingleCart = () => {
@@ -117,16 +118,10 @@ const SingleCart = () => {
               <tr key={item.cart_item_id}>
                 <td className="cart-item">
                   <img 
-                    src={
-                      item.image_url?.startsWith('http') 
-                        ? item.image_url 
-                        : `http://localhost:5000/${item.image_url || '/placeholder-image.jpg'}`
-                    }
+                    src={getPrimaryImageUrl(item)}
                     alt={item.product_name} 
                     className="cart-item-img"
-                    onError={(e) => {
-                      e.target.src = "/placeholder-image.jpg";
-                    }}
+                    onError={(e) => handleImageError(e)}
                   />
                   <div className="item-details">
                     <span className="item-name">{item.product_name}</span>

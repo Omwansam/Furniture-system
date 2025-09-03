@@ -22,6 +22,37 @@ def update_cart_total(cart):
 ####################################################################################################################
 
 
+@cart_bp.route('/debug', methods=['GET'])
+def debug_cart():
+    """Debug route to check cart data without authentication"""
+    from models import Product, ProductImage
+    
+    products = Product.query.limit(3).all()
+    debug_data = []
+    
+    for product in products:
+        primary_image = ProductImage.query.filter_by(
+            product_id=product.product_id,
+            is_primary=True
+        ).first()
+        
+        debug_data.append({
+            'product_id': product.product_id,
+            'product_name': product.product_name,
+            'primary_image_url': primary_image.image_url if primary_image else None,
+            'all_images': [
+                {
+                    'image_url': img.image_url,
+                    'is_primary': img.is_primary
+                } for img in product.images
+            ] if hasattr(product, 'images') else []
+        })
+    
+    return jsonify({
+        'debug_info': debug_data,
+        'message': 'Debug cart data'
+    }), 200
+
 @cart_bp.route('',methods=['GET'])
 @jwt_required()
 def get_cart():
@@ -55,6 +86,9 @@ def get_cart():
             is_primary=True
         ).first()
         
+        image_url = primary_image.image_url if primary_image else None
+        print(f"Cart item {item.cart_item_id}: Product {product.product_name} - Image URL: {image_url}")
+        
         cart_items.append({
             'cart_item_id': item.cart_item_id,
             'product_id': product.product_id,
@@ -62,11 +96,9 @@ def get_cart():
             'description': product.product_description,
             'price': item.price,
             'quantity': item.quantity,
-            'image_url': primary_image.image_url if primary_image else None,
+            'image_url': image_url,
             'stock_available': product.stock_quantity,
             'added_at': item.added_at.isoformat() if item.added_at else None,
-
-
             'max_allowed': min(product.stock_quantity, 10)  # Example limit
         })
     

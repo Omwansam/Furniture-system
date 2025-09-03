@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { getPrimaryImageUrl, handleImageError } from '../../utils/imageUtils';
 import './FeaturedProducts.css';
 
 const FeaturedProducts = () => {
@@ -10,32 +11,46 @@ const FeaturedProducts = () => {
     fetch('http://localhost:5000/api/product') 
       .then(res => res.json())
       .then(data => {
-        // Handle the correct response format - data.products is the array
-        const productsArray = data.products || data;
+        // Normalize API response to always be an array
+        let productsArray = [];
+        if (Array.isArray(data)) {
+          productsArray = data;
+        } else if (data && Array.isArray(data.products)) {
+          productsArray = data.products;
+        } else {
+          console.warn('Unexpected products response shape:', data);
+          productsArray = [];
+        }
         setProducts(productsArray);
         setIsLoading(false);
       })
       .catch(err => {
-        console.error("Failed to fetch products:", err);
+        console.error('Failed to fetch products:', err);
+        setProducts([]);
         setIsLoading(false);
       });
   }, []);
 
-  // Calculate total slides needed
-  const totalSlides = Math.ceil(products.length / 6);
+  // Calculate total slides needed; ensure at least 1 to avoid modulo by 0
+  const totalSlides = Math.max(1, Math.ceil((Array.isArray(products) ? products.length : 0) / 6));
   
-  // Get current 6 products
-  const currentProducts = products.slice(currentSlide * 6, (currentSlide * 6) + 6);
+  // Get current 6 products safely
+  const currentProducts = Array.isArray(products)
+    ? products.slice(currentSlide * 6, (currentSlide * 6) + 6)
+    : [];
 
   const nextSlide = () => {
+    if (totalSlides <= 1) return;
     setCurrentSlide((prev) => (prev + 1) % totalSlides);
   };
 
   const prevSlide = () => {
+    if (totalSlides <= 1) return;
     setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
   };
 
   const goToSlide = (slideIndex) => {
+    if (slideIndex < 0 || slideIndex >= totalSlides) return;
     setCurrentSlide(slideIndex);
   };
 
@@ -44,6 +59,20 @@ const FeaturedProducts = () => {
       <section className='featured-products'>
         <div className='featured-container'>
           <div className='loading-spinner'>Loading featured products...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!Array.isArray(products) || products.length === 0) {
+    return (
+      <section className='featured-products'>
+        <div className='featured-header'>
+          <h2>Featured Products</h2>
+          <p>Discover our most popular furniture pieces</p>
+        </div>
+        <div className='featured-container'>
+          <div className='empty-state'>No products available right now.</div>
         </div>
       </section>
     );
@@ -79,24 +108,20 @@ const FeaturedProducts = () => {
 
         {/* Products Grid */}
         <div className='featured-container'>
-          {currentProducts.map((product, index) => {
-            const primaryImage = product.images?.find(img => img.is_primary) || product.images?.[0];
-            return (
-              <div 
-                key={`${currentSlide}-${index}`} 
-                className='product-card'
-                style={{
-                  animationDelay: `${index * 0.1}s`
-                }}
-              >
-                <div className='product-image-container'>
-                  <img 
-                    src={primaryImage?.image_url?.startsWith('http') ? primaryImage.image_url : `http://localhost:5000/${primaryImage?.image_url}`} 
-                    alt={product.product_name}
-                    onError={(e) => {
-                      e.target.src = '/placeholder-image.jpg';
-                    }}
-                  />
+          {currentProducts.map((product, index) => (
+            <div 
+              key={`${currentSlide}-${index}`} 
+              className='product-card'
+              style={{
+                animationDelay: `${index * 0.1}s`
+              }}
+            >
+              <div className='product-image-container'>
+                <img 
+                  src={getPrimaryImageUrl(product)} 
+                  alt={product.product_name}
+                  onError={(e) => handleImageError(e)}
+                />
                   <div className='product-overlay'>
                     <button className='view-details-btn'>View Details</button>
                   </div>
@@ -107,8 +132,7 @@ const FeaturedProducts = () => {
                   <p className='view-more'>View More</p>
                 </div>
               </div>
-            );
-          })}
+          ))}
         </div>
 
         {/* Slide Indicators */}

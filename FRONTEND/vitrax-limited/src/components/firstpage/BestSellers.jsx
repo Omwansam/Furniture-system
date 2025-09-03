@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { getBestSellers } from '../productService';
+import { getPrimaryImageUrl, handleImageError } from '../../utils/imageUtils';
 import './BestSeller.css';
 
 const BestSellers = () => {
@@ -55,17 +56,7 @@ const BestSellers = () => {
   };
 
   const getImageUrl = (product) => {
-    // Try to get primary image, fallback to first image, then placeholder
-    if (product.primary_image) {
-      return product.primary_image;
-    }
-    
-    if (product.all_images && product.all_images.length > 0) {
-      return product.all_images[0].image_url;
-    }
-    
-    // Fallback to a placeholder image
-    return 'https://via.placeholder.com/300x300/f0f0f0/666666?text=Product+Image';
+    return getPrimaryImageUrl(product);
   };
 
   if (loading) {
@@ -140,9 +131,7 @@ const BestSellers = () => {
                 <img 
                   src={getImageUrl(product)}
                   alt={product.product_name}
-                  onError={(e) => {
-                    e.target.src = 'https://via.placeholder.com/300x300/f0f0f0/666666?text=Product+Image';
-                  }}
+                  onError={(e) => handleImageError(e)}
                 />
                 <h3>{product.product_name}</h3>
                 <p className='product-price'>{formatPrice(product.product_price)}</p>

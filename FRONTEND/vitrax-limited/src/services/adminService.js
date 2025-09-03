@@ -33,6 +33,163 @@ export const userService = {
     }
   },
 
+  // Get all customers (admin only)
+  getAllCustomers: async (params = {}) => {
+    try {
+      const queryParams = new URLSearchParams();
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+          queryParams.append(key, params[key]);
+        }
+      });
+      
+      const response = await fetch(`${API_BASE_URL}/customers/admin/customers?${queryParams}`, {
+        headers: getAuthHeaders()
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error fetching customers:', error);
+      throw error;
+    }
+  },
+
+  // Get customer statistics
+  getCustomerStats: async (days = 30) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/customers/admin/customers/stats?days=${days}`, {
+        headers: getAuthHeaders()
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error fetching customer stats:', error);
+      throw error;
+    }
+  },
+
+  // Get customer details
+  getCustomerDetails: async (customerId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/customers/admin/customers/${customerId}`, {
+        headers: getAuthHeaders()
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error fetching customer details:', error);
+      throw error;
+    }
+  },
+
+  // Update customer
+  updateCustomer: async (customerId, customerData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/customers/admin/customers/${customerId}`, {
+        method: 'PUT',
+        headers: {
+          ...getAuthHeaders(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(customerData)
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error updating customer:', error);
+      throw error;
+    }
+  },
+
+  // Delete customer
+  deleteCustomer: async (customerId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/customers/admin/customers/${customerId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error deleting customer:', error);
+      throw error;
+    }
+  },
+
+  // Analytics Services
+  // Dashboard Overview
+  getDashboardAnalytics: async (days = 30) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/analytics/admin/dashboard?days=${days}`, {
+        headers: getAuthHeaders()
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error fetching dashboard analytics:', error);
+      throw error;
+    }
+  },
+
+  // Sales Analytics
+  getSalesAnalytics: async (days = 30) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/analytics/admin/sales-analytics?days=${days}`, {
+        headers: getAuthHeaders()
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error fetching sales analytics:', error);
+      throw error;
+    }
+  },
+
+  // Customer Analytics
+  getCustomerAnalytics: async (days = 30) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/analytics/admin/customer-analytics?days=${days}`, {
+        headers: getAuthHeaders()
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error fetching customer analytics:', error);
+      throw error;
+    }
+  },
+
+  // Product Analytics
+  getProductAnalytics: async (days = 30) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/analytics/admin/product-analytics?days=${days}`, {
+        headers: getAuthHeaders()
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error fetching product analytics:', error);
+      throw error;
+    }
+  },
+
+  // Financial Analytics
+  getFinancialAnalytics: async (days = 30) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/analytics/admin/financial-analytics?days=${days}`, {
+        headers: getAuthHeaders()
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error fetching financial analytics:', error);
+      throw error;
+    }
+  },
+
+  // Real-time Analytics
+  getRealTimeAnalytics: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/analytics/admin/real-time`, {
+        headers: getAuthHeaders()
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error fetching real-time analytics:', error);
+      throw error;
+    }
+  },
+
   // Create new user
   createUser: async (userData) => {
     try {
@@ -90,7 +247,7 @@ export const productService = {
         }
       });
       
-      const response = await fetch(`${API_BASE_URL}/products/product?${queryParams}`, {
+      const response = await fetch(`${API_BASE_URL}/api/product?${queryParams}`, {
         headers: getAuthHeaders()
       });
       const data = await handleResponse(response);
@@ -104,7 +261,7 @@ export const productService = {
   // Get product statistics
   getProductStats: async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/products/admin/stats`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/stats`, {
         headers: getAuthHeaders()
       });
       return handleResponse(response);
@@ -117,7 +274,7 @@ export const productService = {
   // Bulk update products
   bulkUpdateProducts: async (productIds, updates) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/products/admin/bulk-update`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/bulk-update`, {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({ product_ids: productIds, updates })
@@ -132,7 +289,7 @@ export const productService = {
   // Bulk delete products
   bulkDeleteProducts: async (productIds) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/products/admin/bulk-delete`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/bulk-delete`, {
         method: 'DELETE',
         headers: getAuthHeaders(),
         body: JSON.stringify({ product_ids: productIds })
@@ -147,7 +304,7 @@ export const productService = {
   // Export products
   exportProducts: async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/products/admin/export`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/export`, {
         headers: getAuthHeaders()
       });
       return handleResponse(response);
@@ -160,7 +317,7 @@ export const productService = {
   // Get single product
   getProduct: async (productId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/${productId}`, {
         headers: getAuthHeaders()
       });
       return handleResponse(response);
@@ -173,10 +330,22 @@ export const productService = {
   // Create product
   createProduct: async (productData) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/products/product`, {
+      let headers = getAuthHeaders();
+      let body;
+
+      // Check if productData is FormData (for image uploads)
+      if (productData instanceof FormData) {
+        // Remove Content-Type header to let browser set it with boundary for FormData
+        delete headers['Content-Type'];
+        body = productData;
+      } else {
+        body = JSON.stringify(productData);
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/product`, {
         method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(productData)
+        headers,
+        body
       });
       return handleResponse(response);
     } catch (error) {
@@ -188,10 +357,22 @@ export const productService = {
   // Update product
   updateProduct: async (productId, productData) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
+      let headers = getAuthHeaders();
+      let body;
+
+      // Check if productData is FormData (for image uploads)
+      if (productData instanceof FormData) {
+        // Remove Content-Type header to let browser set it with boundary for FormData
+        delete headers['Content-Type'];
+        body = productData;
+      } else {
+        body = JSON.stringify(productData);
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/${productId}`, {
         method: 'PUT',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(productData)
+        headers,
+        body
       });
       return handleResponse(response);
     } catch (error) {
@@ -203,7 +384,7 @@ export const productService = {
   // Delete product
   deleteProduct: async (productId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/${productId}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
@@ -218,9 +399,16 @@ export const productService = {
 // Order Management APIs
 export const orderService = {
   // Get all orders
-  getAllOrders: async () => {
+  getAllOrders: async (params = {}) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/orders/admin/all`, {
+      const queryParams = new URLSearchParams();
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+          queryParams.append(key, params[key]);
+        }
+      });
+      
+      const response = await fetch(`${API_BASE_URL}/orders/admin/all?${queryParams}`, {
         headers: getAuthHeaders()
       });
       return handleResponse(response);
@@ -230,10 +418,23 @@ export const orderService = {
     }
   },
 
+  // Get order statistics
+  getOrderStats: async (days = 30) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/orders/admin/stats?days=${days}`, {
+        headers: getAuthHeaders()
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error fetching order stats:', error);
+      throw error;
+    }
+  },
+
   // Update order status
   updateOrderStatus: async (orderId, status) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/orders/${orderId}/status`, {
+      const response = await fetch(`${API_BASE_URL}/orders/admin/${orderId}/status`, {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({ status })
@@ -329,6 +530,37 @@ export const categoryService = {
       return handleResponse(response);
     } catch (error) {
       console.error('Error fetching category stats:', error);
+      throw error;
+    }
+  }
+};
+
+// Dashboard Overview APIs
+export const dashboardService = {
+  // Get dashboard overview data
+  getDashboardOverview: async (timeRange = '30d') => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/dashboard/admin/overview?timeRange=${timeRange}`, {
+        headers: getAuthHeaders()
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error fetching dashboard overview:', error);
+      throw error;
+    }
+  },
+
+  // Export dashboard data
+  exportDashboard: async (format = 'csv', timeRange = '30d') => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/dashboard/admin/overview/export`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ format, timeRange })
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error exporting dashboard:', error);
       throw error;
     }
   }
@@ -455,6 +687,7 @@ export default {
   productService,
   orderService,
   categoryService,
+  dashboardService,
   analyticsService,
   inventoryService,
   paymentMethodService

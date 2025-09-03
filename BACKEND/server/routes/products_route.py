@@ -421,14 +421,43 @@ def get_products_by_category(category_slug):
 @jwt_required()
 def update_product(product_id):
     """Update a product's details."""
-    data = request.get_json()
     product = Product.query.get_or_404(product_id)
     
-    product.product_name = data.get('product_name', product.product_name)
-    product.product_description = data.get('product_description', product.product_description)
-    product.product_price = data.get('product_price', product.product_price)
-    product.stock_quantity = data.get('stock_quantity', product.stock_quantity)
-    product.category_id = data.get('category_id', product.category_id)
+    # Handle both JSON and FormData
+    if request.content_type and request.content_type.startswith('multipart/form-data'):
+        data = request.form
+        files = request.files.getlist('images')
+        
+        # Update product details
+        product.product_name = data.get('product_name', product.product_name)
+        product.product_description = data.get('product_description', product.product_description)
+        product.product_price = float(data.get('product_price', product.product_price))
+        product.stock_quantity = int(data.get('stock_quantity', product.stock_quantity))
+        product.category_id = int(data.get('category_id', product.category_id))
+        
+        # Process new images if any
+        if files:
+            current_count = ProductImage.query.filter_by(product_id=product_id).count()
+            for idx, img in enumerate(files[:MAX_IMAGES_PER_PRODUCT - current_count]):
+                if img.filename == '':
+                    continue
+                    
+                image_path = save_product_image(img, product_id)
+                if image_path:
+                    is_primary = (idx == 0 and current_count == 0)  # Primary if first image and no existing images
+                    new_image = ProductImage(
+                        image_url=image_path,
+                        is_primary=is_primary,
+                        product_id=product_id
+                    )
+                    db.session.add(new_image)
+    else:
+        data = request.get_json()
+        product.product_name = data.get('product_name', product.product_name)
+        product.product_description = data.get('product_description', product.product_description)
+        product.product_price = data.get('product_price', product.product_price)
+        product.stock_quantity = data.get('stock_quantity', product.stock_quantity)
+        product.category_id = data.get('category_id', product.category_id)
     
     db.session.commit()
     return jsonify({'message': 'Product updated successfully'}), 200
@@ -529,9 +558,15 @@ def add_product_images(product_id):
 
 # Admin-specific routes for product management
 
-@product_bp.route('/admin/stats', methods=['GET'])
+@product_bp.route('/admin/stats', methods=['GET', 'OPTIONS'])
 @jwt_required()
 def get_product_stats():
+    if request.method == 'OPTIONS':
+        response = jsonify({'message': 'OK'})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
+        return response, 200
     """Get product statistics for admin dashboard"""
     try:
         from sqlalchemy import func
@@ -554,7 +589,7 @@ def get_product_stats():
             func.count(Product.product_id).label('count')
         ).join(Product, isouter=True).group_by(Category.category_id).all()
         
-        return jsonify({
+        response = jsonify({
             'total_products': total_products,
             'out_of_stock': out_of_stock,
             'low_stock': low_stock,
@@ -565,15 +600,25 @@ def get_product_stats():
                 {'category': cat, 'count': count} 
                 for cat, count in category_stats
             ]
-        }), 200
+        })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
+        return response, 200
         
     except Exception as e:
         return jsonify({'error': f'Error fetching product stats: {str(e)}'}), 500
 
 
-@product_bp.route('/admin/bulk-update', methods=['PUT'])
+@product_bp.route('/admin/bulk-update', methods=['PUT', 'OPTIONS'])
 @jwt_required()
 def bulk_update_products():
+    if request.method == 'OPTIONS':
+        response = jsonify({'message': 'OK'})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'PUT,OPTIONS')
+        return response, 200
     """Bulk update products (admin only)"""
     try:
         data = request.get_json()
@@ -595,19 +640,29 @@ def bulk_update_products():
         
         db.session.commit()
         
-        return jsonify({
+        response = jsonify({
             'message': f'Successfully updated {updated_count} products',
             'updated_count': updated_count
-        }), 200
+        })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'PUT,OPTIONS')
+        return response, 200
         
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': f'Error in bulk update: {str(e)}'}), 500
 
 
-@product_bp.route('/admin/bulk-delete', methods=['DELETE'])
+@product_bp.route('/admin/bulk-delete', methods=['DELETE', 'OPTIONS'])
 @jwt_required()
 def bulk_delete_products():
+    if request.method == 'OPTIONS':
+        response = jsonify({'message': 'OK'})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'DELETE,OPTIONS')
+        return response, 200
     """Bulk delete products (admin only)"""
     try:
         data = request.get_json()
@@ -638,19 +693,29 @@ def bulk_delete_products():
         
         db.session.commit()
         
-        return jsonify({
+        response = jsonify({
             'message': f'Successfully deleted {deleted_count} products',
             'deleted_count': deleted_count
-        }), 200
+        })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'DELETE,OPTIONS')
+        return response, 200
         
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': f'Error in bulk delete: {str(e)}'}), 500
 
 
-@product_bp.route('/admin/export', methods=['GET'])
+@product_bp.route('/admin/export', methods=['GET', 'OPTIONS'])
 @jwt_required()
 def export_products():
+    if request.method == 'OPTIONS':
+        response = jsonify({'message': 'OK'})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
+        return response, 200
     """Export products to CSV (admin only)"""
     try:
         products = Product.query.all()
@@ -673,10 +738,14 @@ def export_products():
                 'Updated': product.updated_at.isoformat() if product.updated_at else ''
             })
         
-        return jsonify({
+        response = jsonify({
             'csv_data': csv_data,
             'filename': f'products_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
-        }), 200
+        })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
+        return response, 200
         
     except Exception as e:
         return jsonify({'error': f'Error exporting products: {str(e)}'}), 500

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify
 from extensions import db
 from flask_jwt_extended import jwt_required, get_jwt_identity, verify_jwt_in_request
@@ -402,3 +402,186 @@ def validate_coupon():
         "min_order_amount": str(coupon.min_order_amount) if coupon.min_order_amount else None,
         "max_discount_amount": str(coupon.max_discount_amount) if coupon.max_discount_amount else None
     }), 200
+
+@order_bp.route('/admin/all', methods=['GET'])
+@jwt_required()
+def get_all_orders():
+    """Admin endpoint to get all orders with filtering and pagination"""
+    if not is_admin():
+        return jsonify({"error": "Admin access required"}), 403
+    
+    try:
+        # Get query parameters
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 20, type=int)
+        status_filter = request.args.get('status', '')
+        search = request.args.get('search', '')
+        date_from = request.args.get('date_from', '')
+        date_to = request.args.get('date_to', '')
+        
+        # Build query
+        query = Order.query
+        
+        # Apply filters
+        if status_filter:
+            query = query.filter(Order.order_status == OrderStatus(status_filter))
+        
+        if search:
+            # Search by order ID, user email, or username
+            query = query.join(User).filter(
+                db.or_(
+                    Order.order_id == search if search.isdigit() else False,
+                    User.email.contains(search),
+                    User.username.contains(search)
+                )
+            )
+        
+        if date_from:
+            try:
+                from_date = datetime.fromisoformat(date_from.replace('Z', '+00:00'))
+                query = query.filter(Order.order_date >= from_date)
+            except ValueError:
+                pass
+        
+        if date_to:
+            try:
+                to_date = datetime.fromisoformat(date_to.replace('Z', '+00:00'))
+                query = query.filter(Order.order_date <= to_date)
+            except ValueError:
+                pass
+        
+        # Order by most recent first
+        query = query.order_by(Order.order_date.desc())
+        
+        # Paginate results
+        pagination = query.paginate(
+            page=page, 
+            per_page=per_page, 
+            error_out=False
+        )
+        
+        orders = []
+        for order in pagination.items:
+            order_data = {
+                'order_id': order.order_id,
+                'order_date': order.order_date.isoformat() if order.order_date else None,
+                'total_amount': order.total_amount,
+                'order_status': order.order_status.value if order.order_status else None,
+                'shipping_address': order.shipping_address,
+                'user': {
+                    'id': order.user.id if order.user else None,
+                    'username': order.user.username if order.user else None,
+                    'email': order.user.email if order.user else None
+                },
+                'items_count': len(order.order_items) if order.order_items else 0,
+                'payment_status': order.payment.payment_status.value if order.payment else None,
+                'shipping_status': order.order_items[0].shipping_status.value if order.order_items else None
+            }
+            orders.append(order_data)
+        
+        return jsonify({
+            'orders': orders,
+            'pagination': {
+                'page': page,
+                'per_page': per_page,
+                'total': pagination.total,
+                'pages': pagination.pages,
+                'has_next': pagination.has_next,
+                'has_prev': pagination.has_prev
+            }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch orders", "details": str(e)}), 500
+
+@order_bp.route('/admin/stats', methods=['GET'])
+@jwt_required()
+def get_order_stats():
+    """Admin endpoint to get order statistics"""
+    if not is_admin():
+        return jsonify({"error": "Admin access required"}), 403
+    
+    try:
+        # Get date range from query params
+        days = request.args.get('days', 30, type=int)
+        from_date = datetime.now() - timedelta(days=days)
+        
+        # Get orders in date range
+        orders = Order.query.filter(Order.order_date >= from_date).all()
+        
+        # Calculate statistics
+        total_orders = len(orders)
+        total_revenue = sum(order.total_amount for order in orders)
+        pending_orders = len([o for o in orders if o.order_status == OrderStatus.PENDING])
+        completed_orders = len([o for o in orders if o.order_status == OrderStatus.DELIVERED])
+        cancelled_orders = len([o for o in orders if o.order_status == OrderStatus.CANCELLED])
+        
+        # Get status distribution
+        status_counts = {}
+        for order in orders:
+            status = order.order_status.value if order.order_status else 'unknown'
+            status_counts[status] = status_counts.get(status, 0) + 1
+        
+        # Get daily revenue for chart
+        daily_revenue = {}
+        for order in orders:
+            date_str = order.order_date.strftime('%Y-%m-%d') if order.order_date else 'unknown'
+            daily_revenue[date_str] = daily_revenue.get(date_str, 0) + order.total_amount
+        
+        return jsonify({
+            'total_orders': total_orders,
+            'total_revenue': total_revenue,
+            'pending_orders': pending_orders,
+            'completed_orders': completed_orders,
+            'cancelled_orders': cancelled_orders,
+            'status_distribution': status_counts,
+            'daily_revenue': daily_revenue,
+            'average_order_value': total_revenue / total_orders if total_orders > 0 else 0
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch order stats", "details": str(e)}), 500
+
+@order_bp.route('/admin/<int:order_id>/status', methods=['PUT'])
+@jwt_required()
+def update_order_status(order_id):
+    """Admin endpoint to update order status"""
+    if not is_admin():
+        return jsonify({"error": "Admin access required"}), 403
+    
+    try:
+        data = request.get_json()
+        new_status = data.get('status')
+        
+        if not new_status:
+            return jsonify({"error": "Status is required"}), 400
+        
+        order = Order.query.get(order_id)
+        if not order:
+            return jsonify({"error": "Order not found"}), 404
+        
+        # Update order status
+        order.order_status = OrderStatus(new_status)
+        
+        # Update shipping status for all items
+        for item in order.order_items:
+            if new_status == 'delivered':
+                item.shipping_status = ShippingStatus.DELIVERED
+            elif new_status == 'shipped':
+                item.shipping_status = ShippingStatus.SHIPPED
+            elif new_status == 'processing':
+                item.shipping_status = ShippingStatus.PENDING
+        
+        db.session.commit()
+        
+        return jsonify({
+            "message": "Order status updated successfully",
+            "order_id": order_id,
+            "new_status": new_status
+        }), 200
+        
+    except ValueError as e:
+        return jsonify({"error": "Invalid status value"}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to update order status", "details": str(e)}), 500

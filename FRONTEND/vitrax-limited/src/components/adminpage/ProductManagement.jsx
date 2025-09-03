@@ -1,5 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import { FaCheckCircle, FaExclamationTriangle, FaStar, FaTimes, FaPlus, FaEdit, FaTrash, FaEye, FaDownload, FaUpload, FaSearch, FaFilter, FaSort, FaFileExport, FaFileImport } from 'react-icons/fa';
+import { 
+  FaCheckCircle, 
+  FaExclamationTriangle, 
+  FaStar, 
+  FaTimes, 
+  FaPlus, 
+  FaEdit, 
+  FaTrash, 
+  FaEye, 
+  FaDownload, 
+  FaUpload, 
+  FaSearch, 
+  FaFilter, 
+  FaSort, 
+  FaFileExport, 
+  FaFileImport,
+  FaBox,
+  FaBoxes,
+  FaExclamationCircle,
+  FaDollarSign,
+  FaChartLine,
+  FaCog,
+  FaImage,
+  FaCamera,
+  FaTrashAlt,
+  FaSave,
+  FaUndo,
+  FaCheck,
+  FaBan,
+  FaEyeSlash,
+  FaStarHalfAlt,
+  FaHeart,
+  FaShoppingCart,
+  FaUsers,
+  FaClipboardList,
+  FaTruck,
+  FaCreditCard,
+  FaShieldAlt,
+  FaBell,
+  FaCalendarAlt,
+  FaClock,
+  FaMapMarkerAlt,
+  FaPhone,
+  FaEnvelope,
+  FaGlobe,
+  FaRuler,
+  FaPalette,
+  FaQuestion,
+  FaPaperPlane,
+  FaEllipsisH
+} from 'react-icons/fa';
+import { FiRefreshCw } from 'react-icons/fi';
 import { productService } from '../../services/adminService';
 import './ProductManagement.css';
 
@@ -10,16 +61,35 @@ const ProductManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
-  const [sortBy, setSortBy] = useState("name");
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortBy] = useState("product_name");
+  const [sortOrder] = useState("asc");
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [viewingProduct, setViewingProduct] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [categories, setCategories] = useState([]);
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState([]);
+  const [activeActionMenu, setActiveActionMenu] = useState(null);
+
+  // Close action menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (activeActionMenu && !event.target.closest('.action-menu')) {
+        setActiveActionMenu(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [activeActionMenu]);
 
   // Form state
   const [newProduct, setNewProduct] = useState({
@@ -31,7 +101,30 @@ const ProductManagement = () => {
     images: []
   });
 
-  const statuses = ["All", "Active", "Inactive", "Out of Stock", "Discontinued"];
+  const statuses = ["All", "Active", "Low Stock", "Out of Stock", "Inactive"];
+
+  // Helper functions - moved to top to avoid hoisting issues
+  const getProductStatus = (product) => {
+    if (product.stock_quantity === 0) return "Out of Stock";
+    if (product.stock_quantity <= 5) return "Low Stock";
+    return "Active";
+  };
+
+  const getStatusVariant = (status) => {
+    switch (status) {
+      case "Active": return "success";
+      case "Low Stock": return "warning";
+      case "Out of Stock": return "danger";
+      case "Inactive": return "secondary";
+      default: return "secondary";
+    }
+  };
+
+  const getStockStatus = (stock) => {
+    if (stock === 0) return { status: "Out of Stock", color: "text-red", icon: <FaExclamationCircle /> };
+    if (stock <= 5) return { status: "Low Stock", color: "text-orange", icon: <FaExclamationTriangle /> };
+    return { status: "In Stock", color: "text-green", icon: <FaCheckCircle /> };
+  };
 
   // Fetch products on component mount
   useEffect(() => {
@@ -112,30 +205,36 @@ const ProductManagement = () => {
   const totalProducts = products.length;
   const activeProducts = products.filter((p) => getProductStatus(p) === "Active").length;
   const lowStockProducts = products.filter((p) => p.stock_quantity <= 5 && p.stock_quantity > 0).length;
-  const outOfStockProducts = products.filter((p) => p.stock_quantity === 0).length;
   const totalValue = products.reduce((sum, p) => sum + (p.product_price * p.stock_quantity), 0);
 
-  // Helper functions
-  const getProductStatus = (product) => {
-    if (product.stock_quantity === 0) return "Out of Stock";
-    if (product.stock_quantity <= 5) return "Low Stock";
-    return "Active";
-  };
-
-  const getStatusVariant = (status) => {
-    switch (status) {
-      case "Active": return "success";
-      case "Low Stock": return "warning";
-      case "Out of Stock": return "danger";
-      case "Inactive": return "secondary";
-      default: return "secondary";
+  // Image handling functions
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length + uploadedImages.length > 10) {
+      alert('Maximum 10 images allowed');
+      return;
     }
+
+    const newImages = files.map(file => ({
+      file,
+      id: Date.now() + Math.random(),
+      preview: URL.createObjectURL(file)
+    }));
+
+    setUploadedImages([...uploadedImages, ...newImages]);
+    setImagePreviewUrls([...imagePreviewUrls, ...newImages.map(img => img.preview)]);
   };
 
-  const getStockStatus = (stock) => {
-    if (stock === 0) return { status: "Out of Stock", color: "text-red", icon: <FaExclamationTriangle /> };
-    if (stock <= 5) return { status: "Low Stock", color: "text-orange", icon: <FaExclamationTriangle /> };
-    return { status: "In Stock", color: "text-green", icon: <FaCheckCircle /> };
+  const removeImage = (imageId) => {
+    const imageToRemove = uploadedImages.find(img => img.id === imageId);
+    if (imageToRemove) {
+      URL.revokeObjectURL(imageToRemove.preview);
+    }
+    
+    setUploadedImages(uploadedImages.filter(img => img.id !== imageId));
+    setImagePreviewUrls(imagePreviewUrls.filter((_, index) => 
+      uploadedImages.findIndex(img => img.id === imageId) !== index
+    ));
   };
 
   // CRUD operations
@@ -146,8 +245,22 @@ const ProductManagement = () => {
     }
 
     try {
-      await productService.createProduct(newProduct);
+      const formData = new FormData();
+      formData.append('product_name', newProduct.product_name);
+      formData.append('product_description', newProduct.product_description);
+      formData.append('product_price', newProduct.product_price);
+      formData.append('stock_quantity', newProduct.stock_quantity);
+      formData.append('category_id', newProduct.category_id);
+
+      // Add images
+      uploadedImages.forEach((image) => {
+        formData.append('images', image.file);
+      });
+
+      await productService.createProduct(formData);
       await fetchProducts();
+      
+      // Reset form
       setNewProduct({
         product_name: "",
         product_description: "",
@@ -156,6 +269,8 @@ const ProductManagement = () => {
         category_id: "",
         images: []
       });
+      setUploadedImages([]);
+      setImagePreviewUrls([]);
       setIsAddDialogOpen(false);
       alert("Product added successfully");
     } catch (err) {
@@ -168,10 +283,24 @@ const ProductManagement = () => {
     if (!editingProduct) return;
 
     try {
-      await productService.updateProduct(editingProduct.product_id, editingProduct);
+      const formData = new FormData();
+      formData.append('product_name', editingProduct.product_name);
+      formData.append('product_description', editingProduct.product_description);
+      formData.append('product_price', editingProduct.product_price);
+      formData.append('stock_quantity', editingProduct.stock_quantity);
+      formData.append('category_id', editingProduct.category_id);
+
+      // Add new images
+      uploadedImages.forEach((image) => {
+        formData.append('images', image.file);
+      });
+
+      await productService.updateProduct(editingProduct.product_id, formData);
       await fetchProducts();
       setIsEditDialogOpen(false);
       setEditingProduct(null);
+      setUploadedImages([]);
+      setImagePreviewUrls([]);
       alert("Product updated successfully");
     } catch (err) {
       alert("Failed to update product");
@@ -190,6 +319,11 @@ const ProductManagement = () => {
         console.error('Error deleting product:', err);
       }
     }
+  };
+
+  const handleViewProduct = (product) => {
+    setViewingProduct(product);
+    setIsViewDialogOpen(true);
   };
 
   // Bulk actions
@@ -261,47 +395,7 @@ const ProductManagement = () => {
     }
   };
 
-  const handleImport = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.csv';
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const csv = event.target.result;
-          const lines = csv.split('\n');
-          
-          // Parse CSV and create products
-          const importedProducts = lines.slice(1).filter(line => line.trim()).map(line => {
-            const values = line.split(',');
-            return {
-              product_name: values[1],
-              product_description: values[2],
-              product_price: parseFloat(values[3]) || 0,
-              stock_quantity: parseInt(values[4]) || 0,
-              category_id: categories.find(c => c.category_name === values[5])?.category_id || 1
-            };
-          });
 
-          // Add products one by one
-          importedProducts.forEach(async (product) => {
-            try {
-              await productService.createProduct(product);
-            } catch (err) {
-              console.error('Error importing product:', err);
-            }
-          });
-
-          fetchProducts();
-          alert(`Imported ${importedProducts.length} products`);
-        };
-        reader.readAsText(file);
-      }
-    };
-    input.click();
-  };
 
   const toggleSelectAll = (e) => {
     if (e.target.checked) {
@@ -327,18 +421,15 @@ const ProductManagement = () => {
       {/* Header */}
       <div className="product-header">
         <div className="header-details">
-          <h1 className="header-title">Product Management</h1>
-          <p className="header-subtitle">Manage your furniture and product catalog</p>
+          <h1 className="header-title">Products</h1>
+          <p className="header-subtitle">Manage and track your furniture catalog</p>
         </div>
         <div className="product-actions">
-          <button className="btn btn-outline" onClick={handleImport}>
-            <FaFileImport /> Import
-          </button>
-          <button className="btn btn-outline" onClick={handleExport}>
-            <FaFileExport /> Export
+          <button className="btn btn-outline" onClick={() => fetchProducts()}>
+            <FiRefreshCw /> Refresh
           </button>
           <button className="btn btn-primary" onClick={() => setIsAddDialogOpen(true)}>
-            <FaPlus /> Add Product
+            <FaPlus /> + Create Product
           </button>
         </div>
       </div>
@@ -346,53 +437,57 @@ const ProductManagement = () => {
       {/* Stats Cards */}
       <div className="stats-cards">
         <div className="stat-card">
-          <div className="stat-icon total">📦</div>
+          <div className="stat-icon total">
+            <FaBoxes />
+          </div>
           <div className="stat-content">
             <div className="stat-value">{totalProducts}</div>
             <div className="stat-label">Total Products</div>
+            <div className="stat-change positive">+15% from last month</div>
           </div>
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon active">✅</div>
+          <div className="stat-icon active">
+            <FaDollarSign />
+          </div>
           <div className="stat-content">
-            <div className="stat-value">{activeProducts}</div>
-            <div className="stat-label">Active Products</div>
+            <div className="stat-value">Ksh {totalValue.toLocaleString()}</div>
+            <div className="stat-label">Total Value</div>
+            <div className="stat-change positive">+12% from last month</div>
           </div>
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon low-stock">⚠️</div>
+          <div className="stat-icon low-stock">
+            <FaExclamationTriangle />
+          </div>
           <div className="stat-content">
             <div className="stat-value">{lowStockProducts}</div>
             <div className="stat-label">Low Stock</div>
+            <div className="stat-change negative">-8% from last month</div>
           </div>
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon out-of-stock">❌</div>
-          <div className="stat-content">
-            <div className="stat-value">{outOfStockProducts}</div>
-            <div className="stat-label">Out of Stock</div>
+          <div className="stat-icon out-of-stock">
+            <FaChartLine />
           </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon value">💰</div>
           <div className="stat-content">
-            <div className="stat-value">${totalValue.toLocaleString()}</div>
-            <div className="stat-label">Total Value</div>
+            <div className="stat-value">{Math.round((activeProducts / totalProducts) * 100)}%</div>
+            <div className="stat-label">Active Rate</div>
+            <div className="stat-change positive">+3% from last month</div>
           </div>
         </div>
       </div>
 
-      {/* Filters and Search */}
+      {/* Search and Filter Section */}
       <div className="filters-section">
         <div className="search-box">
           <FaSearch className="search-icon" />
           <input
             type="text"
-            placeholder="Search products..."
+            placeholder="Search products by name or description..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -418,6 +513,7 @@ const ProductManagement = () => {
             onChange={(e) => setSelectedStatus(e.target.value)}
             className="filter-select"
           >
+            <option value="all">All Status</option>
             {statuses.map((stat) => (
               <option key={stat} value={stat.toLowerCase()}>
                 {stat}
@@ -425,34 +521,29 @@ const ProductManagement = () => {
             ))}
           </select>
 
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="filter-select"
-          >
-            <option value="product_name">Sort by Name</option>
-            <option value="product_price">Sort by Price</option>
-            <option value="stock_quantity">Sort by Stock</option>
-            <option value="created_at">Sort by Date</option>
-          </select>
+          <button className="btn btn-outline filter-btn">
+            <FaFilter /> More Filters
+          </button>
         </div>
       </div>
 
       {/* Bulk Actions */}
       {selectedProducts.length > 0 && (
         <div className="bulk-actions">
-          <span className="selected-count">{selectedProducts.length} products selected</span>
+          <span className="selected-count">
+            <FaCheckCircle /> {selectedProducts.length} products selected
+          </span>
           <button className="btn btn-secondary" onClick={() => handleBulkAction("activate")}>
-            Activate
+            <FaCheck /> Activate
           </button>
           <button className="btn btn-secondary" onClick={() => handleBulkAction("deactivate")}>
-            Deactivate
+            <FaBan /> Deactivate
           </button>
           <button className="btn btn-danger" onClick={() => handleBulkAction("delete")}>
-            Delete
+            <FaTrash /> Delete
           </button>
           <button className="btn btn-clear" onClick={() => setSelectedProducts([])}>
-            Clear
+            <FaTimes /> Clear
           </button>
         </div>
       )}
@@ -469,12 +560,12 @@ const ProductManagement = () => {
                   onChange={toggleSelectAll}
                 />
               </th>
-              <th>Product</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>PRODUCT</th>
+              <th>CATEGORY</th>
+              <th>PRICE</th>
+              <th>STOCK</th>
+              <th>STATUS</th>
+              <th>ACTIONS</th>
             </tr>
           </thead>
           <tbody>
@@ -503,7 +594,7 @@ const ProductManagement = () => {
                     <div className="product-info">
                       <img 
                         className="product-thumbnail" 
-                        src={product.images?.[0]?.image_url || "/placeholder.svg"} 
+                        src={product.primary_image || product.images?.[0]?.image_url || "/placeholder.svg"} 
                         alt={product.product_name}
                         onError={(e) => {
                           e.target.src = "/placeholder.svg";
@@ -511,51 +602,101 @@ const ProductManagement = () => {
                       />
                       <div className="product-details">
                         <div className="product-name">{product.product_name}</div>
-                        <div className="product-description">
-                          {product.product_description?.substring(0, 50)}...
-                        </div>
+                        <div className="product-id">PROD-{String(product.product_id).padStart(3, '0')}</div>
                       </div>
                     </div>
                   </td>
 
                   <td>{category?.category_name || 'Unknown'}</td>
-                  <td>${product.product_price?.toFixed(2)}</td>
+                  <td>Ksh {product.product_price?.toLocaleString()}</td>
                   <td>
                     <span className={`stock-status ${stockInfo.color}`}>
-                      {stockInfo.icon} {product.stock_quantity}
+                      {product.stock_quantity} items
                     </span>
                   </td>
                   <td>
                     <span className={`status-badge status-${getStatusVariant(status)}`}>
-                      {status}
+                      {status === 'Active' ? <FaCheckCircle /> : <FaTimes />} {status}
                     </span>
                   </td>
                   <td>
-                    <div className="action-buttons">
+                    <div className="action-menu">
                       <button 
-                        className="action-btn btn-view" 
-                        onClick={() => alert("View details - Implement view modal")}
-                        title="View Details"
+                        className="action-menu-btn" 
+                        onClick={() => setActiveActionMenu(product.product_id)}
+                        title="More actions"
                       >
-                        <FaEye />
+                        <FaEllipsisH />
                       </button>
-                      <button 
-                        className="action-btn btn-edit" 
-                        onClick={() => {
-                          setEditingProduct({ ...product });
-                          setIsEditDialogOpen(true);
-                        }}
-                        title="Edit Product"
-                      >
-                        <FaEdit />
-                      </button>
-                      <button 
-                        className="action-btn btn-delete" 
-                        onClick={() => handleDeleteProduct(product.product_id)}
-                        title="Delete Product"
-                      >
-                        <FaTrash />
-                      </button>
+                      {activeActionMenu === product.product_id && (
+                        <>
+                          <div className="action-sidebar-backdrop" onClick={() => setActiveActionMenu(null)}></div>
+                          <div className="action-sidebar">
+                          <div className="action-sidebar-header">
+                            <h3>Actions</h3>
+                            <button 
+                              className="close-sidebar"
+                              onClick={() => setActiveActionMenu(null)}
+                            >
+                              <FaTimes />
+                            </button>
+                          </div>
+                          <div className="action-sidebar-content">
+                            <button 
+                              className="action-sidebar-item" 
+                              onClick={() => {
+                                handleViewProduct(product);
+                                setActiveActionMenu(null);
+                              }}
+                            >
+                              <FaEye />
+                              <span>View Details</span>
+                            </button>
+                            <button 
+                              className="action-sidebar-item" 
+                              onClick={() => {
+                                setEditingProduct({ ...product });
+                                setIsEditDialogOpen(true);
+                                setActiveActionMenu(null);
+                              }}
+                            >
+                              <FaEdit />
+                              <span>Edit Product</span>
+                            </button>
+                            <button 
+                              className="action-sidebar-item" 
+                              onClick={() => {
+                                handleExport();
+                                setActiveActionMenu(null);
+                              }}
+                            >
+                              <FaDownload />
+                              <span>Download</span>
+                            </button>
+                            <button 
+                              className="action-sidebar-item" 
+                              onClick={() => {
+                                handleViewProduct(product);
+                                setActiveActionMenu(null);
+                              }}
+                            >
+                              <FaPaperPlane />
+                              <span>Send</span>
+                            </button>
+                            <button 
+                              className="action-sidebar-item danger" 
+                              onClick={() => {
+                                handleDeleteProduct(product.product_id);
+                                setActiveActionMenu(null);
+                              }}
+                            >
+                              <FaTrash />
+                              <span>Delete Product</span>
+                            </button>
+                          </div>
+                        </div>
+                      </>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -566,7 +707,9 @@ const ProductManagement = () => {
 
         {paginatedProducts.length === 0 && (
           <div className="empty-state">
-            <div className="empty-icon">📦</div>
+            <div className="empty-icon">
+              <FaBoxes />
+            </div>
             <h3>No products found</h3>
             <p>Try adjusting your search or filters</p>
             <button className="btn btn-primary" onClick={() => setIsAddDialogOpen(true)}>
@@ -576,36 +719,81 @@ const ProductManagement = () => {
         )}
       </div>
 
-      {/* Pagination */}
+      {/* Enhanced Pagination with Numbered Pages */}
       {totalPages > 1 && (
         <div className="pagination-container">
           <span className="pagination-info">
-            Showing {paginatedProducts.length} of {sortedProducts.length} results
+            Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, sortedProducts.length)} of {sortedProducts.length} results • Page {currentPage} of {totalPages}
           </span>
           <div className="pagination-controls">
-            <button 
-              className="pagination-btn" 
-              disabled={currentPage === 1} 
-              onClick={() => setCurrentPage(currentPage - 1)}
-            >
-              Previous
-            </button>
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                className={`pagination-btn ${currentPage === i + 1 ? "active" : ""}`}
-                onClick={() => setCurrentPage(i + 1)}
+            {/* Previous button - only show if not on first page */}
+            {currentPage > 1 && (
+              <button 
+                className="pagination-btn" 
+                onClick={() => setCurrentPage(currentPage - 1)}
+                title="Previous page"
               >
-                {i + 1}
+                ← Previous
               </button>
-            ))}
-            <button 
-              className="pagination-btn" 
-              disabled={currentPage === totalPages} 
-              onClick={() => setCurrentPage(currentPage + 1)}
-            >
-              Next
-            </button>
+            )}
+            
+            {/* Page numbers */}
+            {[...Array(totalPages)].map((_, i) => {
+              const pageNum = i + 1;
+              
+              // Show all pages if total pages <= 7
+              if (totalPages <= 7) {
+                return (
+                  <button
+                    key={pageNum}
+                    className={`pagination-btn ${currentPage === pageNum ? "active" : ""}`}
+                    onClick={() => setCurrentPage(pageNum)}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              }
+              
+              // For more than 7 pages, show smart pagination
+              if (
+                pageNum === 1 || // Always show first page
+                pageNum === totalPages || // Always show last page
+                (pageNum >= currentPage - 1 && pageNum <= currentPage + 1) || // Show pages around current
+                (currentPage <= 3 && pageNum <= 5) || // Show first 5 pages when near start
+                (currentPage >= totalPages - 2 && pageNum >= totalPages - 4) // Show last 5 pages when near end
+              ) {
+                return (
+                  <button
+                    key={pageNum}
+                    className={`pagination-btn ${currentPage === pageNum ? "active" : ""}`}
+                    onClick={() => setCurrentPage(pageNum)}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              }
+              
+              // Show ellipsis
+              if (
+                (pageNum === 2 && currentPage > 4) ||
+                (pageNum === totalPages - 1 && currentPage < totalPages - 3)
+              ) {
+                return <span key={`ellipsis-${pageNum}`} className="pagination-ellipsis">...</span>;
+              }
+              
+              return null;
+            })}
+            
+            {/* Next button - only show if not on last page */}
+            {currentPage < totalPages && (
+              <button 
+                className="pagination-btn" 
+                onClick={() => setCurrentPage(currentPage + 1)}
+                title="Next page"
+              >
+                Next →
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -616,7 +804,7 @@ const ProductManagement = () => {
           <div className="dialog-content">
             <div className="dialog-header">
               <div className="dialog-title">
-                <h2>Add New Product</h2>
+                <h2><FaPlus /> Add New Product</h2>
                 <p>Create a new product in your furniture catalog</p>
               </div>
               <button
@@ -746,7 +934,7 @@ const ProductManagement = () => {
               {activeTab === 2 && (
                 <div className="form-grid">
                   <label className="full-width">
-                    Product Images
+                    Product Images (Max 10)
                     <div className="image-upload-area">
                       <FaUpload className="upload-icon" />
                       <p>Drag and drop images here or click to browse</p>
@@ -754,12 +942,26 @@ const ProductManagement = () => {
                         type="file"
                         multiple
                         accept="image/*"
-                        onChange={(e) => {
-                          // Handle image upload
-                          console.log('Images selected:', e.target.files);
-                        }}
+                        onChange={handleImageUpload}
                       />
                     </div>
+                    
+                    {uploadedImages.length > 0 && (
+                      <div className="image-previews">
+                        {uploadedImages.map((image) => (
+                          <div key={image.id} className="image-preview">
+                            <img src={image.preview} alt="Preview" />
+                            <button
+                              type="button"
+                              className="remove-image"
+                              onClick={() => removeImage(image.id)}
+                            >
+                              <FaTimes />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </label>
                 </div>
               )}
@@ -769,7 +971,7 @@ const ProductManagement = () => {
                   Cancel
                 </button>
                 <button type="button" className="btn btn-primary" onClick={handleAddProduct}>
-                  Create Product
+                  <FaSave /> Create Product
                 </button>
               </div>
             </form>
@@ -783,7 +985,7 @@ const ProductManagement = () => {
           <div className="dialog-content">
             <div className="dialog-header">
               <div className="dialog-title">
-                <h2>Edit Product</h2>
+                <h2><FaEdit /> Edit Product</h2>
                 <p>Modify the details of this product</p>
               </div>
               <button
@@ -909,7 +1111,7 @@ const ProductManagement = () => {
               {activeTab === 2 && (
                 <div className="form-grid">
                   <label className="full-width">
-                    Product Images
+                    Product Images (Max 10)
                     <div className="image-upload-area">
                       <FaUpload className="upload-icon" />
                       <p>Drag and drop images here or click to browse</p>
@@ -917,12 +1119,26 @@ const ProductManagement = () => {
                         type="file"
                         multiple
                         accept="image/*"
-                        onChange={(e) => {
-                          // Handle image upload
-                          console.log('Images selected:', e.target.files);
-                        }}
+                        onChange={handleImageUpload}
                       />
                     </div>
+                    
+                    {uploadedImages.length > 0 && (
+                      <div className="image-previews">
+                        {uploadedImages.map((image) => (
+                          <div key={image.id} className="image-preview">
+                            <img src={image.preview} alt="Preview" />
+                            <button
+                              type="button"
+                              className="remove-image"
+                              onClick={() => removeImage(image.id)}
+                            >
+                              <FaTimes />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </label>
                 </div>
               )}
@@ -932,10 +1148,89 @@ const ProductManagement = () => {
                   Cancel
                 </button>
                 <button type="button" className="btn btn-primary" onClick={handleEditProduct}>
-                  Update Product
+                  <FaSave /> Update Product
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* View Product Dialog */}
+      {isViewDialogOpen && viewingProduct && (
+        <div className="dialog-overlay">
+          <div className="dialog-content view-dialog">
+            <div className="dialog-header">
+              <div className="dialog-title">
+                <h2><FaEye /> Product Details</h2>
+                <p>View product information</p>
+              </div>
+              <button
+                className="close-dialog"
+                onClick={() => setIsViewDialogOpen(false)}
+              >
+                <FaTimes />
+              </button>
+            </div>
+
+            <div className="product-view-content">
+              <div className="product-images">
+                <img 
+                  src={viewingProduct.primary_image || viewingProduct.images?.[0]?.image_url || "/placeholder.svg"} 
+                  alt={viewingProduct.product_name}
+                  className="main-product-image"
+                />
+              </div>
+              
+              <div className="product-details-view">
+                <h3>{viewingProduct.product_name}</h3>
+                <p className="product-description">{viewingProduct.product_description}</p>
+                
+                <div className="product-stats">
+                  <div className="stat">
+                    <span className="label">Price:</span>
+                    <span className="value">${viewingProduct.product_price?.toFixed(2)}</span>
+                  </div>
+                  <div className="stat">
+                    <span className="label">Stock:</span>
+                    <span className="value">{viewingProduct.stock_quantity}</span>
+                  </div>
+                  <div className="stat">
+                    <span className="label">Category:</span>
+                    <span className="value">
+                      {categories.find(c => c.category_id === viewingProduct.category_id)?.category_name || 'Unknown'}
+                    </span>
+                  </div>
+                  <div className="stat">
+                    <span className="label">Status:</span>
+                    <span className={`value status-${getStatusVariant(getProductStatus(viewingProduct))}`}>
+                      {getProductStatus(viewingProduct)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="dialog-footer">
+              <button 
+                type="button" 
+                className="btn btn-outline" 
+                onClick={() => setIsViewDialogOpen(false)}
+              >
+                Close
+              </button>
+              <button 
+                type="button" 
+                className="btn btn-primary" 
+                onClick={() => {
+                  setEditingProduct({ ...viewingProduct });
+                  setIsViewDialogOpen(false);
+                  setIsEditDialogOpen(true);
+                }}
+              >
+                <FaEdit /> Edit Product
+              </button>
+            </div>
           </div>
         </div>
       )}

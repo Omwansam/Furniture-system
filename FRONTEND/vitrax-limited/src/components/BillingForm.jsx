@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { FaUser, FaBuilding, FaMapMarkerAlt, FaPhone, FaEnvelope, FaCreditCard } from "react-icons/fa";
 import { cartService } from "./cartService";
+import { getPrimaryImageUrl } from "../utils/imageUtils";
 import "./BillingForm.css";
 
 
@@ -264,13 +265,18 @@ const BillingForm = () => {
           {cartData.items.map((item) => (
             <div key={item.cart_item_id} className="order-item">
               <img 
-                src={
-                  item.image_url?.startsWith('http') 
-                    ? item.image_url 
-                    : `http://localhost:5000/${item.image_url}`
-                }
+                src={getPrimaryImageUrl(item)}
                 alt={item.product_name}
                 className="order-item-img"
+                onError={(e) => {
+                  console.error('Image failed to load for billing item:', item.cart_item_id, 'URL:', e.target.src);
+                  // Show placeholder on error
+                  e.target.style.display = 'none';
+                  const placeholder = document.createElement('div');
+                  placeholder.className = 'order-item-img-placeholder';
+                  placeholder.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21,15 16,10 5,21"></polyline></svg>';
+                  e.target.parentNode.insertBefore(placeholder, e.target);
+                }}
               />
               <div className="order-item-details">
                 <h4>{item.product_name}</h4>

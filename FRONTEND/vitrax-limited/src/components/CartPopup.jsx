@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FiX, FiPlus, FiMinus, FiTrash2 } from "react-icons/fi";
 import { cartService } from "./cartService";
 import { handleAuthError } from "../utils/authUtils";
+import { getPrimaryImageUrl } from "../utils/imageUtils";
 import "./CartPopup.css";
 
 const CartPopup = ({ onClose, onCartUpdate }) => {
@@ -10,6 +11,7 @@ const CartPopup = ({ onClose, onCartUpdate }) => {
   const [cartData, setCartData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState({});
+
 
   console.log("CartPopup rendered with onClose:", onClose);
 
@@ -22,6 +24,17 @@ const CartPopup = ({ onClose, onCartUpdate }) => {
     try {
       setLoading(true);
       const data = await cartService.getCart();
+      console.log('Cart data received:', data);
+      console.log('Cart items:', data?.items);
+      if (data?.items) {
+        data.items.forEach((item, index) => {
+          console.log(`Item ${index}:`, {
+            name: item.product_name,
+            image_url: item.image_url,
+            primary_image_url: getPrimaryImageUrl(item)
+          });
+        });
+      }
       setCartData(data);
     } catch (error) {
       console.error('Error fetching cart:', error);
@@ -89,6 +102,30 @@ const CartPopup = ({ onClose, onCartUpdate }) => {
 
 
 
+  const renderProductImage = (item) => {
+    const imageUrl = getPrimaryImageUrl(item);
+    
+    console.log('Rendering image for item:', item.cart_item_id, 'URL:', imageUrl);
+    
+    return (
+      <img
+        src={imageUrl}
+        alt={item.product_name || 'Product image'}
+        className="cart-item-img"
+        onError={(e) => {
+          console.error('Image failed to load for item:', item.cart_item_id, 'URL:', e.target.src);
+          // Show placeholder on error
+          e.target.style.display = 'none';
+          const placeholder = document.createElement('div');
+          placeholder.className = 'cart-item-img-placeholder';
+          placeholder.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21,15 16,10 5,21"></polyline></svg>';
+          e.target.parentNode.insertBefore(placeholder, e.target);
+        }}
+        onLoad={() => console.log('Image loaded successfully for item:', item.cart_item_id, 'URL:', imageUrl)}
+      />
+    );
+  };
+
   if (loading) {
     return (
       <div className="cart-popup-overlay">
@@ -141,20 +178,10 @@ const CartPopup = ({ onClose, onCartUpdate }) => {
         </div>
 
         <div className="cart-items-container">
-          {cartItems.map((item) => (
-            <div key={item.cart_item_id} className="cart-item">
-              <img
-                src={
-                  item.image_url?.startsWith('http') 
-                    ? item.image_url 
-                    : `http://localhost:5000/${item.image_url || '/placeholder-image.jpg'}`
-                }
-                alt={item.product_name || 'Product image'}
-                className="cart-item-img"
-                onError={(e) => {
-                  e.target.src = "/placeholder-image.jpg";
-                }}
-              />
+          {cartItems.map((item) => {
+            return (
+              <div key={item.cart_item_id} className="cart-item">
+                {renderProductImage(item)}
               <div className="cart-item-details">
                 <h3>{item.product_name || 'Unknown Product'}</h3>
                 <p className="cart-price">
@@ -192,7 +219,8 @@ const CartPopup = ({ onClose, onCartUpdate }) => {
                 <FiTrash2 />
               </button>
             </div>
-          ))}
+          );
+        })}
         </div>
 
         <div className="cart-subtotal">
