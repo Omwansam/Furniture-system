@@ -961,6 +961,135 @@ export const settingsService = {
   }
 };
 
+// Blog Management APIs
+export const blogService = {
+  // Get all blogs (admin only)
+  getAllBlogs: async (params = {}) => {
+    try {
+      const queryParams = new URLSearchParams();
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+          queryParams.append(key, params[key]);
+        }
+      });
+      
+      const response = await fetch(`${API_BASE_URL}/blog/admin/posts?${queryParams}`, {
+        headers: getAuthHeaders()
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error fetching blogs:', error);
+      throw error;
+    }
+  },
+
+  // Get blog categories
+  getBlogCategories: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/blog/admin/categories`, {
+        headers: getAuthHeaders()
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error fetching blog categories:', error);
+      throw error;
+    }
+  },
+
+  // Create a new blog post
+  createBlog: async (blogData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/blog/admin/posts`, {
+        method: 'POST',
+        headers: {
+          ...getAuthHeaders(),
+          // Remove Content-Type for FormData
+        },
+        body: blogData // FormData for file uploads
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error creating blog:', error);
+      throw error;
+    }
+  },
+
+  // Update a blog post
+  updateBlog: async (blogId, blogData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/blog/admin/posts/${blogId}`, {
+        method: 'PUT',
+        headers: {
+          ...getAuthHeaders(),
+          // Remove Content-Type for FormData
+        },
+        body: blogData // FormData for file uploads
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error updating blog:', error);
+      throw error;
+    }
+  },
+
+  // Delete a blog post
+  deleteBlog: async (blogId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/blog/admin/posts/${blogId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error deleting blog:', error);
+      throw error;
+    }
+  },
+
+  // Bulk delete blogs
+  bulkDeleteBlogs: async (blogIds) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/blog/admin/posts/bulk-delete`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ blog_ids: blogIds })
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error bulk deleting blogs:', error);
+      throw error;
+    }
+  },
+
+  // Bulk update blogs
+  bulkUpdateBlogs: async (blogIds, updates) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/blog/admin/posts/bulk-update`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ blog_ids: blogIds, updates })
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error bulk updating blogs:', error);
+      throw error;
+    }
+  },
+
+  // Get blog statistics
+  getBlogStats: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/blog/admin/stats`, {
+        headers: getAuthHeaders()
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error fetching blog stats:', error);
+      throw error;
+    }
+  }
+};
+
 // Export all services
 export default {
   userService,
@@ -974,5 +1103,6 @@ export default {
   suppliersService,
   usersManagementService,
   reportsService,
-  settingsService
+  settingsService,
+  blogService
 };

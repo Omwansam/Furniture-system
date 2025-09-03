@@ -8,12 +8,11 @@ import sys
 from datetime import datetime, timedelta
 import re
 
-# Add the parent directory to the path so we can import our modules
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add the current directory to the path so we can import our modules
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from server import create_app
-from server.models import db, BlogPost, BlogImage
-from server.extensions import db as db_instance
+from app import app
+from models import db, BlogPost, BlogImage
 
 def create_slug(title):
     """Create a URL-friendly slug from the title"""
@@ -23,8 +22,6 @@ def create_slug(title):
 
 def seed_blog_posts():
     """Seed the database with sample blog posts"""
-    
-    app = create_app()
     
     with app.app_context():
         # Check if blog posts already exist

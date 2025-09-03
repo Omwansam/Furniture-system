@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import {
   FaTachometerAlt, FaBox, FaShoppingCart, FaUsers,
-  FaWarehouse, FaUserCog, FaChartBar, FaCouch, FaTruck, FaCog
+  FaWarehouse, FaUserCog, FaChartBar, FaCouch, FaTruck, FaCog, FaBlog
 } from 'react-icons/fa';
 import DashboardOverview from './DashboardOverview';
 import AdvancedAnalytics from './AdvancedAnalytics';
@@ -12,6 +12,7 @@ import CustomerManagement from './CustomerManagement';
 import InventoryManagement from './InventoryManagement';
 import SuppliersManagement from './SuppliersManagement';
 import UserManagement from './UserManagement';
+import BlogManagement from './BlogManagement';
 import Reports from './Reports';
 import Settings from './Settings';
 import './Dashboard.css';
@@ -98,6 +99,13 @@ const Dashboard = () => {
               User Management
             </button>
             <button 
+              onClick={() => handleNavClick('blogs')}
+              className="sidebar-button"
+            >
+              <span className="icon"><FaBlog /></span>
+              Blog Management
+            </button>
+            <button 
               onClick={() => handleNavClick('reports')}
               className="sidebar-button"
             >
@@ -172,6 +180,7 @@ const Dashboard = () => {
             <Route path="inventory" element={<InventoryManagement />} />
             <Route path="suppliers" element={<SuppliersManagement />} />
             <Route path="users" element={<UserManagement />} />
+            <Route path="blogs" element={<BlogManagement />} />
             <Route path="reports" element={<Reports />} />
             <Route path="settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="overview" replace />} />
