@@ -1,8 +1,9 @@
-from flask import Flask, send_from_directory, make_response
+from flask import Flask, send_from_directory, make_response, jsonify
 from config import Config
 from flask_cors import CORS
 from extensions import db, migrate, jwt
 from models import User
+from flask_jwt_extended import JWTManager
 from routes.users_route import users_bp
 from routes.products_route import product_bp
 from routes.productImage_route import product_image_bp
@@ -35,6 +36,31 @@ CORS(app)
 db.init_app(app)
 migrate.init_app(app, db)
 jwt.init_app(app)
+
+# JWT Error Handlers
+@jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+    response = jsonify({"error": "Token has expired"})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response, 401
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    response = jsonify({"error": "Invalid token"})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response, 401
+
+@jwt.unauthorized_loader
+def missing_token_callback(error):
+    response = jsonify({"error": "Authorization token is required"})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response, 401
+
+@jwt.needs_fresh_token_loader
+def token_not_fresh_callback(jwt_header, jwt_payload):
+    response = jsonify({"error": "Fresh token required"})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response, 401
 
 
 

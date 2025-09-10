@@ -22,36 +22,7 @@ def update_cart_total(cart):
 ####################################################################################################################
 
 
-@cart_bp.route('/debug', methods=['GET'])
-def debug_cart():
-    """Debug route to check cart data without authentication"""
-    from models import Product, ProductImage
-    
-    products = Product.query.limit(3).all()
-    debug_data = []
-    
-    for product in products:
-        primary_image = ProductImage.query.filter_by(
-            product_id=product.product_id,
-            is_primary=True
-        ).first()
-        
-        debug_data.append({
-            'product_id': product.product_id,
-            'product_name': product.product_name,
-            'primary_image_url': primary_image.image_url if primary_image else None,
-            'all_images': [
-                {
-                    'image_url': img.image_url,
-                    'is_primary': img.is_primary
-                } for img in product.images
-            ] if hasattr(product, 'images') else []
-        })
-    
-    return jsonify({
-        'debug_info': debug_data,
-        'message': 'Debug cart data'
-    }), 200
+
 
 @cart_bp.route('',methods=['GET'])
 @jwt_required()
@@ -87,7 +58,6 @@ def get_cart():
         ).first()
         
         image_url = primary_image.image_url if primary_image else None
-        print(f"Cart item {item.cart_item_id}: Product {product.product_name} - Image URL: {image_url}")
         
         cart_items.append({
             'cart_item_id': item.cart_item_id,
@@ -120,74 +90,95 @@ def get_cart():
 @jwt_required()
 def add_to_cart():
     """Add an item to the shopping cart"""
-    identity = get_jwt_identity()
-    user_id = identity.get('id') if isinstance(identity, dict) else identity
-    data = request.get_json()
-    
-    if not data or 'product_id' not in data:
-        return jsonify({"error": "Product ID is required"}), 400
-    
     try:
-        product_id = int(data['product_id'])
-        quantity = int(data.get('quantity', 1))
-    except (ValueError, TypeError):
-        return jsonify({"error": "Invalid product ID or quantity"}), 400
-    
-    if quantity <= 0:
-        return jsonify({"error": "Quantity must be at least 1"}), 400
-    
-    product = Product.query.get(product_id)
-    if not product:
-        return jsonify({"error": "Product not found"}), 404
-    
-    if product.stock_quantity < quantity:
-        return jsonify({
-            "error": "Not enough stock available",
-            "stock_available": product.stock_quantity
-        }), 400
-    
-    # Get or create cart
-    cart = ShoppingCart.query.filter_by(user_id=user_id).first()
-    if not cart:
-        cart = ShoppingCart(
-            user_id=user_id,
-            total_price="0.00",
-            shopping_quantity=0
-        )
-        db.session.add(cart)
-        db.session.flush()
-    
-    # Check if product already in cart
-    existing_item = CartItem.query.filter_by(
-        shopping_cart_id=cart.shopping_cart_id,
-        product_id=product_id
-    ).first()
-    
-    if existing_item:
-        new_quantity = existing_item.quantity + quantity
-        if product.stock_quantity < new_quantity:
-            return jsonify({
-                "error": "Adding this quantity would exceed available stock",
-                "current_in_cart": existing_item.quantity,
+        identity = get_jwt_identity()
+        user_id = identity.get('id') if isinstance(identity, dict) else identity
+        data = request.get_json()
+        
+        if not data or 'product_id' not in data:
+            response = jsonify({"error": "Product ID is required"})
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response, 400
+        
+        try:
+            product_id = int(data['product_id'])
+            quantity = int(data.get('quantity', 1))
+        except (ValueError, TypeError):
+            response = jsonify({"error": "Invalid product ID or quantity"})
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response, 400
+        
+        if quantity <= 0:
+            response = jsonify({"error": "Quantity must be at least 1"})
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response, 400
+        
+        product = Product.query.get(product_id)
+        if not product:
+            response = jsonify({"error": "Product not found"})
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response, 404
+        
+        if product.stock_quantity < quantity:
+            response = jsonify({
+                "error": "Not enough stock available",
                 "stock_available": product.stock_quantity
-            }), 400
-        existing_item.quantity = new_quantity
-    else:
-        new_item = CartItem(
+            })
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response, 400
+        
+        # Get or create cart
+        cart = ShoppingCart.query.filter_by(user_id=user_id).first()
+        if not cart:
+            cart = ShoppingCart(
+                user_id=user_id,
+                total_price="0.00",
+                shopping_quantity=0
+            )
+            db.session.add(cart)
+            db.session.flush()
+        
+        # Check if product already in cart
+        existing_item = CartItem.query.filter_by(
             shopping_cart_id=cart.shopping_cart_id,
-            product_id=product_id,
-            price=f"{product.product_price:.2f}",
-            quantity=quantity
-        )
-        db.session.add(new_item)
-    
-    update_cart_total(cart)
-    
-    return jsonify({
-        "message": "Item added to cart successfully",
-        "cart_total": cart.total_price,
-        "items_count": cart.shopping_quantity
-    }), 201
+            product_id=product_id
+        ).first()
+        
+        if existing_item:
+            new_quantity = existing_item.quantity + quantity
+            if product.stock_quantity < new_quantity:
+                response = jsonify({
+                    "error": "Adding this quantity would exceed available stock",
+                    "current_in_cart": existing_item.quantity,
+                    "stock_available": product.stock_quantity
+                })
+                response.headers.add('Access-Control-Allow-Origin', '*')
+                return response, 400
+            existing_item.quantity = new_quantity
+        else:
+            new_item = CartItem(
+                shopping_cart_id=cart.shopping_cart_id,
+                product_id=product_id,
+                price=f"{product.product_price:.2f}",
+                quantity=quantity
+            )
+            db.session.add(new_item)
+        
+        update_cart_total(cart)
+        
+        response = jsonify({
+            "message": "Item added to cart successfully",
+            "cart_total": cart.total_price,
+            "items_count": cart.shopping_quantity
+        })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 201
+        
+    except Exception as e:
+        db.session.rollback()
+        response = jsonify({"error": "Internal server error"})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 500
 
 ########################################################################################################################
 

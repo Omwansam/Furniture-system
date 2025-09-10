@@ -72,14 +72,12 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = async (product, quantity = 1) => {
     if (!user) {
-      console.log('User not authenticated, redirecting to login');
       return false;
     }
 
     // Get token from localStorage as fallback
     const token = user.access_token || localStorage.getItem('token');
     if (!token) {
-      console.log('No access token found, redirecting to login');
       return false;
     }
 
@@ -100,7 +98,6 @@ export const CartProvider = ({ children }) => {
         await fetchCart(); // Refresh cart data
         return true;
       } else if (response.status === 401) {
-        console.log('Token expired or invalid, redirecting to login');
         // Clear invalid token
         localStorage.removeItem('token');
         localStorage.removeItem('furniture_user');
