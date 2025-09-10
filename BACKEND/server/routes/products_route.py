@@ -313,6 +313,174 @@ def get_products():
     except Exception as e:
         return jsonify({'error': f'Error fetching products: {str(e)}'}), 500
 
+# Get related products by category - Simple route
+@product_bp.route('/related-products/<int:product_id>', methods=['GET', 'OPTIONS'])
+def get_related_products_simple(product_id):
+    """Simple route for related products to avoid CORS issues."""
+    print(f"🔍 Simple related products route called for product_id: {product_id}, method: {request.method}")
+    
+    if request.method == 'OPTIONS':
+        print("📡 Handling OPTIONS request (simple route)")
+        response = jsonify({'message': 'OK'})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,Accept')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
+        response.headers.add('Access-Control-Max-Age', '86400')
+        return response, 200
+    
+    try:
+        print(f"🔍 Processing GET request for product_id: {product_id} (simple route)")
+        # Get the current product to find its category
+        current_product = Product.query.get(product_id)
+        if not current_product:
+            return jsonify({"error": "Product not found"}), 404
+        
+        # Get related products from the same category (excluding the current product)
+        related_products = Product.query.filter(
+            Product.category_id == current_product.category_id,
+            Product.product_id != product_id
+        ).limit(4).all()
+        
+        # If we don't have enough products in the same category, get some from other categories
+        if len(related_products) < 4:
+            additional_products = Product.query.filter(
+                Product.product_id != product_id,
+                Product.product_id.notin_([p.product_id for p in related_products])
+            ).limit(4 - len(related_products)).all()
+            related_products.extend(additional_products)
+        
+        # Format response
+        products_data = []
+        for product in related_products:
+            # Get primary image
+            primary_image = ProductImage.query.filter_by(
+                product_id=product.product_id, 
+                is_primary=True
+            ).first()
+            
+            # Get category name
+            category_name = None
+            if product.category_id:
+                category = Category.query.get(product.category_id)
+                category_name = category.category_name if category else None
+            
+            product_data = {
+                'product_id': product.product_id,
+                'product_name': product.product_name,
+                'product_description': product.product_description,
+                'product_price': float(product.product_price),
+                'stock_quantity': product.stock_quantity,
+                'category_id': product.category_id,
+                'category_name': category_name,
+                'created_at': product.created_at.isoformat() if product.created_at else None,
+                'primary_image': url_for('static', filename=primary_image.image_url, _external=True) if primary_image else None,
+                'images': [{
+                    'image_id': img.image_id, 
+                    'image_url': url_for('static', filename=img.image_url, _external=True), 
+                    'is_primary': img.is_primary
+                } for img in product.images]
+            }
+            products_data.append(product_data)
+        
+        response = jsonify({
+            'related_products': products_data,
+            'total_related': len(products_data)
+        })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
+        
+        print(f"✅ Returning {len(products_data)} related products (simple route)")
+        return response, 200
+        
+    except Exception as e:
+        print(f"❌ Error in simple related products route: {str(e)}")
+        return jsonify({'error': f'Error fetching related products: {str(e)}'}), 500
+
+# Get related products by category
+@product_bp.route('/<int:product_id>/related', methods=['GET', 'OPTIONS'])
+def get_related_products(product_id):
+    """Get related products based on the same category as the given product."""
+    print(f"🔍 Related products route called for product_id: {product_id}, method: {request.method}")
+    
+    if request.method == 'OPTIONS':
+        print("📡 Handling OPTIONS request")
+        response = jsonify({'message': 'OK'})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,Accept')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
+        response.headers.add('Access-Control-Max-Age', '86400')
+        return response, 200
+    
+    try:
+        print(f"🔍 Processing GET request for product_id: {product_id}")
+        # Get the current product to find its category
+        current_product = Product.query.get(product_id)
+        if not current_product:
+            return jsonify({"error": "Product not found"}), 404
+        
+        # Get related products from the same category (excluding the current product)
+        related_products = Product.query.filter(
+            Product.category_id == current_product.category_id,
+            Product.product_id != product_id
+        ).limit(4).all()
+        
+        # If we don't have enough products in the same category, get some from other categories
+        if len(related_products) < 4:
+            additional_products = Product.query.filter(
+                Product.product_id != product_id,
+                Product.product_id.notin_([p.product_id for p in related_products])
+            ).limit(4 - len(related_products)).all()
+            related_products.extend(additional_products)
+        
+        # Format response
+        products_data = []
+        for product in related_products:
+            # Get primary image
+            primary_image = ProductImage.query.filter_by(
+                product_id=product.product_id, 
+                is_primary=True
+            ).first()
+            
+            # Get category name
+            category_name = None
+            if product.category_id:
+                category = Category.query.get(product.category_id)
+                category_name = category.category_name if category else None
+            
+            product_data = {
+                'product_id': product.product_id,
+                'product_name': product.product_name,
+                'product_description': product.product_description,
+                'product_price': float(product.product_price),
+                'stock_quantity': product.stock_quantity,
+                'category_id': product.category_id,
+                'category_name': category_name,
+                'created_at': product.created_at.isoformat() if product.created_at else None,
+                'primary_image': url_for('static', filename=primary_image.image_url, _external=True) if primary_image else None,
+                'images': [{
+                    'image_id': img.image_id, 
+                    'image_url': url_for('static', filename=img.image_url, _external=True), 
+                    'is_primary': img.is_primary
+                } for img in product.images]
+            }
+            products_data.append(product_data)
+        
+        response = jsonify({
+            'related_products': products_data,
+            'total_related': len(products_data)
+        })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
+        
+        print(f"✅ Returning {len(products_data)} related products")
+        return response, 200
+        
+    except Exception as e:
+        print(f"❌ Error in related products route: {str(e)}")
+        return jsonify({'error': f'Error fetching related products: {str(e)}'}), 500
+
 # Get a specific product by ID
 @product_bp.route('/<int:product_id>', methods=['GET'])
 def get_product(product_id):

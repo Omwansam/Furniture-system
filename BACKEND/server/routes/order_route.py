@@ -71,8 +71,13 @@ def checkout():
     
     # Validate required fields
     required_fields = ['shipping_address', 'payment_method']
-    if not all(field in data for field in required_fields):
-        return jsonify({"error": "Missing required fields", "required": required_fields}), 400
+    missing = [f for f in required_fields if f not in data or data.get(f) in (None, '')]
+    if missing:
+        return jsonify({
+            "error": "Missing required fields",
+            "missing": missing,
+            "required": required_fields
+        }), 400
     
     # Get user and cart
     cart = ShoppingCart.query.filter_by(user_id=user_id).first()
@@ -84,11 +89,12 @@ def checkout():
     unavailable_items = []
     for item in cart.cart_items:
         product = Product.query.get(item.product_id)
-        if not product or product.stock_quantity < item.quantity:
+        available_qty = int(product.stock_quantity or 0) if product else 0
+        if not product or available_qty < item.quantity:
             unavailable_items.append({
                 "product_id": item.product_id,
                 "requested": item.quantity,
-                "available": product.stock_quantity if product else 0
+                "available": available_qty
             })
     
     if unavailable_items:
@@ -98,8 +104,14 @@ def checkout():
         }), 400
     
     try:
-        # Calculate subtotal
-        subtotal = float(cart.total_price)
+        # Calculate subtotal (fallback if cart.total_price is missing or zero)
+        try:
+            subtotal_val = float(cart.total_price or 0)
+        except Exception:
+            subtotal_val = 0.0
+        if subtotal_val <= 0:
+            subtotal_val = sum(float(ci.price) * ci.quantity for ci in cart.cart_items)
+        subtotal = float(f"{subtotal_val:.2f}")
         shipping_cost = calculate_shipping_cost(cart.cart_items, data['shipping_address'])
         discount = 0.0
         coupon_code = data.get('coupon_code')

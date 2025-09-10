@@ -204,6 +204,54 @@
   color: #333;
 }
 
+/* M-Pesa specific UI */
+.mpesa-card {
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  background: #f9fbff;
+  padding: 16px;
+}
+
+.mpesa-header {
+  margin-bottom: 12px;
+}
+
+.mpesa-title {
+  font-weight: 600;
+  color: #1a3353;
+}
+
+.mpesa-subtitle {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.mpesa-phone-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.mpesa-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.mpesa-phone-input input {
+  max-width: 100%;
+}
+
+.mpesa-hint {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
 /* Submit Button */
 .submit-btn {
   width: 100%;
@@ -279,6 +327,171 @@
   .order-item-img {
     width: 80px;
     height: 80px;
+  }
+}
+
+/* Shipping Information Styles */
+.billing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.saved-addresses-btn {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  color: #495057;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.saved-addresses-btn:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.saved-addresses {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 25px;
+}
+
+.saved-addresses h4 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.address-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.address-item {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+  transition: all 0.3s ease;
+}
+
+.address-item:hover {
+  border-color: #2c5aa0;
+  box-shadow: 0 2px 8px rgba(44, 90, 160, 0.1);
+}
+
+.address-info {
+  flex: 1;
+}
+
+.address-info strong {
+  color: #333;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.default-badge {
+  background: #28a745;
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.address-info p {
+  margin: 3px 0;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.use-address-btn {
+  background: #2c5aa0;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  white-space: nowrap;
+}
+
+.use-address-btn:hover {
+  background: #1e3f73;
+}
+
+.save-option {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.save-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #495057;
+}
+
+.save-checkbox input[type="checkbox"] {
+  margin: 0;
+  accent-color: #2c5aa0;
+  transform: scale(1.1);
+}
+
+.save-checkbox .icon {
+  color: #2c5aa0;
+  font-size: 1rem;
+}
+
+.save-checkbox span {
+  font-weight: 500;
+}
+
+/* Responsive adjustments for shipping features */
+@media (max-width: 768px) {
+  .billing-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .saved-addresses-btn {
+    justify-content: center;
+  }
+  
+  .address-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  .use-address-btn {
+    align-self: flex-start;
   }
 }
   

@@ -501,6 +501,52 @@ class BillingInformation(db.Model):
 
 ###################################################################################################################################################################
 
+class UserShippingInformation(db.Model):
+    """User's saved shipping information for quick checkout"""
+    __tablename__ = 'user_shipping_information'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    company_name = db.Column(db.String(100))
+    country = db.Column(db.String(100), nullable=False)
+    street_address = db.Column(db.String(200), nullable=False)
+    city = db.Column(db.String(100), nullable=False)
+    province = db.Column(db.String(100), nullable=False)
+    zip_code = db.Column(db.String(20), nullable=False)
+    phone = db.Column(db.String(20), nullable=False)
+    email = db.Column(db.String(100), nullable=False)
+    additional_info = db.Column(db.Text)
+    is_default = db.Column(db.Boolean, default=False, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+    # Relationship to user
+    user = db.relationship('User', backref='shipping_information')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'company_name': self.company_name,
+            'country': self.country,
+            'street_address': self.street_address,
+            'city': self.city,
+            'province': self.province,
+            'zip_code': self.zip_code,
+            'phone': self.phone,
+            'email': self.email,
+            'additional_info': self.additional_info,
+            'is_default': self.is_default,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+
+###################################################################################################################################################################
+
 class NewsletterSubscriber(db.Model):
 
     __tablename__ = 'newsletter_subscribers'

@@ -66,7 +66,7 @@ curl -X POST http://localhost:5000/payments/mpesa/stkpush \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -d '{
-    "phone_number": "254708374149",
+    "phone_number": "254114080686",
     "order_id": 1,
     "amount": 1
   }'

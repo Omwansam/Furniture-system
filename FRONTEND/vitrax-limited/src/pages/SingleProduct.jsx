@@ -296,8 +296,8 @@ const SingleProduct = () => {
       </div>
 
       {/* Product Details & Related Products */}
-      <ProductDetails />
-      <RelatedProducts />
+      <ProductDetails product={product} />
+      <RelatedProducts currentProduct={product} />
 
       {/* Toast Notifications */}
       {showLoginPrompt && (

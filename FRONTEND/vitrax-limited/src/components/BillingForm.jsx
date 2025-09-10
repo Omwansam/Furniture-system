@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from "react";
-import { FaUser, FaBuilding, FaMapMarkerAlt, FaPhone, FaEnvelope, FaCreditCard } from "react-icons/fa";
+import { FaUser, FaBuilding, FaMapMarkerAlt, FaPhone, FaEnvelope, FaCreditCard, FaSave, FaHistory } from "react-icons/fa";
 import { cartService } from "./cartService";
 import { getPrimaryImageUrl } from "../utils/imageUtils";
 import "./BillingForm.css";
+import PaymentStatus from "./mpesa/PaymentStatus";
 
 
 
@@ -26,13 +27,27 @@ const BillingForm = () => {
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("mpesa");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [useBillingPhone, setUseBillingPhone] = useState(true);
+  const [savedShippingInfo, setSavedShippingInfo] = useState([]);
+  const [showSavedAddresses, setShowSavedAddresses] = useState(false);
+  const [saveForLater, setSaveForLater] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState("idle");
+  const [checkoutRequestId, setCheckoutRequestId] = useState(null);
 
   const countries = ["Kenya", "Uganda", "Tanzania", "Rwanda", "Ethiopia"];
   const provinces = ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret"];
 
   useEffect(() => {
     fetchCart();
+    fetchSavedShippingInfo();
   }, []);
+
+  // Keep M-Pesa phone in sync with billing phone if toggled
+  useEffect(() => {
+    if (paymentMethod === 'mpesa' && useBillingPhone) {
+      setPhoneNumber(formData.phone || "");
+    }
+  }, [paymentMethod, useBillingPhone, formData.phone]);
 
   const fetchCart = async () => {
     try {
@@ -41,6 +56,91 @@ const BillingForm = () => {
     } catch (error) {
       console.error('Error fetching cart:', error);
     }
+  };
+
+  const fetchSavedShippingInfo = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/shipping/get", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSavedShippingInfo(data.shipping_infos || []);
+        
+        // Auto-populate form with default shipping info if available
+        const defaultInfo = data.shipping_infos?.find(info => info.is_default) || data.shipping_infos?.[0];
+        if (defaultInfo) {
+          setFormData({
+            first_name: defaultInfo.first_name || "",
+            last_name: defaultInfo.last_name || "",
+            company_name: defaultInfo.company_name || "",
+            country: defaultInfo.country || "Kenya",
+            street_address: defaultInfo.street_address || "",
+            city: defaultInfo.city || "",
+            province: defaultInfo.province || "Nairobi",
+            zip_code: defaultInfo.zip_code || "",
+            phone: defaultInfo.phone || "",
+            email: defaultInfo.email || "",
+            additional_info: defaultInfo.additional_info || ""
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching saved shipping info:', error);
+    }
+  };
+
+  const saveShippingInfo = async (shippingData, isDefault = false) => {
+    try {
+      const response = await fetch("http://localhost:5000/shipping/save", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          ...shippingData,
+          is_default: isDefault
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Shipping info saved:', data);
+        // Refresh the saved shipping info list
+        await fetchSavedShippingInfo();
+        return true;
+      } else {
+        const errorData = await response.json();
+        console.error('Error saving shipping info:', errorData);
+        return false;
+      }
+    } catch (error) {
+      console.error('Error saving shipping info:', error);
+      return false;
+    }
+  };
+
+  const loadSavedAddress = (address) => {
+    setFormData({
+      first_name: address.first_name || "",
+      last_name: address.last_name || "",
+      company_name: address.company_name || "",
+      country: address.country || "Kenya",
+      street_address: address.street_address || "",
+      city: address.city || "",
+      province: address.province || "Nairobi",
+      zip_code: address.zip_code || "",
+      phone: address.phone || "",
+      email: address.email || "",
+      additional_info: address.additional_info || ""
+    });
+    setShowSavedAddresses(false);
   };
 
   const handleChange = (e) => {
@@ -58,7 +158,7 @@ const BillingForm = () => {
         },
         body: JSON.stringify({
           shipping_address: `${billingData.street_address}, ${billingData.city}, ${billingData.province}, ${billingData.country}`,
-          payment_method: paymentMethod,
+          payment_method: paymentMethod || "mpesa",
           billing_details: billingData,
           coupon_code: null // Optional coupon code
         })
@@ -79,8 +179,10 @@ const BillingForm = () => {
 
   const initiatePayment = async (orderId, amount) => {
     try {
+      // Normalize: prefer billing phone if toggle is on
+      const mpesaPhone = useBillingPhone ? (formData.phone || phoneNumber) : phoneNumber;
       console.log("Sending M-Pesa STK push request:", {
-        phone_number: phoneNumber,
+        phone_number: mpesaPhone,
         order_id: orderId,
         amount: amount
       });
@@ -92,7 +194,7 @@ const BillingForm = () => {
           "Authorization": `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({
-          phone_number: phoneNumber,
+          phone_number: mpesaPhone,
           order_id: orderId,
           amount: amount
         })
@@ -119,6 +221,27 @@ const BillingForm = () => {
     } catch (error) {
       console.error('Error initiating payment:', error);
       throw error;
+    }
+  };
+
+  const pollPaymentStatus = async (checkoutId) => {
+    try {
+      const resp = await fetch(`http://localhost:5000/payments/mpesa/status/${checkoutId}`, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (!resp.ok) return;
+      const data = await resp.json();
+      if (data.status === "COMPLETED") {
+        setPaymentStatus("success");
+      } else if (data.status === "FAILED") {
+        setPaymentStatus("failed");
+      } else {
+        setTimeout(() => pollPaymentStatus(checkoutId), 3000);
+      }
+    } catch (e) {
+      console.error('Polling error:', e);
     }
   };
 
@@ -176,10 +299,13 @@ const BillingForm = () => {
 
     try {
       // Validate phone number for M-Pesa
-      if (paymentMethod === "mpesa" && !phoneNumber) {
-        alert("Please enter your phone number for M-Pesa payment");
+      if (paymentMethod === "mpesa") {
+        const effectivePhone = useBillingPhone ? formData.phone : phoneNumber;
+        if (!effectivePhone) {
+          alert("Please provide a phone number for M-Pesa payment");
         setLoading(false);
         return;
+        }
       }
 
       console.log("Creating order with data:", {
@@ -187,6 +313,11 @@ const BillingForm = () => {
         payment_method: paymentMethod,
         billing_details: formData
       });
+
+      // Save shipping information if user wants to
+      if (saveForLater) {
+        await saveShippingInfo(formData, true); // Save as default
+      }
 
       // Create order
       const orderId = await createOrder(formData);
@@ -197,17 +328,29 @@ const BillingForm = () => {
         try {
           console.log("Initiating M-Pesa payment for order:", orderId);
           console.log("Payment amount:", parseFloat(cartData.total_price));
-          console.log("Phone number:", phoneNumber);
+          console.log("Phone number:", useBillingPhone ? formData.phone : phoneNumber);
           
           const paymentResult = await initiatePayment(orderId, parseFloat(cartData.total_price));
           console.log("M-Pesa payment result:", paymentResult);
           
-          if (paymentResult.CheckoutRequestID) {
-            alert("Payment initiated successfully! Please check your phone for the M-Pesa prompt.");
-            // Clear cart after successful order creation
+          const checkoutId = paymentResult.checkout_request_id || paymentResult.CheckoutRequestID;
+          if (checkoutId) {
+            setCheckoutRequestId(checkoutId);
+            setPaymentStatus("pending");
+            
+            // If it's a mock payment, show success immediately
+            if (paymentResult.mock) {
+              setTimeout(() => {
+                setPaymentStatus("success");
+                // Clear cart and redirect after showing success
+                setTimeout(async () => {
             await cartService.clearCart();
-            // Redirect to order confirmation
             window.location.href = `/order-confirmation/${orderId}`;
+                }, 2000);
+              }, 1000);
+            } else {
+              pollPaymentStatus(checkoutId);
+            }
           } else {
             alert("Payment initiation failed. Please try again.");
           }
@@ -254,6 +397,22 @@ const BillingForm = () => {
     );
   }
 
+  if (paymentStatus !== "idle") {
+    return (
+      <div className="billing-container">
+        <PaymentStatus
+          status={paymentStatus === 'pending' ? 'idle' : paymentStatus === 'success' ? 'success' : 'failed'}
+          amount={parseFloat(cartData?.total_price || 0).toLocaleString()}
+          transactionId={checkoutRequestId}
+          onReset={() => {
+            setPaymentStatus('idle');
+            setCheckoutRequestId(null);
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="billing-container">
       <h2>Checkout</h2>
@@ -292,7 +451,45 @@ const BillingForm = () => {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <h3>Billing Details</h3>
+        <div className="billing-header">
+          <h3>Billing Details</h3>
+          {savedShippingInfo.length > 0 && (
+            <button
+              type="button"
+              className="saved-addresses-btn"
+              onClick={() => setShowSavedAddresses(!showSavedAddresses)}
+            >
+              <FaHistory className="icon" />
+              {showSavedAddresses ? 'Hide' : 'Show'} Saved Addresses ({savedShippingInfo.length})
+            </button>
+          )}
+        </div>
+
+        {showSavedAddresses && savedShippingInfo.length > 0 && (
+          <div className="saved-addresses">
+            <h4>Saved Addresses</h4>
+            <div className="address-list">
+              {savedShippingInfo.map((address) => (
+                <div key={address.id} className="address-item">
+                  <div className="address-info">
+                    <strong>{address.first_name} {address.last_name}</strong>
+                    {address.is_default && <span className="default-badge">Default</span>}
+                    <p>{address.street_address}, {address.city}, {address.province}</p>
+                    <p>{address.country} - {address.zip_code}</p>
+                    <p>{address.phone} | {address.email}</p>
+                  </div>
+                  <button
+                    type="button"
+                    className="use-address-btn"
+                    onClick={() => loadSavedAddress(address)}
+                  >
+                    Use This Address
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="form-grid">
           <div className="input-group">
@@ -461,7 +658,25 @@ const BillingForm = () => {
           </div>
 
           {paymentMethod === "mpesa" && (
-            <div className="input-group">
+            <div className="mpesa-card">
+              <div className="mpesa-header">
+                <div className="mpesa-title">Lipa na M-Pesa</div>
+                <div className="mpesa-subtitle">You will receive an STK push on your phone</div>
+              </div>
+
+              <div className="mpesa-phone-row">
+                <label className="mpesa-toggle">
+                  <input
+                    type="checkbox"
+                    checked={useBillingPhone}
+                    onChange={(e) => setUseBillingPhone(e.target.checked)}
+                  />
+                  <span>Use billing phone ({formData.phone || 'not set'})</span>
+                </label>
+              </div>
+
+              {!useBillingPhone && (
+                <div className="input-group mpesa-phone-input">
               <FaPhone className="icon" />
               <input
                 type="tel"
@@ -470,8 +685,25 @@ const BillingForm = () => {
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 required
               />
+                </div>
+              )}
+
+              <div className="mpesa-hint">Ensure your phone is on and has network. Standard M-Pesa charges may apply.</div>
             </div>
           )}
+        </div>
+
+        {/* Save for Later Option */}
+        <div className="save-option">
+          <label className="save-checkbox">
+            <input
+              type="checkbox"
+              checked={saveForLater}
+              onChange={(e) => setSaveForLater(e.target.checked)}
+            />
+            <FaSave className="icon" />
+            <span>Save this address for future orders</span>
+          </label>
         </div>
 
         <button 
