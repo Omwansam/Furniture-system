@@ -1,9 +1,9 @@
 .navbar{
-    padding: 16px;
+    padding: 12px 20px;
     position: relative;
     background-color: #FBEBB5;
     color: #000;
-    
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .nav-container{
@@ -23,7 +23,6 @@
     flex: 1;
     gap: 20px;
     padding: 0;
-    gap: 20px;
 }
 
 .nav-link{
@@ -92,20 +91,29 @@
     position: relative;
     background: white;
     padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     width: 400px;
+    max-width: 90vw;
   }
   
   .close-btn {
     position: absolute;
-    top: 10px;
+    top: 12px;
     right: 15px;
     background: transparent;
     border: none;
-    font-size: 18px;
+    font-size: 20px;
     cursor: pointer;
+    color: #333;
+    padding: 0;
+    transition: color 0.3s ease;
   }
+  
+  .close-btn:hover {
+    color: #159EEC;
+  }
+  
   .auth-popup {
     position: fixed;
     top: 0;
@@ -122,10 +130,11 @@
   .auth-content {
     background: white;
     padding: 20px;
-    border-radius: 10px;
+    border-radius: 5px;
     width: 350px;
+    max-width: 90vw;
     position: relative;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     text-align: center;
   }
   
@@ -138,25 +147,56 @@
     background: rgba(0, 0, 0, 0.6);
   }
   
-  .close-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-  }
-  
   .toggle-text {
     margin-top: 15px;
     font-size: 14px;
   }
   
   .toggle-link {
-    color: blue;
+    color: #159EEC;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 600;
     margin-left: 5px;
   }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .nav-container {
+    height: auto;
+    padding: 10px 0;
+  }
   
+  .nav-links {
+    gap: 12px;
+    font-size: 14px;
+  }
+  
+  .nav-icons {
+    gap: 10px;
+  }
+  
+  .icon-btn {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 10px 15px;
+  }
+  
+  .nav-links {
+    gap: 8px;
+    font-size: 12px;
+  }
+  
+  .search-input {
+    max-width: 120px;
+  }
+  
+  .signup-content,
+  .auth-content {
+    width: 90vw;
+    max-width: 350px;
+  }
+}

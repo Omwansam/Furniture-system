@@ -17,16 +17,16 @@
     background: none;
     border: none;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 600;
     cursor: pointer;
-    color: #888;
+    color: #666;
     padding: 10px 15px;
     transition: color 0.3s ease;
   }
   
   .tabs button.active {
-    color: black;
-    border-bottom: 2px solid black;
+    color: #333;
+    border-bottom: 2px solid #333;
   }
   
   .review-count {
@@ -55,4 +55,54 @@
     background-color: #f8f8f8;
     padding: 10px;
   }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .product-details {
+    padding: 15px;
+  }
   
+  .tabs {
+    gap: 12px;
+  }
+  
+  .tabs button {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+  
+  .product-images {
+    gap: 15px;
+  }
+  
+  .product-images img {
+    width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-details {
+    padding: 10px;
+  }
+  
+  .tabs {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .tabs button {
+    font-size: 12px;
+    padding: 6px 10px;
+    border-bottom: 1px solid #ddd !important;
+  }
+  
+  .product-images {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .product-images img {
+    width: 100%;
+    max-width: 400px;
+  }
+}

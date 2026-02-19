@@ -3,7 +3,8 @@
     padding: 20px;
     background: #fff;
     border: 1px solid #ddd;
-    border-radius: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
   
   .order-header {
@@ -65,17 +66,52 @@
   
   .place-order {
     width: 100%;
-    padding: 12px;
-    background: #000;
+    padding: 12px 16px;
+    background-color: #333;
     color: #fff;
     border: none;
     font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
     border-radius: 5px;
     margin-top: 10px;
+    transition: background-color 0.3s ease;
   }
   
   .place-order:hover {
-    background: #333;
+    background-color: #555;
   }
   
+  .place-order:active {
+    background-color: #222;
+  }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .order-container {
+    width: 100%;
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .order-container {
+    padding: 15px;
+  }
+  
+  .order-header,
+  .order-item,
+  .order-total,
+  .order-final {
+    font-size: 12px;
+  }
+  
+  .highlight {
+    font-size: 16px;
+  }
+  
+  .place-order {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}

@@ -23,7 +23,7 @@
   .auth-card {
     background-color: white;
     border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     width: 100%;
     max-width: 450px;
     padding: 30px;
@@ -66,22 +66,23 @@
   
   .input-icon {
     margin-right: 8px;
-    color: #3498db;
+    color: #159EEC;
   }
   
   input {
     width: 100%;
-    padding: 12px 15px;
+    padding: 10px 12px;
     border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 16px;
-    transition: border-color 0.3s;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    font-family: Arial, sans-serif;
   }
   
   input:focus {
     outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    border-color: #159EEC;
+    box-shadow: 0 0 0 2px rgba(21, 158, 236, 0.1);
   }
   
   .password-input {
@@ -100,7 +101,7 @@
   }
   
   .toggle-password:hover {
-    color: #3498db;
+    color: #159EEC;
   }
   
   .forgot-password {
@@ -109,7 +110,7 @@
   }
   
   .forgot-password a {
-    color: #3498db;
+    color: #159EEC;
     text-decoration: none;
     font-size: 14px;
   }
@@ -120,19 +121,23 @@
   
   .submit-btn {
     width: 100%;
-    padding: 14px;
-    background-color: #3498db;
+    padding: 12px 16px;
+    background-color: #333;
     color: white;
     border: none;
-    border-radius: 6px;
-    font-size: 16px;
+    border-radius: 5px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease;
   }
   
   .submit-btn:hover {
-    background-color: #2980b9;
+    background-color: #555;
+  }
+  
+  .submit-btn:active {
+    background-color: #222;
   }
   
   /* Footer styles */
@@ -145,7 +150,7 @@
   .toggle-view {
     background: none;
     border: none;
-    color: #3498db;
+    color: #159EEC;
     font-weight: 600;
     cursor: pointer;
     margin-left: 5px;
