@@ -1,0 +1,164 @@
+.favorite-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.favorite-button:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #d1d5db;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.favorite-button.favorited {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+.favorite-button.favorited:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.favorite-icon {
+  transition: all 0.3s ease;
+}
+
+.favorite-button.favorited .favorite-icon {
+  color: #dc2626;
+  animation: heartBeat 0.6s ease;
+}
+
+.favorite-text {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* Size variants */
+.favorite-button.small {
+  padding: 6px 8px;
+  min-width: 32px;
+  height: 32px;
+}
+
+.favorite-button.small .favorite-icon {
+  font-size: 14px;
+}
+
+.favorite-button.medium {
+  padding: 8px 12px;
+  min-width: 40px;
+  height: 40px;
+}
+
+.favorite-button.medium .favorite-icon {
+  font-size: 16px;
+}
+
+.favorite-button.large {
+  padding: 12px 16px;
+  min-width: 48px;
+  height: 48px;
+}
+
+.favorite-button.large .favorite-icon {
+  font-size: 18px;
+}
+
+.favorite-button.large .favorite-text {
+  font-size: 14px;
+}
+
+/* Animation */
+@keyframes heartBeat {
+  0% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.3);
+  }
+  28% {
+    transform: scale(1);
+  }
+  42% {
+    transform: scale(1.3);
+  }
+  70% {
+    transform: scale(1);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .favorite-button {
+    padding: 6px 8px;
+    min-width: 36px;
+    height: 36px;
+  }
+  
+  .favorite-button .favorite-icon {
+    font-size: 14px;
+  }
+  
+  .favorite-button .favorite-text {
+    display: none;
+  }
+}
+
+/* Product card specific styling */
+.product-card .favorite-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+.product-card:hover .favorite-button {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.product-card .favorite-button.favorited {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Overlay variant for product images */
+.favorite-button.overlay {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  color: white;
+  backdrop-filter: blur(4px);
+}
+
+.favorite-button.overlay:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.favorite-button.overlay.favorited {
+  background: rgba(220, 38, 38, 0.9);
+  color: white;
+}
+
+.favorite-button.overlay.favorited:hover {
+  background: rgba(220, 38, 38, 1);
+}

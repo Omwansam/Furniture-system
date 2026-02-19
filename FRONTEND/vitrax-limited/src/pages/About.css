@@ -1,0 +1,289 @@
+.about-page {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  overflow-x: hidden;
+}
+
+/* Floating Navigation Dots */
+.floating-nav {
+  position: fixed;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.nav-dot {
+  width: 12px;
+  height: 12px;
+  background: rgba(59, 130, 246, 0.3);
+  border: 2px solid rgba(59, 130, 246, 0.5);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.nav-dot:hover {
+  background: rgba(59, 130, 246, 0.6);
+  border-color: rgba(59, 130, 246, 0.8);
+  transform: scale(1.2);
+}
+
+.nav-dot.active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+}
+
+.nav-dot::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.nav-dot:hover::before {
+  opacity: 1;
+}
+
+.dot-tooltip {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(30, 41, 59, 0.9);
+  backdrop-filter: blur(10px);
+  color: #f8fafc;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.dot-tooltip::after {
+  content: '';
+  position: absolute;
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid rgba(30, 41, 59, 0.9);
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+}
+
+.nav-dot:hover .dot-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Scroll Progress Indicator */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(59, 130, 246, 0.1);
+  z-index: 1001;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+  width: 0%;
+  transition: width 0.1s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: shimmer 2s infinite;
+}
+
+/* Global Animations */
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Section Animations */
+.about-hero {
+  animation: fadeInUp 1s ease-out;
+}
+
+.about-story {
+  animation: fadeInUp 1s ease-out 0.2s both;
+}
+
+.about-cta {
+  animation: fadeInUp 1s ease-out 0.4s both;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .floating-nav {
+    right: 20px;
+    gap: 12px;
+  }
+
+  .nav-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .dot-tooltip {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .floating-nav {
+    right: 15px;
+    gap: 10px;
+  }
+
+  .nav-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .dot-tooltip {
+    display: none;
+  }
+
+  .scroll-progress {
+    height: 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .floating-nav {
+    right: 10px;
+    gap: 8px;
+  }
+
+  .nav-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scroll-progress {
+    height: 2px;
+  }
+}
+
+/* Dark mode enhancements */
+@media (prefers-color-scheme: dark) {
+  .about-page {
+    background: linear-gradient(135deg, #0a0f1a 0%, #1a1f2e 50%, #0a0f1a 100%);
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .nav-dot {
+    border-width: 3px;
+  }
+
+  .nav-dot.active {
+    border-width: 4px;
+  }
+
+  .progress-bar {
+    height: 6px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .about-hero,
+  .about-story,
+  .about-cta {
+    animation: none;
+  }
+
+  .progress-bar::after {
+    animation: none;
+  }
+
+  .nav-dot,
+  .dot-tooltip {
+    transition: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .floating-nav,
+  .scroll-progress {
+    display: none;
+  }
+
+  .about-page {
+    background: white;
+    color: black;
+  }
+}

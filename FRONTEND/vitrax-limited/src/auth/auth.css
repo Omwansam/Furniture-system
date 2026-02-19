@@ -46,6 +46,21 @@
     color: #7f8c8d;
     font-size: 16px;
   }
+
+  .auth-message {
+    margin-top: 15px;
+    padding: 10px 15px;
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 6px;
+    color: #856404;
+    font-size: 14px;
+  }
+
+  .auth-message p {
+    margin: 0;
+    color: #856404;
+  }
   
   /* Form styles */
   .auth-form {
@@ -96,6 +111,20 @@
     background: none;
     border: none;
     color: #7f8c8d;
+    cursor: pointer;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 500;
+    color: #2c3e50;
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin-right: 8px;
     cursor: pointer;
   }
   

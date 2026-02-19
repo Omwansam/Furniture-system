@@ -1,56 +1,54 @@
 
-import { useState, useEffect } from "react";
+
+import React, { useState, useEffect } from "react";
+
 import { useNavigate } from "react-router-dom";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import "./auth.css";
+import { useAuth } from "../context/AuthContext";
 
 const AdminLoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const API_URL = "http://localhost:5000/auth/admin/login";
-
-  // If already logged in, redirect
+  // If already logged in as admin, redirect
   useEffect(() => {
-    const token = localStorage.getItem("adminToken");
-    if (token) {
-      navigate("/admin/overview");
+    const user = localStorage.getItem("furniture_user");
+    if (user) {
+      try {
+        const userData = JSON.parse(user);
+        if (userData.role === 'admin') {
+          navigate("/admin/dashboard/overview");
+        }
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+        localStorage.removeItem("furniture_user");
+      }
     }
-  }, [navigate]);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.message || "Login failed");
-        return;
+      const result = await login(email, password, 'admin');
+      if (result && result.success && result.role === 'admin') {
+        navigate("/admin/dashboard/overview");
+      } else {
+        setError(result?.error || "Login failed. Please check your credentials or ensure you have admin access.");
       }
-
-      if (data.user?.role !== "admin") {
-        alert("Access denied: Not an admin");
-        return;
-      }
-
-      // Store admin tokens
-      localStorage.setItem("adminToken", data.access_token);
-      localStorage.setItem("adminRefreshToken", data.refresh_token);
-      localStorage.setItem("role", data.user.role);
-
-      navigate("/admin/overview");
     } catch (err) {
       console.error("Login error:", err);
-      alert("Something went wrong. Please try again.");
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,6 +72,7 @@ const AdminLoginPage = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               required
+              disabled={loading}
             />
           </div>
           <div className="form-group">
@@ -89,23 +88,53 @@ const AdminLoginPage = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 required
+                disabled={loading}
               />
               <button
                 type="button"
                 className="toggle-password"
                 onClick={() => setShowPassword((prev) => !prev)}
+                disabled={loading}
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
           </div>
 
+          {error && (
+            <div className="error-message" style={{ 
+              color: '#e74c3c', 
+              backgroundColor: '#fdf2f2', 
+              padding: '10px', 
+              borderRadius: '4px', 
+              marginBottom: '15px',
+              border: '1px solid #fecaca'
+            }}>
+              {error}
+            </div>
+          )}
+
           <div className="forgot-password">
             <a href="#">Forgot password?</a>
           </div>
 
-          <button type="submit" className="submit-btn">Login</button>
+          <button type="submit" className="submit-btn" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
         </form>
+        
+        <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#e3f2fd', borderRadius: '5px', fontSize: '14px', border: '1px solid #2196f3' }}>
+          <strong>💡 Admin Credentials:</strong><br />
+          <strong>Email:</strong> admin@furniture.com<br />
+          <strong>Password:</strong> admin123<br />
+          <br />
+          <strong>Backend API:</strong> http://localhost:5000<br />
+          <strong>Login Endpoint:</strong> /auth/login
+        </div>
+        
+        <div style={{ marginTop: '20px', textAlign: 'center' }}>
+          <p>Don't have an admin account? <a href="/admin/register" style={{ color: '#2563eb' }}>Register here</a></p>
+        </div>
       </div>
     </div>
   );

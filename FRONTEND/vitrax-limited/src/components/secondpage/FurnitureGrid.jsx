@@ -3,30 +3,14 @@ import { Link } from 'react-router-dom';
 import { FiFilter } from "react-icons/fi";
 import "./FurntureGrid.css";
 import { getProducts } from '../productService'
+import { getPrimaryImageUrl, handleImageError } from '../../utils/imageUtils'
 
 
 
-const FurnitureGrid = () => {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+const FurnitureGrid = ({ products = [], loading = false, error = null, categoryName = '' }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(8);
     const [sortOrder, setSortOrder] = useState("default");
-
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const data = await getProducts();
-                setProducts(data);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchProducts();
-    }, []);
 
     const sortedProducts = [...products].sort((a, b) => {
         if (sortOrder === "priceLowToHigh") return a.product_price - b.product_price;
@@ -48,8 +32,15 @@ const FurnitureGrid = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const displayedProducts = sortedProducts.slice(startIndex, startIndex + itemsPerPage);
 
-    if (loading) return <div>Loading products...</div>;
-    if (error) return <div>Error: {error}</div>;
+    if (loading) return <div className="loading-message">Loading products...</div>;
+    if (error) return <div className="error-message">Error: {error}</div>;
+    if (products.length === 0) return (
+      <div className="no-products-message">
+        <h3>No products found</h3>
+        <p>There are no products available in this category at the moment.</p>
+        <Link to="/shop" className="back-to-shop-btn">Back to All Products</Link>
+      </div>
+    );
 
 
   return (
@@ -78,13 +69,11 @@ const FurnitureGrid = () => {
             {displayedProducts.map((product) => (
                 <div key={product.product_id} className='essentials-card'>
                     <Link to={`/singleproduct/${product.product_id}`} className='essentials'>
-                        {product.images.length > 0 && (
-                            <img 
-                                src={product.images[0].image_url} 
-                                alt={product.product_name}
-                                onError={(e) => { e.target.src = '/placeholder-image.jpg'; }}
-                            />
-                        )}
+                        <img 
+                            src={getPrimaryImageUrl(product)} 
+                            alt={product.product_name}
+                            onError={(e) => handleImageError(e)}
+                        />
                         <h3>{product.product_name}</h3>
                         <p>Ksh: {product.product_price.toLocaleString()}</p>
                     </Link>

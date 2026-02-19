@@ -1,0 +1,17 @@
+{
+  "name": "furniture-system-dev",
+  "version": "1.0.0",
+  "description": "Development scripts for Furniture System with auto-reload",
+  "scripts": {
+    "dev": "node dev-server.js",
+    "dev:frontend": "cd FRONTEND/vitrax-limited && npm run dev",
+    "dev:backend": "cd BACKEND/server && python app.py",
+    "start": "node dev-server.js",
+    "install:frontend": "cd FRONTEND/vitrax-limited && npm install",
+    "install:all": "npm run install:frontend",
+    "build": "cd FRONTEND/vitrax-limited && npm run build"
+  },
+  "keywords": ["development", "auto-reload", "react", "flask"],
+  "author": "Furniture System Team",
+  "license": "MIT"
+}

@@ -1,0 +1,543 @@
+.card {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 10px;
+    border: 1px solid red;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .card-header{
+    color: #fff;
+    background-color: #4CAF50;
+    padding: 10px;
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  .subtitle {
+    font-size: 0.875rem;
+    opacity: 0.8;
+  }
+  
+  .logo-circle {
+    background: white;
+    padding: 8px;
+    border-radius: 50%;
+  }
+  
+  .logo-inner-circle {
+    width: 24px;
+    height: 24px;
+    background-color: #4CAF50;
+    border-radius: 50%;
+    margin: auto;
+  }
+  .card-content {
+    padding: 20px;
+    margin-bottom: 20px;
+    
+    gap: 12px;
+  }
+  .card-content label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .input-group {
+    position: relative;
+  }
+  
+  
+  .input-group .icon {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    color: #666;
+  font-size: 16px;
+  }
+
+  .input-group input {
+    width: 100%;
+    max-width: 85%;
+    padding: 10px 10px 10px 40px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+
+  .input-group input:focus {
+    outline: none;
+    border-color: #4CAF50;
+  }
+  
+  
+  .card-footer {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .pay-button {
+    width: 100%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .pay-button:hover {
+    background-color: #43A047;
+  }
+  
+  .note {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 10px;
+  }
+  
+  .status-header {
+    text-align: center;
+    padding: 30px 20px;
+    color: white;
+  }
+  
+  .status-header.success {
+    background-color: #4CAF50;
+  }
+  
+  .status-header.error {
+    background-color: #F44336;
+  }
+  
+  .status-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+  }
+  
+  .card-content.center {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .status-amount {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #4CAF50;
+  }
+  
+  .status-amount.error {
+    color: #F44336;
+  }
+  
+  .tx-id {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 10px;
+  }
+  
+  .reset-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 15px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .reset-button.success {
+    background-color: #4CAF50;
+  }
+  
+  .reset-button.success:hover {
+    background-color: #43A047;
+  }
+  
+  .reset-button.error {
+    background-color: #F44336;
+  }
+  
+  .reset-button.error:hover {
+    background-color: #D32F2F;
+  }
+
+  .mpesa-payment-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .payment-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .card-header {
+    padding: 20px;
+    background: #007bff;
+    color: white;
+  }
+  
+  .card-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  
+  .card-header p {
+    margin: 5px 0 0;
+    opacity: 0.9;
+  }
+  
+  .error-message {
+    background: #ffebee;
+    color: #c62828;
+    padding: 10px 20px;
+    margin: 0 20px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+  }
+  
+  form {
+    padding: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .input-icon {
+    position: absolute;
+    left: 12px;
+    color: #666;
+  }
+  
+  input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  input:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+  
+  .pay-button {
+    width: 100%;
+    padding: 14px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .pay-button:hover {
+    background: #0069d9;
+  }
+  
+  .pay-button:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  .spinner {
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  .payment-note {
+    padding: 0 20px 20px;
+    font-size: 0.9rem;
+    color: #666;
+    text-align: center;
+  }
+  
+  .payment-note p {
+    margin: 5px 0;
+  }
+  
+  /* Status Card Styles */
+  .status-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    text-align: center;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .status-header {
+    margin-bottom: 20px;
+  }
+  
+  .status-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+  }
+  
+  .status-icon.success {
+    color: #4caf50;
+  }
+  
+  .status-icon.error {
+    color: #f44336;
+  }
+  
+  .status-content {
+    margin-bottom: 25px;
+  }
+  
+  .amount-display {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 15px 0;
+    color: #007bff;
+  }
+  
+  .transaction-id {
+    margin-top: 20px;
+    padding: 10px;
+    background: #f5f5f5;
+    border-radius: 5px;
+    font-size: 0.9rem;
+  }
+  
+  .transaction-id span {
+    font-weight: 500;
+  }
+  
+  .reset-button {
+    padding: 12px 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 0 auto;
+  }
+  
+  .reset-button:hover {
+    background: #0069d9;
+  }
+  
+
+/**
+.card {
+    width: 800px;
+    margin: auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .card-header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 20px;
+  }
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .subtitle {
+    font-size: 0.875rem;
+    opacity: 0.8;
+  }
+  
+  .logo-circle {
+    background: white;
+    padding: 8px;
+    border-radius: 50%;
+  }
+  
+  .logo-inner-circle {
+    width: 24px;
+    height: 24px;
+    background-color: #4CAF50;
+    border-radius: 50%;
+    margin: auto;
+  }
+  
+  .card-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .input-group {
+    position: relative;
+  }
+  
+  .input-group .icon {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    color: #888;
+  }
+  
+  .input-group input {
+    width: 100%;
+    padding: 10px 10px 10px 36px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .card-footer {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .pay-button {
+    width: 100%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .pay-button:hover {
+    background-color: #43A047;
+  }
+  
+  .note {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 10px;
+  }
+  
+  .status-header {
+    text-align: center;
+    padding: 30px 20px;
+    color: white;
+  }
+  
+  .status-header.success {
+    background-color: #4CAF50;
+  }
+  
+  .status-header.error {
+    background-color: #F44336;
+  }
+  
+  .status-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+  }
+  
+  .card-content.center {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .status-amount {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #4CAF50;
+  }
+  
+  .status-amount.error {
+    color: #F44336;
+  }
+  
+  .tx-id {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 10px;
+  }
+  
+  .reset-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 15px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .reset-button.success {
+    background-color: #4CAF50;
+  }
+  
+  .reset-button.success:hover {
+    background-color: #43A047;
+  }
+  
+  .reset-button.error {
+    background-color: #F44336;
+  }
+  
+  .reset-button.error:hover {
+    background-color: #D32F2F;
+  }
+  

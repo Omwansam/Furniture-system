@@ -1,0 +1,55 @@
+.account-layout {
+  min-height: 80vh;
+  background: #f8f9fa;
+  padding: 40px 20px;
+}
+
+.account-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.account-sidebar-wrapper {
+  position: relative;
+}
+
+.account-main {
+  background: transparent;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .account-container {
+    grid-template-columns: 240px 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .account-layout {
+    padding: 20px 16px;
+  }
+  
+  .account-container {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .account-sidebar-wrapper {
+    order: -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .account-layout {
+    padding: 16px 12px;
+  }
+  
+  .account-container {
+    gap: 16px;
+  }
+}

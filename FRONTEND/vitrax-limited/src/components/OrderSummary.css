@@ -18,8 +18,58 @@
   .order-item, .order-total, .order-final {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 10px 0;
     font-size: 14px;
+  }
+
+  .order-item-details {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+
+  .order-item-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #eee;
+  }
+
+  .order-item-img-placeholder {
+    width: 50px;
+    height: 50px;
+    border-radius: 6px;
+    border: 1px solid #eee;
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+  }
+
+  .order-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .order-item-name {
+    font-weight: 500;
+    color: #333;
+  }
+
+  .order-item-quantity {
+    color: #666;
+    font-size: 12px;
+  }
+
+  .order-item-price {
+    font-weight: 600;
+    color: #2c5aa0;
   }
   
   .order-final {
