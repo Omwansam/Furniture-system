@@ -1,0 +1,180 @@
+.account-sidebar {
+  width: 280px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+
+.sidebar-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.sidebar-header h3 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.sidebar-header p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #333;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.sidebar-item:hover {
+  background: #f8f9fa;
+  color: #159EEC;
+  border-color: #e3f2fd;
+}
+
+.sidebar-item.active {
+  background: #159EEC;
+  color: white;
+  border-color: #159EEC;
+}
+
+.sidebar-item.active .sidebar-description {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.sidebar-icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.sidebar-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 2px;
+}
+
+.sidebar-description {
+  font-size: 0.8rem;
+  color: #666;
+  transition: color 0.3s ease;
+}
+
+.sidebar-item:hover .sidebar-description {
+  color: #159EEC;
+}
+
+.sidebar-footer {
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: #c82333;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .account-sidebar {
+    width: 240px;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .account-sidebar {
+    width: 100%;
+    position: static;
+    margin-bottom: 20px;
+  }
+  
+  .sidebar-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .sidebar-item {
+    flex: 1;
+    min-width: 150px;
+    flex-direction: column;
+    text-align: center;
+    padding: 16px 12px;
+  }
+  
+  .sidebar-content {
+    align-items: center;
+  }
+  
+  .sidebar-description {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .account-sidebar {
+    padding: 16px;
+  }
+  
+  .sidebar-nav {
+    flex-direction: column;
+  }
+  
+  .sidebar-item {
+    flex-direction: row;
+    text-align: left;
+    min-width: auto;
+  }
+  
+  .sidebar-content {
+    align-items: flex-start;
+  }
+  
+  .sidebar-description {
+    display: block;
+  }
+}

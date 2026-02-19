@@ -126,3 +126,48 @@
     color: white;
     border-color: #333;
 }
+
+.loading-message,
+.error-message,
+.no-products-message {
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 18px;
+  color: #666;
+}
+
+.error-message {
+  color: #e74c3c;
+}
+
+.no-products-message {
+  background: #f8f9fa;
+  border-radius: 12px;
+  margin: 40px auto;
+  max-width: 500px;
+}
+
+.no-products-message h3 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.no-products-message p {
+  margin-bottom: 20px;
+  color: #666;
+}
+
+.back-to-shop-btn {
+  display: inline-block;
+  padding: 12px 24px;
+  background: #159EEC;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+.back-to-shop-btn:hover {
+  background: #0d7bb8;
+}

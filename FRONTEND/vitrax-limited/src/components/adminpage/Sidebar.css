@@ -1,65 +1,80 @@
 .sidebar {
   width: 240px;
-  background-color: #ffffff;
-  border: 1px solid red;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: var(--primary-700);
+  box-shadow: var(--shadow-lg);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   top: 0;
+  left: 0;
   position: fixed;
+  z-index: var(--z-fixed);
 }
 
 .sidebar-header {
   display: flex;
   align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid #e0e0e0;
+  padding: var(--space-5);
+  border-bottom: 1px solid var(--primary-600);
+  background-color: var(--primary-800);
 }
 
 .sidebar-logo {
-  font-size: 24px;
-  color: #2563eb; /* blue-600 */
-  margin-right: 10px;
+  font-size: var(--text-2xl);
+  color: var(--accent-400);
+  margin-right: var(--space-2);
 }
 
 .sidebar-title {
-  font-size: 20px;
-  font-weight: bold;
-  color: #1f2937; /* gray-900 */
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--text-inverse);
 }
 
 .sidebar-menu {
-  margin-top: 20px;
+  margin-top: var(--space-5);
   display: flex;
   flex-direction: column;
+  padding: 0 var(--space-2);
 }
 
 .sidebar-button {
   display: flex;
   align-items: center;
-  padding: 12px 24px;
+  padding: var(--space-3) var(--space-6);
   background: none;
   border: none;
   text-align: left;
-  font-size: 16px;
-  color: #374151; /* gray-700 */
+  font-size: var(--text-base);
+  color: var(--text-inverse);
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition: var(--transition-normal);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-1);
+  font-weight: var(--font-medium);
 }
 
 .sidebar-button .icon {
-  margin-right: 12px;
-  font-size: 18px;
+  margin-right: var(--space-3);
+  font-size: var(--text-lg);
+  opacity: 0.8;
 }
 
 .sidebar-button:hover {
-  background-color: #f0f4ff;
-  color: #2563eb;
+  background-color: var(--primary-600);
+  color: var(--text-inverse);
+  transform: translateX(var(--space-1));
+}
+
+.sidebar-button:active {
+  background-color: var(--primary-500);
+  transform: translateX(0);
 }
 
 .sidebar-button.active {
-  background-color: #e0edff;
-  color: #2563eb;
-  border-right: 4px solid #2563eb;
+  background-color: var(--accent-600);
+  color: var(--text-inverse);
+  border-right: 4px solid var(--accent-400);
+  box-shadow: var(--shadow-sm);
 }

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify
 from extensions import db
 from flask_jwt_extended import jwt_required, get_jwt_identity, verify_jwt_in_request
@@ -9,11 +9,20 @@ from sqlalchemy.exc import SQLAlchemyError
 
 order_bp = Blueprint('order', __name__)
 
+
+def _extract_user_id(identity):
+    if identity is None:
+        return None
+    if isinstance(identity, dict):
+        return identity.get('id')
+    return identity
+
 def is_admin():
     """Check if current user is admin"""
     try:
         verify_jwt_in_request()
-        user_id = get_jwt_identity()
+        identity = get_jwt_identity()
+        user_id = _extract_user_id(identity)
         user = User.query.get(user_id)
         return user and user.is_admin
     except:
@@ -56,13 +65,19 @@ def apply_coupon(coupon_code, order_amount):
 @jwt_required()
 def checkout():
     """Enhanced checkout process with coupon support"""
-    user_id = get_jwt_identity()
+    identity = get_jwt_identity()
+    user_id = _extract_user_id(identity)
     data = request.get_json()
     
     # Validate required fields
     required_fields = ['shipping_address', 'payment_method']
-    if not all(field in data for field in required_fields):
-        return jsonify({"error": "Missing required fields", "required": required_fields}), 400
+    missing = [f for f in required_fields if f not in data or data.get(f) in (None, '')]
+    if missing:
+        return jsonify({
+            "error": "Missing required fields",
+            "missing": missing,
+            "required": required_fields
+        }), 400
     
     # Get user and cart
     cart = ShoppingCart.query.filter_by(user_id=user_id).first()
@@ -74,11 +89,12 @@ def checkout():
     unavailable_items = []
     for item in cart.cart_items:
         product = Product.query.get(item.product_id)
-        if not product or product.stock_quantity < item.quantity:
+        available_qty = int(product.stock_quantity or 0) if product else 0
+        if not product or available_qty < item.quantity:
             unavailable_items.append({
                 "product_id": item.product_id,
                 "requested": item.quantity,
-                "available": product.stock_quantity if product else 0
+                "available": available_qty
             })
     
     if unavailable_items:
@@ -88,8 +104,14 @@ def checkout():
         }), 400
     
     try:
-        # Calculate subtotal
-        subtotal = float(cart.total_price)
+        # Calculate subtotal (fallback if cart.total_price is missing or zero)
+        try:
+            subtotal_val = float(cart.total_price or 0)
+        except Exception:
+            subtotal_val = 0.0
+        if subtotal_val <= 0:
+            subtotal_val = sum(float(ci.price) * ci.quantity for ci in cart.cart_items)
+        subtotal = float(f"{subtotal_val:.2f}")
         shipping_cost = calculate_shipping_cost(cart.cart_items, data['shipping_address'])
         discount = 0.0
         coupon_code = data.get('coupon_code')
@@ -135,12 +157,22 @@ def checkout():
             product.stock_quantity -= cart_item.quantity
         
         # Process payment
+        # Create payment to match current Payment model schema
+        payment_method = data.get('payment_method', 'mpesa')
+        
+        # Set payment status based on payment method
+        if payment_method == 'mpesa':
+            payment_status = PaymentStatus.PENDING  # Will be updated when payment is confirmed
+        else:
+            payment_status = PaymentStatus.COMPLETED  # For bank transfer, mark as completed
+            
         payment = Payment(
             order_id=new_order.order_id,
-            amount=total_amount,
-            payment_method=data['payment_method'],
+            user_id=user_id,
+            payment_amount=f"{total_amount:.2f}",
             transaction_id=f"txn_{datetime.now().strftime('%Y%m%d%H%M%S')}",
-            status=PaymentStatus.COMPLETED,
+            payment_status=payment_status,
+            payment_method_id=1,  # Default to 1 for now
             payment_date=db.func.current_timestamp()
         )
         db.session.add(payment)
@@ -167,7 +199,9 @@ def checkout():
             "shipping_cost": shipping_cost,
             "discount": f"{discount:.2f}",
             "total_amount": f"{total_amount:.2f}",
-            "coupon_applied": bool(coupon_code)
+            "coupon_applied": bool(coupon_code),
+            "payment_method": payment_method,
+            "payment_status": payment_status.value
         }), 201
         
     except SQLAlchemyError as e:
@@ -380,3 +414,186 @@ def validate_coupon():
         "min_order_amount": str(coupon.min_order_amount) if coupon.min_order_amount else None,
         "max_discount_amount": str(coupon.max_discount_amount) if coupon.max_discount_amount else None
     }), 200
+
+@order_bp.route('/admin/all', methods=['GET'])
+@jwt_required()
+def get_all_orders():
+    """Admin endpoint to get all orders with filtering and pagination"""
+    if not is_admin():
+        return jsonify({"error": "Admin access required"}), 403
+    
+    try:
+        # Get query parameters
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 20, type=int)
+        status_filter = request.args.get('status', '')
+        search = request.args.get('search', '')
+        date_from = request.args.get('date_from', '')
+        date_to = request.args.get('date_to', '')
+        
+        # Build query
+        query = Order.query
+        
+        # Apply filters
+        if status_filter:
+            query = query.filter(Order.order_status == OrderStatus(status_filter))
+        
+        if search:
+            # Search by order ID, user email, or username
+            query = query.join(User).filter(
+                db.or_(
+                    Order.order_id == search if search.isdigit() else False,
+                    User.email.contains(search),
+                    User.username.contains(search)
+                )
+            )
+        
+        if date_from:
+            try:
+                from_date = datetime.fromisoformat(date_from.replace('Z', '+00:00'))
+                query = query.filter(Order.order_date >= from_date)
+            except ValueError:
+                pass
+        
+        if date_to:
+            try:
+                to_date = datetime.fromisoformat(date_to.replace('Z', '+00:00'))
+                query = query.filter(Order.order_date <= to_date)
+            except ValueError:
+                pass
+        
+        # Order by most recent first
+        query = query.order_by(Order.order_date.desc())
+        
+        # Paginate results
+        pagination = query.paginate(
+            page=page, 
+            per_page=per_page, 
+            error_out=False
+        )
+        
+        orders = []
+        for order in pagination.items:
+            order_data = {
+                'order_id': order.order_id,
+                'order_date': order.order_date.isoformat() if order.order_date else None,
+                'total_amount': order.total_amount,
+                'order_status': order.order_status.value if order.order_status else None,
+                'shipping_address': order.shipping_address,
+                'user': {
+                    'id': order.user.id if order.user else None,
+                    'username': order.user.username if order.user else None,
+                    'email': order.user.email if order.user else None
+                },
+                'items_count': len(order.order_items) if order.order_items else 0,
+                'payment_status': order.payment.payment_status.value if order.payment else None,
+                'shipping_status': order.order_items[0].shipping_status.value if order.order_items else None
+            }
+            orders.append(order_data)
+        
+        return jsonify({
+            'orders': orders,
+            'pagination': {
+                'page': page,
+                'per_page': per_page,
+                'total': pagination.total,
+                'pages': pagination.pages,
+                'has_next': pagination.has_next,
+                'has_prev': pagination.has_prev
+            }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch orders", "details": str(e)}), 500
+
+@order_bp.route('/admin/stats', methods=['GET'])
+@jwt_required()
+def get_order_stats():
+    """Admin endpoint to get order statistics"""
+    if not is_admin():
+        return jsonify({"error": "Admin access required"}), 403
+    
+    try:
+        # Get date range from query params
+        days = request.args.get('days', 30, type=int)
+        from_date = datetime.now() - timedelta(days=days)
+        
+        # Get orders in date range
+        orders = Order.query.filter(Order.order_date >= from_date).all()
+        
+        # Calculate statistics
+        total_orders = len(orders)
+        total_revenue = sum(order.total_amount for order in orders)
+        pending_orders = len([o for o in orders if o.order_status == OrderStatus.PENDING])
+        completed_orders = len([o for o in orders if o.order_status == OrderStatus.DELIVERED])
+        cancelled_orders = len([o for o in orders if o.order_status == OrderStatus.CANCELLED])
+        
+        # Get status distribution
+        status_counts = {}
+        for order in orders:
+            status = order.order_status.value if order.order_status else 'unknown'
+            status_counts[status] = status_counts.get(status, 0) + 1
+        
+        # Get daily revenue for chart
+        daily_revenue = {}
+        for order in orders:
+            date_str = order.order_date.strftime('%Y-%m-%d') if order.order_date else 'unknown'
+            daily_revenue[date_str] = daily_revenue.get(date_str, 0) + order.total_amount
+        
+        return jsonify({
+            'total_orders': total_orders,
+            'total_revenue': total_revenue,
+            'pending_orders': pending_orders,
+            'completed_orders': completed_orders,
+            'cancelled_orders': cancelled_orders,
+            'status_distribution': status_counts,
+            'daily_revenue': daily_revenue,
+            'average_order_value': total_revenue / total_orders if total_orders > 0 else 0
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch order stats", "details": str(e)}), 500
+
+@order_bp.route('/admin/<int:order_id>/status', methods=['PUT'])
+@jwt_required()
+def update_order_status(order_id):
+    """Admin endpoint to update order status"""
+    if not is_admin():
+        return jsonify({"error": "Admin access required"}), 403
+    
+    try:
+        data = request.get_json()
+        new_status = data.get('status')
+        
+        if not new_status:
+            return jsonify({"error": "Status is required"}), 400
+        
+        order = Order.query.get(order_id)
+        if not order:
+            return jsonify({"error": "Order not found"}), 404
+        
+        # Update order status
+        order.order_status = OrderStatus(new_status)
+        
+        # Update shipping status for all items
+        for item in order.order_items:
+            if new_status == 'delivered':
+                item.shipping_status = ShippingStatus.DELIVERED
+            elif new_status == 'shipped':
+                item.shipping_status = ShippingStatus.SHIPPED
+            elif new_status == 'processing':
+                item.shipping_status = ShippingStatus.PENDING
+        
+        db.session.commit()
+        
+        return jsonify({
+            "message": "Order status updated successfully",
+            "order_id": order_id,
+            "new_status": new_status
+        }), 200
+        
+    except ValueError as e:
+        return jsonify({"error": "Invalid status value"}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to update order status", "details": str(e)}), 500
