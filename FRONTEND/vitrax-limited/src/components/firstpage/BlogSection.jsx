@@ -8,148 +8,158 @@ import { FiCalendar } from "react-icons/fi";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import './BlogSection.css'
 
-
-
 const blogPosts = [
     {
         id: 1,
         title: "Going all-in with millennial design",
-        excerpt: "Discover how modern furniture design embraces millennial aesthetics with clean lines, minimalist approaches, and sustainable materials that resonate with today's generation.",
+        excerpt: "Discover how modern furniture design embraces millennial aesthetics with clean lines, sustainable materials, and multifunctional pieces that transform living spaces.",
         image: Blog1,
         readTime: "5 min",
         date: "12th Oct 2022",
     },
     {
         id: 2,
-        title: "Sustainable furniture for modern homes",
-        excerpt: "Explore eco-friendly furniture options that combine style with sustainability, helping you create beautiful spaces while caring for the environment.",
-        image:Blog2,
+        title: "Sustainable furniture for eco-conscious homes",
+        excerpt: "Explore the latest trends in eco-friendly furniture that combines style with sustainability, featuring reclaimed wood and recycled materials.",
+        image: Blog2,
         readTime: "5 min",
         date: "12th Oct 2022",
     },
     {
         id: 3,
-        title: "Maximizing small spaces with smart design",
-        excerpt: "Learn innovative furniture solutions and design tips to make the most of compact living spaces without compromising on style or functionality.",
+        title: "Maximizing small spaces with smart furniture",
+        excerpt: "Learn innovative design solutions for compact living spaces, including space-saving furniture that maximizes functionality without compromising style.",
         image: Blog3,
         readTime: "5 min",
         date: "12th Oct 2022",
     },
     {
         id: 4,
-        title: "The art of mixing vintage and modern",
-        excerpt: "Master the technique of blending vintage pieces with contemporary furniture to create unique, timeless interiors that tell your personal story.",
-        image:Blog2,
+        title: "The art of mixing modern and vintage styles",
+        excerpt: "Master the technique of blending contemporary furniture with vintage pieces to create unique, timeless interiors that reflect your personal style.",
+        image: Blog2,
         readTime: "5 min",
         date: "12th Oct 2022",
     },
     {
         id: 5,
-        title: "Color trends in furniture design 2024",
-        excerpt: "Stay ahead with the latest color palettes and trends shaping furniture design this year, from bold statements to subtle elegance.",
+        title: "Color psychology in furniture selection",
+        excerpt: "Understand how different colors affect mood and atmosphere in your home, and choose furniture that creates the perfect ambiance for each room.",
         image: Blog3,
         readTime: "5 min",
         date: "12th Oct 2022",
     },
     {
         id: 6,
-        title: "Creating cozy corners in your home",
-        excerpt: "Transform unused spaces into inviting nooks with the right furniture choices, lighting, and accessories for ultimate comfort and relaxation.",
-        image:Blog2,
+        title: "Luxury furniture on a budget",
+        excerpt: "Discover smart shopping strategies and design tips to achieve a high-end look without breaking the bank, including DIY upgrades and thrift finds.",
+        image: Blog2,
         readTime: "5 min",
         date: "12th Oct 2022",
     },
     {
         id: 7,
-        title: "Investment pieces that last a lifetime",
-        excerpt: "Discover which furniture pieces are worth the investment, offering durability, timeless design, and value that grows over the years.",
+        title: "Ergonomic furniture for home offices",
+        excerpt: "Create a productive workspace with ergonomic furniture designed for comfort and efficiency, essential for the modern remote work lifestyle.",
         image: Blog3,
         readTime: "5 min",
         date: "12th Oct 2022",
     },
     {
         id: 8,
-        title: "Home office furniture essentials",
-        excerpt: "Design a productive workspace with ergonomic furniture solutions that balance comfort, functionality, and style for the modern remote worker.",
-        image:Blog2,
+        title: "Outdoor furniture trends for 2024",
+        excerpt: "Stay ahead with the latest outdoor furniture trends, featuring weather-resistant materials and designs that extend your living space outdoors.",
+        image: Blog2,
         readTime: "5 min",
         date: "12th Oct 2022",
     },
     {
         id: 9,
-        title: "Outdoor furniture for all seasons",
-        excerpt: "Choose durable outdoor furniture that withstands weather while maintaining elegance, creating perfect spaces for relaxation and entertainment.",
+        title: "Minimalist furniture design principles",
+        excerpt: "Embrace the minimalist philosophy with furniture that emphasizes simplicity, functionality, and quality over quantity in your home decor.",
         image: Blog3,
         readTime: "5 min",
         date: "12th Oct 2022",
     },
     {
         id: 10,
-        title: "Minimalist design principles",
-        excerpt: "Embrace the beauty of less with minimalist furniture design that focuses on quality, functionality, and clean aesthetics for serene living spaces.",
-        image:Blog2,
+        title: "Custom furniture: when to invest",
+        excerpt: "Learn when custom furniture is worth the investment and how to work with designers to create pieces perfectly tailored to your space and needs.",
+        image: Blog2,
         readTime: "5 min",
         date: "12th Oct 2022",
     },
     {
         id: 11,
-        title: "Smart storage solutions",
-        excerpt: "Maximize your home's potential with innovative furniture that doubles as storage, keeping your space organized and clutter-free.",
+        title: "Furniture maintenance and care tips",
+        excerpt: "Extend the life of your furniture with proper maintenance techniques, from cleaning different materials to protecting against wear and damage.",
         image: Blog3,
         readTime: "5 min",
         date: "12th Oct 2022",
     },
     {
         id: 12,
-        title: "Luxury furniture on a budget",
-        excerpt: "Achieve high-end looks without breaking the bank with strategic furniture choices and styling tips that create luxury on any budget.",
-        image:Blog2,
+        title: "Smart furniture for the connected home",
+        excerpt: "Explore the future of furniture with integrated technology, from charging stations to smart storage solutions that enhance modern living.",
+        image: Blog2,
         readTime: "5 min",
         date: "12th Oct 2022",
     },
-               
 ];
 
 const BlogSection = () => {
-  const [currentIndex, setCurrentIndex] = useState(1); // Start at 1 because we duplicate first slide
+  const [currentIndex, setCurrentIndex] = useState(1); // Start at 1 because of duplicate at start
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const [isTransitioning, setIsTransitioning] = useState(true);
-  const intervalRef = useRef(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const trackRef = useRef(null);
+  const intervalRef = useRef(null);
   const cardsPerView = 2;
   const totalSlides = Math.ceil(blogPosts.length / cardsPerView);
-  
-  // Create slides array with duplicates for infinite loop
+
+  // Create slides with duplicates for infinite loop
   const createSlides = () => {
     const slides = [];
-    // Add last slide at the beginning
-    slides.push(blogPosts.slice(-cardsPerView));
-    // Add all slides
+    // Add duplicate of last slide at the beginning
+    const lastSlideIndex = totalSlides - 1;
+    slides.push(blogPosts.slice(lastSlideIndex * cardsPerView, lastSlideIndex * cardsPerView + cardsPerView));
+    
+    // Add all original slides
     for (let i = 0; i < totalSlides; i++) {
       slides.push(blogPosts.slice(i * cardsPerView, i * cardsPerView + cardsPerView));
     }
-    // Add first slide at the end
+    
+    // Add duplicate of first slide at the end
     slides.push(blogPosts.slice(0, cardsPerView));
+    
     return slides;
   };
 
   const slides = createSlides();
-  const totalSlidesWithDupes = slides.length;
+  const displayIndex = currentIndex;
 
   // Auto-rotate carousel every 10 seconds
   useEffect(() => {
-    if (isAutoPlaying) {
+    if (isAutoPlaying && !isTransitioning) {
       intervalRef.current = setInterval(() => {
         setCurrentIndex((prevIndex) => {
           const nextIndex = prevIndex + 1;
-          // If we've reached the last duplicate slide, instantly jump to the real first slide
-          if (nextIndex >= totalSlidesWithDupes - 1) {
+          if (nextIndex >= totalSlides + 1) {
+            // When reaching duplicate at end, reset to real first slide
             setTimeout(() => {
-              setIsTransitioning(false);
-              setCurrentIndex(1);
-              setTimeout(() => setIsTransitioning(true), 10);
-            }, 600);
-            return nextIndex;
+              setIsTransitioning(true);
+              if (trackRef.current) {
+                trackRef.current.style.transition = 'none';
+                trackRef.current.style.transform = `translateX(-100%)`;
+              }
+              setTimeout(() => {
+                setCurrentIndex(1);
+                setIsTransitioning(false);
+                if (trackRef.current) {
+                  trackRef.current.style.transition = 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
+                }
+              }, 50);
+            }, 700);
+            return totalSlides + 1;
           }
           return nextIndex;
         });
@@ -161,54 +171,65 @@ const BlogSection = () => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isAutoPlaying, totalSlidesWithDupes]);
+  }, [isAutoPlaying, isTransitioning, totalSlides]);
 
-  const goToSlide = (index, skipTransition = false) => {
-    if (skipTransition) {
-      setIsTransitioning(false);
-      setCurrentIndex(index);
-      setTimeout(() => setIsTransitioning(true), 50);
-    } else {
-      setCurrentIndex(index);
-    }
+  const goToSlide = (index) => {
+    setCurrentIndex(index + 1); // +1 because of duplicate at start
     setIsAutoPlaying(false);
     // Resume auto-play after 15 seconds of manual navigation
     setTimeout(() => setIsAutoPlaying(true), 15000);
   };
 
   const goToPrevious = () => {
-    const prevIndex = currentIndex - 1;
-    if (prevIndex < 1) {
-      // Smoothly go to duplicate first slide (index 0), then instantly jump to real last
-      goToSlide(0);
+    if (currentIndex <= 1) {
+      // Jump to duplicate at end for seamless loop
+      setIsTransitioning(true);
+      setCurrentIndex(totalSlides + 1);
       setTimeout(() => {
-        setIsTransitioning(false);
-        setCurrentIndex(totalSlidesWithDupes - 2);
-        setTimeout(() => setIsTransitioning(true), 10);
-      }, 600);
+        setIsTransitioning(true);
+        if (trackRef.current) {
+          trackRef.current.style.transition = 'none';
+          trackRef.current.style.transform = `translateX(-${totalSlides * 100}%)`;
+        }
+        setTimeout(() => {
+          setCurrentIndex(totalSlides);
+          setIsTransitioning(false);
+          if (trackRef.current) {
+            trackRef.current.style.transition = 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
+          }
+        }, 50);
+      }, 700);
     } else {
-      goToSlide(prevIndex);
+      setCurrentIndex(currentIndex - 1);
+      setIsAutoPlaying(false);
+      setTimeout(() => setIsAutoPlaying(true), 15000);
     }
   };
 
   const goToNext = () => {
-    const nextIndex = currentIndex + 1;
-    if (nextIndex >= totalSlidesWithDupes - 1) {
-      // Smoothly go to the duplicate last slide, then instantly jump to real first
-      goToSlide(totalSlidesWithDupes - 1);
+    if (currentIndex >= totalSlides) {
+      // Jump to duplicate at start for seamless loop
+      setIsTransitioning(true);
+      setCurrentIndex(0);
       setTimeout(() => {
-        setIsTransitioning(false);
-        setCurrentIndex(1);
-        setTimeout(() => setIsTransitioning(true), 10);
-      }, 600);
+        setIsTransitioning(true);
+        if (trackRef.current) {
+          trackRef.current.style.transition = 'none';
+          trackRef.current.style.transform = `translateX(0%)`;
+        }
+        setTimeout(() => {
+          setCurrentIndex(1);
+          setIsTransitioning(false);
+          if (trackRef.current) {
+            trackRef.current.style.transition = 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
+          }
+        }, 50);
+      }, 700);
     } else {
-      goToSlide(nextIndex);
+      setCurrentIndex(currentIndex + 1);
+      setIsAutoPlaying(false);
+      setTimeout(() => setIsAutoPlaying(true), 15000);
     }
-  };
-
-  const handleDotClick = (dotIndex) => {
-    // dotIndex is 0-based for the real slides, but we start at index 1
-    goToSlide(dotIndex + 1);
   };
 
   return (
@@ -232,15 +253,15 @@ const BlogSection = () => {
               <div className='blog-posts'>
                 <div 
                   ref={trackRef}
-                  className={`blog-posts-track ${!isTransitioning ? 'no-transition' : ''}`}
+                  className='blog-posts-track'
                   style={{
-                    transform: `translateX(-${currentIndex * 100}%)`
+                    transform: `translateX(-${displayIndex * 100}%)`
                   }}
                 >
                   {slides.map((slidePosts, slideIndex) => (
                     <div key={slideIndex} className='blog-slide'>
-                      {slidePosts.map((post) => (
-                        <div key={`${post.id}-${slideIndex}`} className='blog-card'>
+                      {slidePosts.map((post, postIndex) => (
+                        <div key={`${post.id}-${slideIndex}-${postIndex}`} className='blog-card'>
                           <div className='blog-image-wrapper'>
                             <img src={post.image} alt={post.title} className='blog-image' />
                           </div>
@@ -274,23 +295,12 @@ const BlogSection = () => {
             {/* Pagination dots */}
             <div className='carousel-pagination'>
               {Array.from({ length: totalSlides }).map((_, index) => {
-                // Calculate the real slide index (accounting for duplicates at start and end)
-                let realIndex;
-                if (currentIndex === 0) {
-                  // At duplicate last slide, show last real slide
-                  realIndex = totalSlides - 1;
-                } else if (currentIndex >= totalSlidesWithDupes - 1) {
-                  // At duplicate first slide, show first real slide
-                  realIndex = 0;
-                } else {
-                  // Normal case: real slides are indices 1 through totalSlides
-                  realIndex = currentIndex - 1;
-                }
+                const actualIndex = currentIndex > totalSlides ? 0 : currentIndex < 1 ? totalSlides - 1 : currentIndex - 1;
                 return (
                   <button
                     key={index}
-                    className={`pagination-dot ${index === realIndex ? 'active' : ''}`}
-                    onClick={() => handleDotClick(index)}
+                    className={`pagination-dot ${index === actualIndex ? 'active' : ''}`}
+                    onClick={() => goToSlide(index)}
                     aria-label={`Go to slide ${index + 1}`}
                   />
                 );
