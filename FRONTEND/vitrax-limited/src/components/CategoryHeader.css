@@ -1,56 +1,79 @@
+ :root{
+  --cat-border: #e6eef9;
+  --cat-accent: #159EEC;
+  --cat-text: #606770;
+  --cat-bg: #ffffff;
+}
+
 .category-header {
-  background: white;
-  border-bottom: 1px solid #e0e0e0;
-  padding: 12px 0;
+  background: var(--cat-bg);
+  border-bottom: 1px solid var(--cat-border);
+  padding: 8px 0; /* slightly increased vertical padding to avoid clipping/scroll */
 }
 
 .category-header-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 16px;
   display: flex;
   align-items: center;
   gap: 8px;
   overflow-x: auto;
+  height: 64px; /* increased compact height to avoid scrolling/clipping */
+  -webkit-overflow-scrolling: touch;
 }
 
+/* Compact pill-style category items (icon left, name right) */
 .category-item {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 6px;
-  padding: 12px 16px;
+  gap: 10px;
+  padding: 6px 10px;
   text-decoration: none;
-  color: #666;
-  border-radius: 12px;
-  transition: all 0.3s ease;
+  color: var(--cat-text);
+  border-radius: 999px;
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.12s ease;
   white-space: nowrap;
-  min-width: 100px;
+  min-width: 60px;
+  box-sizing: border-box;
 }
 
 .category-item:hover {
-  color: #159EEC;
-  background: rgba(21, 158, 236, 0.05);
+  color: var(--cat-accent);
+  background: rgba(21, 158, 236, 0.06);
+  transform: translateY(-1px);
 }
 
 .category-item.active {
-  color: #159EEC;
-  background: rgba(21, 158, 236, 0.1);
+  color: var(--cat-accent);
+  background: rgba(21, 158, 236, 0.12);
 }
 
 .category-icon {
-  font-size: 24px;
-  width: 40px;
-  height: 40px;
+  font-size: 20px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  background: #f8f9fa;
+  border-radius: 8px;
+  background: #f6f8fb;
+  color: inherit;
 }
 
 .category-name {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  text-align: center;
+  text-align: left;
+  line-height: 1;
+}
+
+/* hide scrollbar but allow scrolling */
+.category-header-container::-webkit-scrollbar{ height:6px }
+.category-header-container::-webkit-scrollbar-thumb{ background: rgba(0,0,0,0.08); border-radius: 8px }
+
+@media (max-width: 520px){
+  .category-name{ display:none } /* keep it compact on small screens */
+  .category-header-container{ padding: 0 8px }
 }

@@ -94,14 +94,14 @@ const Hero = () => {
       {/* Background Pattern */}
       <div className="hero-background-pattern"></div>
       
-      {/* Floating Elements */}
+      {/* Floating Elements 
       <div className="floating-elements">
         <div className="floating-circle circle-1"></div>
         <div className="floating-circle circle-2"></div>
         <div className="floating-circle circle-3"></div>
         <div className="floating-square square-1"></div>
         <div className="floating-square square-2"></div>
-      </div>
+      </div> */}
 
       <div className='hero-container'>
         {/* Left Side - Image */}
@@ -112,10 +112,15 @@ const Hero = () => {
               alt={currentSlideData.title}
               className="main-image"
             />
+
+            {/* Image Overlay and Shadow 
             <div className="image-overlay"></div>
             <div className="image-shadow"></div>
+            */}
           </div>
           
+
+
           {/* Background Image */}
           <div className="background-image">
             <img src={currentSlideData.background} alt="Background" />
@@ -185,7 +190,7 @@ const Hero = () => {
         <FiChevronRight />
       </button>
 
-      {/* Progress Bar */}
+      {/* Progress Bar 
       <div className="progress-bar">
         <div 
           className="progress-fill"
@@ -195,6 +200,7 @@ const Hero = () => {
           }}
         ></div>
       </div>
+      */}
 
       {/* Scroll Indicator */}
       <div className="scroll-indicator">

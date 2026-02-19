@@ -209,15 +209,15 @@ const Navbar = () => {
           </button>
 
           {/* Social Media Icons */}
-          <div className="social-icons">
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="social-link">
-              <FaFacebook className="social-icon" />
+          <div className="nav-social" aria-label="Social links">
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="nav-social-link nav-social-facebook" aria-label="Facebook">
+              <FaFacebook className="nav-social-icon" />
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="social-link">
-              <FaInstagram className="social-icon" />
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="nav-social-link nav-social-instagram" aria-label="Instagram">
+              <FaInstagram className="nav-social-icon" />
             </a>
-            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="social-link">
-              <FaYoutube className="social-icon" />
+            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="nav-social-link nav-social-youtube" aria-label="YouTube">
+              <FaYoutube className="nav-social-icon" />
             </a>
           </div>
         </div>
