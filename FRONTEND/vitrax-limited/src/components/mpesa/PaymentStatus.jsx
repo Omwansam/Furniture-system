@@ -1,6 +1,6 @@
 import React from "react"
 import { FaCheckCircle, FaTimesCircle, FaArrowLeft } from "react-icons/fa"
-import "./MPesaPayment.css"
+import "./MpesaPayment.css"
 
 const PaymentStatus = ({ status, amount, transactionId, onReset }) => {
   return (
