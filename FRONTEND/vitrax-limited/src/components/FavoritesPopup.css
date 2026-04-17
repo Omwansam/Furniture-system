@@ -4,22 +4,25 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(17, 24, 39, 0.45);
+  backdrop-filter: blur(6px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
   animation: fadeIn 0.3s ease-out;
+  padding: var(--space-4, 1rem);
 }
 
 .favorites-popup {
-  background: white;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 80vh;
+  background: var(--color-bg-white);
+  border-radius: var(--radius-card);
+  width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-soft-lg);
+  border: 1px solid rgba(31, 42, 55, 0.08);
   animation: slideUp 0.3s ease-out;
 }
 
@@ -27,32 +30,33 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f8fafc;
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
+  border-bottom: 1px solid rgba(31, 42, 55, 0.08);
+  background: linear-gradient(180deg, var(--color-bg-warm) 0%, var(--color-bg-white) 100%);
 }
 
 .favorites-header h3 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #1f2937;
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
 }
 
 .close-btn {
-  background: none;
+  background: var(--color-bg-surface);
   border: none;
-  font-size: 18px;
-  color: #6b7280;
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
   cursor: pointer;
-  padding: 8px;
-  border-radius: 6px;
+  padding: 0.5rem;
+  border-radius: 10px;
   transition: all 0.2s ease;
 }
 
 .close-btn:hover {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--color-bg-warm);
+  color: var(--color-text-primary);
 }
 
 .favorites-content {
@@ -63,12 +67,12 @@
 .empty-favorites {
   text-align: center;
   padding: 60px 24px;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 .empty-icon {
   font-size: 48px;
-  color: #d1d5db;
+  color: var(--color-text-muted);
   margin-bottom: 16px;
 }
 
@@ -76,7 +80,7 @@
   margin: 0 0 8px 0;
   font-size: 18px;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-primary);
 }
 
 .empty-favorites p {
@@ -87,18 +91,19 @@
 
 .browse-btn {
   display: inline-block;
-  background: #3b82f6;
-  color: white;
+  background: linear-gradient(135deg, var(--color-secondary) 0%, #b8894a 100%);
+  color: #1a1208;
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: var(--radius-pill);
   text-decoration: none;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 14px rgba(200, 155, 90, 0.35);
 }
 
 .browse-btn:hover {
-  background: #2563eb;
   transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(200, 155, 90, 0.45);
 }
 
 .favorites-list {
@@ -109,7 +114,7 @@
   display: flex;
   gap: 16px;
   padding: 16px 0;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid rgba(31, 42, 55, 0.08);
 }
 
 .favorite-item:last-child {
@@ -142,7 +147,7 @@
   margin: 0 0 4px 0;
   font-size: 16px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--color-text-primary);
   line-height: 1.4;
 }
 
@@ -150,7 +155,7 @@
   margin: 0 0 12px 0;
   font-size: 16px;
   font-weight: 600;
-  color: #059669;
+  color: var(--color-secondary);
 }
 
 .favorite-actions {
@@ -174,12 +179,12 @@
 }
 
 .add-to-cart-btn {
-  background: #3b82f6;
-  color: white;
+  background: linear-gradient(135deg, var(--color-secondary) 0%, #b8894a 100%);
+  color: #1a1208;
 }
 
 .add-to-cart-btn:hover {
-  background: #2563eb;
+  filter: brightness(1.05);
 }
 
 .remove-favorite-btn {
@@ -198,8 +203,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  border-top: 1px solid #e5e7eb;
-  background: #f8fafc;
+  border-top: 1px solid rgba(31, 42, 55, 0.08);
+  background: var(--color-bg-warm);
   gap: 12px;
 }
 
@@ -220,18 +225,19 @@
 }
 
 .continue-shopping-btn {
-  background: #10b981;
-  color: white;
+  background: var(--color-accent);
+  color: var(--color-neutral-100);
   text-decoration: none;
   padding: 10px 16px;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  font-weight: 600;
+  transition: filter 0.2s ease, transform 0.2s ease;
 }
 
 .continue-shopping-btn:hover {
-  background: #059669;
+  filter: brightness(1.08);
+  transform: translateY(-1px);
 }
 
 /* Animations */

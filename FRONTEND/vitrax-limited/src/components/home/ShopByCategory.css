@@ -1,0 +1,57 @@
+.shop-cats {
+  background: var(--color-bg-white);
+}
+
+.shop-cats-header {
+  margin-bottom: var(--space-8, 2rem);
+  text-align: center;
+}
+
+.shop-cats-header .eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2, 0.5rem);
+}
+
+.shop-cats-header h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  color: var(--color-text-primary);
+}
+
+.shop-cats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-3, 0.75rem);
+}
+
+.shop-cat-card {
+  text-decoration: none;
+  color: inherit;
+  border-radius: 12px;
+  padding: var(--space-5, 1.25rem);
+  background: var(--color-bg-warm);
+  border: 1px solid rgba(31, 42, 55, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-height: 120px;
+}
+
+.shop-cat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-soft-md);
+}
+
+.shop-cat-label {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.shop-cat-blurb {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}

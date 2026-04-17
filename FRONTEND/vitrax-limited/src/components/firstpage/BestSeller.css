@@ -1,6 +1,6 @@
 .best-sellers{
-    padding: 60px 20px;
-    background-color: #ffffff;
+    padding: var(--space-12) var(--space-5);
+    background: linear-gradient(180deg, var(--color-bg-white) 0%, var(--color-bg-warm) 100%);
     display: flex;
     justify-content: center;
 }
@@ -17,15 +17,16 @@
 }
 
 .sellers-details h2 {
-    font-size: 28px;
-    font-weight: bold;
-    color: #222;
+    font-family: var(--font-heading);
+    font-size: clamp(1.5rem, 3vw, 1.85rem);
+    font-weight: 700;
+    color: var(--color-text-primary);
     margin-bottom: 10px;
 }
 
 .subtitle {
     font-size: 16px;
-    color: #666;
+    color: var(--color-text-secondary);
     margin-bottom: 30px;
     max-width: 600px;
     margin-left: auto;
@@ -43,19 +44,19 @@
 .product-item {
     width: 100%;
     max-width: 320px;
-    background-color: #fff;
-    border-radius: 12px;
+    background-color: var(--color-bg-white);
+    border-radius: var(--radius-lg);
     padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease-in-out;
-    border: 1px solid #f0f0f0;
+    box-shadow: var(--shadow-soft-md);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    border: 1px solid rgba(31, 42, 55, 0.08);
     cursor: pointer;
 }
 
 .product-item:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    border-color: #e0e0e0;
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-soft-lg);
+    border-color: rgba(200, 155, 90, 0.35);
 }
 
 .product-item img {
@@ -73,7 +74,7 @@
 
 .product-item h3 {
     font-size: 16px;
-    color: #333;
+    color: var(--color-text-primary);
     margin-bottom: 10px;
     font-weight: 600;
     line-height: 1.4;
@@ -85,8 +86,8 @@
 
 .product-price {
     font-size: 18px;
-    font-weight: bold;
-    color: #000;
+    font-weight: 700;
+    color: var(--color-secondary);
     margin-bottom: 10px;
 }
 
@@ -96,7 +97,7 @@
     align-items: center;
     margin-top: 10px;
     font-size: 14px;
-    color: #666;
+    color: var(--color-text-secondary);
 }
 
 .product-item .stars {
@@ -106,7 +107,7 @@
 }
 
 .product-item .order-count {
-    color: #666;
+    color: var(--color-text-muted);
     font-size: 13px;
 }
 
@@ -114,7 +115,7 @@
     text-align: center;
     font-size: 16px;
     font-weight: 600;
-    color: #000;
+    color: var(--color-text-primary);
     cursor: pointer;
     position: relative;
     text-decoration: none;
@@ -124,7 +125,7 @@
 }
 
 .sellers-btn:hover {
-    color: #333;
+    color: var(--color-secondary);
     transform: translateY(-2px);
 }
 
@@ -133,7 +134,7 @@
     display: block;
     width: 50px;
     height: 2px;
-    background-color: #000;
+    background-color: var(--color-secondary);
     margin: 5px auto 0;
     transition: width 0.3s ease-in-out;
 }
@@ -154,7 +155,7 @@
 }
 
 .loading-state {
-    color: #666;
+    color: var(--color-text-secondary);
 }
 
 .error-state {

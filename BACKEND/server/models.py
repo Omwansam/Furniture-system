@@ -77,6 +77,9 @@ class User(db.Model):
     payment_method = db.relationship('PaymentMethod', back_populates="user")
     #Relationship mapping the user to multiple wishlists
     wishlists = db.relationship('Wishlist', back_populates="user")
+    wishlist_items = db.relationship(
+        "WishlistItem", back_populates="user", cascade="all, delete-orphan"
+    )
     #Relationships mapping user to refunds
     refunds = db.relationship('Refund', back_populates="user")
 
@@ -198,6 +201,9 @@ class Product(db.Model):
     images = db.relationship('ProductImage', back_populates='product', cascade='all, delete-orphan')
 
     cart_items = db.relationship('CartItem', back_populates="product")
+    wishlist_entries = db.relationship(
+        "WishlistItem", back_populates="product", cascade="all, delete-orphan"
+    )
 
 
 #####################################################################################################################################################################################
@@ -426,6 +432,23 @@ class Wishlist(db.Model):
     #Relationship mapping the wishlist to the related user
     user = db.relationship('User', back_populates="wishlists")
     
+
+
+class WishlistItem(db.Model):
+    """Per-user saved products (wishlist)."""
+    __tablename__ = "wishlist_items"
+
+    wishlist_item_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey("products.product_id"), nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
+
+    user = db.relationship("User", back_populates="wishlist_items")
+    product = db.relationship("Product", back_populates="wishlist_entries")
+
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "product_id", name="uq_wishlist_user_product"),
+    )
 
 
 ####################################################################################################################################################

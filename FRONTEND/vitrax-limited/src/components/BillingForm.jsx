@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { FaUser, FaBuilding, FaMapMarkerAlt, FaPhone, FaEnvelope, FaCreditCard, FaSave, FaHistory } from "react-icons/fa";
 import { cartService } from "./cartService";
 import { getPrimaryImageUrl } from "../utils/imageUtils";
+import { apiUrl } from "../config/api";
 import "./BillingForm.css";
 import PaymentStatus from "./mpesa/PaymentStatus";
 
@@ -60,7 +61,7 @@ const BillingForm = () => {
 
   const fetchSavedShippingInfo = async () => {
     try {
-      const response = await fetch("http://localhost:5000/shipping/get", {
+      const response = await fetch(apiUrl("/shipping/get"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -97,7 +98,7 @@ const BillingForm = () => {
 
   const saveShippingInfo = async (shippingData, isDefault = false) => {
     try {
-      const response = await fetch("http://localhost:5000/shipping/save", {
+      const response = await fetch(apiUrl("/shipping/save"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -150,7 +151,7 @@ const BillingForm = () => {
 
   const createOrder = async (billingData) => {
     try {
-      const response = await fetch("http://localhost:5000/orders/checkout", {
+      const response = await fetch(apiUrl("/orders/checkout"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -187,7 +188,7 @@ const BillingForm = () => {
         amount: amount
       });
 
-      const response = await fetch("http://localhost:5000/payments/mpesa/stkpush", {
+      const response = await fetch(apiUrl("/payments/mpesa/stkpush"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -226,7 +227,7 @@ const BillingForm = () => {
 
   const pollPaymentStatus = async (checkoutId) => {
     try {
-      const resp = await fetch(`http://localhost:5000/payments/mpesa/status/${checkoutId}`, {
+      const resp = await fetch(apiUrl(`/payments/mpesa/status/${checkoutId}`), {
         headers: {
           "Authorization": `Bearer ${localStorage.getItem('token')}`
         }
@@ -248,7 +249,7 @@ const BillingForm = () => {
   const initiateStripePayment = async (orderId, amount) => {
     try {
       // Create payment intent
-      const response = await fetch("http://localhost:5000/stripe/create-payment-intent", {
+      const response = await fetch(apiUrl("/stripe/create-payment-intent"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -269,7 +270,7 @@ const BillingForm = () => {
 
       // For now, we'll just confirm the payment intent without card details
       // In a real implementation, you would use Stripe Elements for card input
-      const confirmResponse = await fetch("http://localhost:5000/stripe/confirm-payment", {
+      const confirmResponse = await fetch(apiUrl("/stripe/confirm-payment"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

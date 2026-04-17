@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import "./auth.css";
 import { useAuth } from "../context/AuthContext";
+import { apiUrl } from "../config/api";
 
 const AdminLoginPage = () => {
   const [email, setEmail] = useState("");
@@ -128,7 +129,7 @@ const AdminLoginPage = () => {
           <strong>Email:</strong> admin@furniture.com<br />
           <strong>Password:</strong> admin123<br />
           <br />
-          <strong>Backend API:</strong> http://localhost:5000<br />
+          <strong>Backend API:</strong> {apiUrl("")}<br />
           <strong>Login Endpoint:</strong> /auth/login
         </div>
         

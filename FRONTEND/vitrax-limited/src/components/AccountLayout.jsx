@@ -1,8 +1,10 @@
-import React from 'react';
-import AccountSidebar from './AccountSidebar';
-import './AccountLayout.css';
+import React from "react";
+import { Outlet } from "react-router-dom";
+import AccountSidebar from "./AccountSidebar";
+import "./AccountLayout.css";
 
-const AccountLayout = ({ children }) => {
+/** Shell for `/account/*` routes (uses nested `<Outlet />`). */
+const AccountLayout = () => {
   return (
     <div className="account-layout">
       <div className="account-container">
@@ -10,7 +12,7 @@ const AccountLayout = ({ children }) => {
           <AccountSidebar />
         </aside>
         <main className="account-main">
-          {children}
+          <Outlet />
         </main>
       </div>
     </div>

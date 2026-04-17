@@ -8,7 +8,6 @@ import {
   FaClock,
   FaSearch
 } from 'react-icons/fa';
-import AccountLayout from '../components/AccountLayout';
 import './Downloads.css';
 
 const Downloads = () => {
@@ -109,7 +108,6 @@ const Downloads = () => {
   };
 
   return (
-    <AccountLayout>
       <div className="downloads-container">
         <div className="downloads-header">
           <h1>My Downloads</h1>
@@ -232,7 +230,6 @@ const Downloads = () => {
           </div>
         </div>
       </div>
-    </AccountLayout>
   );
 };
 

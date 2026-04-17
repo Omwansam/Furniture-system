@@ -127,7 +127,7 @@ const BestSellers = () => {
             <div className='sellers-grid'>
           {bestSellers.map((product) => (
             <div key={product.product_id} className='product-item'>
-              <Link to={`/singleproduct/${product.product_id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Link to={`/product/${product.product_id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <img 
                   src={getImageUrl(product)}
                   alt={product.product_name}

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getPrimaryImageUrl, handleImageError } from '../../utils/imageUtils';
+import { apiUrl } from '../../config/api';
 import './FeaturedProducts.css';
 
 const FeaturedProducts = () => {
@@ -8,7 +9,7 @@ const FeaturedProducts = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/product') 
+    fetch(apiUrl('/api/product')) 
       .then(res => res.json())
       .then(data => {
         // Normalize API response to always be an array
@@ -135,7 +136,7 @@ const FeaturedProducts = () => {
           ))}
         </div>
 
-        {/* Slide Indicators */}
+        {/* Slide Indicators 
         {totalSlides > 1 && (
           <div className='slide-indicators'>
             {Array.from({ length: totalSlides }, (_, index) => (
@@ -148,6 +149,7 @@ const FeaturedProducts = () => {
             ))}
           </div>
         )}
+        */}
       </div>
     </section>
   );

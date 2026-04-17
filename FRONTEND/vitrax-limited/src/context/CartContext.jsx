@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { apiUrl } from '../config/api';
 
 const CartContext = createContext();
 
@@ -40,7 +41,7 @@ export const CartProvider = ({ children }) => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/cart', {
+      const response = await fetch(apiUrl('/cart'), {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -82,7 +83,7 @@ export const CartProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/cart/items', {
+      const response = await fetch(apiUrl('/cart/items'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -117,7 +118,7 @@ export const CartProvider = ({ children }) => {
     if (!token) return false;
 
     try {
-      const response = await fetch(`http://localhost:5000/cart/items/${itemId}`, {
+      const response = await fetch(apiUrl(`/cart/items/${itemId}`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -147,7 +148,7 @@ export const CartProvider = ({ children }) => {
     if (!token) return false;
 
     try {
-      const response = await fetch(`http://localhost:5000/cart/items/${itemId}`, {
+      const response = await fetch(apiUrl(`/cart/items/${itemId}`), {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -175,7 +176,7 @@ export const CartProvider = ({ children }) => {
     if (!token) return false;
 
     try {
-      const response = await fetch('http://localhost:5000/cart', {
+      const response = await fetch(apiUrl('/cart'), {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

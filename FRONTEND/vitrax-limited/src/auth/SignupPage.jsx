@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FaUser, FaLock, FaEnvelope, FaEye, FaEyeSlash } from "react-icons/fa";
+import { apiUrl } from "../config/api";
 import "./auth.css";
 
 const SignupPage = ({ onSwitchToLogin }) => {
@@ -11,8 +12,6 @@ const SignupPage = ({ onSwitchToLogin }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
 
-  const API_URL = "http://localhost:5000/auth/register";
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -22,7 +21,7 @@ const SignupPage = ({ onSwitchToLogin }) => {
     }
 
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(apiUrl("/auth/register"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

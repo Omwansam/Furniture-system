@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from "react-router-dom";
 import './RelatedProducts.css'
 
-const API_BASE_URL = "http://localhost:5000/api";
+import { apiUrl } from "../config/api";
+
+const API_BASE_URL = apiUrl("/api");
 
 const RelatedProducts = ({ currentProduct }) => {
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -75,7 +77,7 @@ const RelatedProducts = ({ currentProduct }) => {
   }, [currentProduct?.product_id]);
 
   const handleProductClick = (productId) => {
-    navigate(`/singleproduct/${productId}`);
+    navigate(`/product/${productId}`);
   };
 
   if (loading) {

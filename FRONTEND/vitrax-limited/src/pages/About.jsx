@@ -8,6 +8,16 @@ const About = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState('hero');
 
+  const handleNavDotClick = (section) => {
+    const element = document.querySelector(`.about-${section}`);
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
   useEffect(() => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
@@ -41,56 +51,9 @@ const About = () => {
     // Add scroll event listener
     window.addEventListener('scroll', handleScroll);
     
-    // Add smooth scrolling for anchor links
-    const handleAnchorClick = (e) => {
-      const href = e.target.getAttribute('href');
-      if (href && href.startsWith('#')) {
-        e.preventDefault();
-        const target = document.querySelector(href);
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }
-      }
-    };
-
-    // Add click listeners to anchor links
-    const anchorLinks = document.querySelectorAll('a[href^="#"]');
-    anchorLinks.forEach(link => {
-      link.addEventListener('click', handleAnchorClick);
-    });
-
-    // Handle navigation dot clicks
-    const handleNavDotClick = (section) => {
-      const element = document.querySelector(`.about-${section}`);
-      if (element) {
-        element.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }
-    };
-
-    // Add click listeners to navigation dots
-    const navDots = document.querySelectorAll('.nav-dot');
-    navDots.forEach(dot => {
-      dot.addEventListener('click', () => {
-        const section = dot.getAttribute('data-section');
-        handleNavDotClick(section);
-      });
-    });
-
     // Cleanup
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      anchorLinks.forEach(link => {
-        link.removeEventListener('click', handleAnchorClick);
-      });
-      navDots.forEach(dot => {
-        dot.removeEventListener('click', handleNavDotClick);
-      });
     };
   }, []);
 
@@ -110,18 +73,21 @@ const About = () => {
         <div 
           className={`nav-dot ${activeSection === 'hero' ? 'active' : ''}`} 
           data-section="hero"
+          onClick={() => handleNavDotClick('hero')}
         >
           <span className="dot-tooltip">Hero</span>
         </div>
         <div 
           className={`nav-dot ${activeSection === 'story' ? 'active' : ''}`} 
           data-section="story"
+          onClick={() => handleNavDotClick('story')}
         >
           <span className="dot-tooltip">Our Story</span>
         </div>
         <div 
           className={`nav-dot ${activeSection === 'cta' ? 'active' : ''}`} 
           data-section="cta"
+          onClick={() => handleNavDotClick('cta')}
         >
           <span className="dot-tooltip">Get Started</span>
         </div>

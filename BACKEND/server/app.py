@@ -25,6 +25,7 @@ from routes.social_media_route import social_media_bp
 from routes.stripe_route import stripe_bp
 from routes.settings_route import settings_bp
 from routes.shipping_route import shipping_bp
+from routes.wishlist_route import wishlist_bp
 
 import os
 
@@ -32,7 +33,15 @@ app = Flask(__name__)
 
 app.config.from_object(Config)
 
-CORS(app)
+CORS(
+    app,
+    origins=[
+        "http://192.168.56.101:3000",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    supports_credentials=True,
+)
 db.init_app(app)
 migrate.init_app(app, db)
 jwt.init_app(app)
@@ -107,6 +116,7 @@ app.register_blueprint(settings_bp, url_prefix = '/settings')
 
 # Register shipping blueprint
 app.register_blueprint(shipping_bp, url_prefix = '/shipping')
+app.register_blueprint(wishlist_bp, url_prefix='/wishlist')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

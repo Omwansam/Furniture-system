@@ -1,95 +1,107 @@
-/* Shop Header Container */
 .shop-header {
-    background: url("../../assets/Background1.png") center/cover no-repeat;
-    height: 200px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    position: relative;
-    padding: 20px;
+  position: relative;
+  padding: calc(var(--space-xl) * 0.75) var(--space-sm) calc(var(--space-lg) * 0.85);
+  background: linear-gradient(
+    125deg,
+    var(--color-primary) 0%,
+    #2e3d4d 42%,
+    rgba(46, 125, 107, 0.92) 100%
+  );
+  color: var(--color-neutral-100);
+}
+
+.shop-header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("../../assets/Background1.png") center/cover no-repeat;
+  opacity: 0.18;
+  filter: blur(2px);
+  z-index: 0;
+}
+
+.shop-content {
+  position: relative;
+  z-index: 1;
+  max-width: min(1200px, 100%);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.shop-logo {
+  height: 56px;
+  width: auto;
+  margin-bottom: var(--space-sm);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.shop-content h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.2);
+}
+
+.breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: var(--space-sm);
+}
+
+.breadcrumb-link {
+  position: relative;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-duration) var(--transition-easing);
+}
+
+.breadcrumb-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 2px;
+  background: var(--color-secondary);
+  border-radius: 999px;
+  transition: width var(--transition-duration) var(--transition-easing);
+}
+
+.breadcrumb-link:hover {
+  color: var(--color-neutral-100);
+}
+
+.breadcrumb-link:hover::after {
+  width: 100%;
+}
+
+.breadcrumb-separator {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.active {
+  color: var(--color-neutral-100);
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .shop-header {
+    padding: calc(var(--space-lg) * 0.6) var(--space-sm) calc(var(--space-md) * 0.6);
   }
-  
-  /* Blurred Overlay 
-  .shop-header::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.5); 
-    backdrop-filter: blur(8px);
-  } */
-  
-  /* Content Layer */
-  .shop-content {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-  }
-  
-  /* Logo Styling */
-  .shop-logo {
-    position: relative;
-    width: 50px;
-    height: 50px;
-    margin-bottom: 5px;
-    
-  }
-  
-  /* Shop Title */
+
   .shop-content h1 {
-    font-size: 28px;
-    font-weight: bold;
-    margin: 8px 0;
-    color: #222;
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
   }
-  
-  /* Breadcrumb Navigation */
+
   .breadcrumb {
-    font-size: 16px;
-    color: #777;
-    margin-top: 5px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
-  
-  /* Breadcrumb Links */
-  .breadcrumb-link {
-    text-decoration: none;
-    color: #000;
-    font-weight: bold;
-    transition: color 0.3s ease-in-out;
-  }
-  
-  .breadcrumb-link:hover {
-    color: #000;
-    font-weight: bold;
-  }
-  
-  /* Breadcrumb Separator */
-  .breadcrumb-separator {
-    margin: 0 5px;
-    color: #000;
-    font-size: 16px;
-    font-weight: bold;
-  }
-  
-  /* Active Page */
-  .active {
-    color: black;
-    font-weight: bold;
-  }
-
-
-
-  /* Meubel House_Logos-05 
-
-position: absolute;
-width: 77px;
-height: 77px;
-left: 682px;
-top: 161px;
-
-background: url(Meubel House_Logos-01);
-
-  */
+}

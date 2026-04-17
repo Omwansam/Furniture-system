@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaTimes, FaHeart, FaShoppingCart } from 'react-icons/fa';
 import { useFavorites } from '../context/FavoritesContext';
 import { useCart } from '../context/CartContext';
+import { getPrimaryImageUrl, handleImageError } from '../utils/imageUtils';
 import './FavoritesPopup.css';
 
 const FavoritesPopup = ({ onClose }) => {
@@ -14,20 +15,13 @@ const FavoritesPopup = ({ onClose }) => {
   };
 
   const handleRemoveFromFavorites = (productId) => {
-    removeFromFavorites(productId);
+    void removeFromFavorites(productId);
   };
 
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(price);
-  };
-
-  const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return '/placeholder-product.jpg';
-    if (imageUrl.startsWith('http')) return imageUrl;
-    return `http://localhost:5000/uploads/${imageUrl}`;
+    const n = Number(price);
+    if (Number.isNaN(n)) return "—";
+    return `Ksh ${n.toLocaleString()}`;
   };
 
   return (
@@ -55,21 +49,21 @@ const FavoritesPopup = ({ onClose }) => {
           ) : (
             <>
               <div className="favorites-list">
-                {favorites.map((product) => (
-                  <div key={product.id} className="favorite-item">
+                {favorites.map((product) => {
+                  const pid = product.product_id ?? product.id;
+                  return (
+                  <div key={pid} className="favorite-item">
                     <div className="favorite-image">
                       <img 
-                        src={getImageUrl(product.image_url || product.primary_image)} 
-                        alt={product.name}
-                        onError={(e) => {
-                          e.target.src = '/placeholder-product.jpg';
-                        }}
+                        src={getPrimaryImageUrl(product)} 
+                        alt={product.product_name || product.name || "Product"}
+                        onError={(e) => handleImageError(e)}
                       />
                     </div>
                     
                     <div className="favorite-details">
-                      <h4 className="favorite-name">{product.name}</h4>
-                      <p className="favorite-price">{formatPrice(product.price)}</p>
+                      <h4 className="favorite-name">{product.product_name || product.name}</h4>
+                      <p className="favorite-price">{formatPrice(product.product_price ?? product.price)}</p>
                       <div className="favorite-actions">
                         <button 
                           className="add-to-cart-btn"
@@ -79,20 +73,21 @@ const FavoritesPopup = ({ onClose }) => {
                         </button>
                         <button 
                           className="remove-favorite-btn"
-                          onClick={() => handleRemoveFromFavorites(product.id)}
+                          onClick={() => handleRemoveFromFavorites(pid)}
                         >
                           <FaHeart /> Remove
                         </button>
                       </div>
                     </div>
                   </div>
-                ))}
+                )})}
               </div>
               
               <div className="favorites-footer">
                 <button 
                   className="clear-favorites-btn"
-                  onClick={clearFavorites}
+                  type="button"
+                  onClick={() => void clearFavorites()}
                 >
                   Clear All Favorites
                 </button>

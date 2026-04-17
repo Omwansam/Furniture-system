@@ -7,8 +7,9 @@ import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { requireAuth } from "../utils/authUtils";
 import "./SingleProduct.css";
+import { apiUrl, assetUrl } from "../config/api";
 
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = apiUrl("/api");
 
 const SingleProduct = () => {
   const { productId } = useParams();
@@ -71,7 +72,7 @@ const SingleProduct = () => {
     if (!product) return;
 
     // Check if user is authenticated
-    if (!requireAuth(navigate, `/singleproduct/${productId}`)) {
+    if (!requireAuth(navigate, `/product/${productId}`)) {
       return;
     }
 
@@ -88,7 +89,7 @@ const SingleProduct = () => {
         if (!user) {
           navigate("/login", { 
             state: { 
-              from: `/singleproduct/${productId}`,
+              from: `/product/${productId}`,
               message: "Please login to add items to your cart"
             } 
           });
@@ -141,7 +142,7 @@ const SingleProduct = () => {
         <div className="image-section">
           <div className="main-image-container">
             <img
-              src={mainImage.startsWith('http') ? mainImage : `http://localhost:5000${mainImage}`}
+              src={mainImage.startsWith("http") ? mainImage : assetUrl(mainImage)}
               alt={product.product_name}
               className="main-image"
               onError={(e) => {
@@ -154,7 +155,7 @@ const SingleProduct = () => {
               {thumbnails.map((img, index) => (
                 <img
                   key={index}
-                  src={img.image_url.startsWith('http') ? img.image_url : `http://localhost:5000${img.image_url}`}
+                  src={img.image_url.startsWith("http") ? img.image_url : assetUrl(img.image_url)}
                   alt={`Thumbnail ${index + 1}`}
                   className={img.image_url === mainImage ? "active-thumbnail" : ""}
                   onClick={() => handleThumbnailClick(img.image_url)}
@@ -318,123 +319,3 @@ const SingleProduct = () => {
 };
 
 export default SingleProduct;
-
-
-
-
-
-
-
-
-{/**import React, {useState, useEffect} from 'react'
-import { useParams } from 'react-router-dom'
-import { FiFacebook, FiLinkedin, FiInstagram } from "react-icons/fi";
-
-import './SingleProduct.css'
-import ProductDetails from '../components/ProductDetails';
-import RelatedProducts from '../components/RelatedProducts';
-import CartPopup from '../components/CartPopup';
-import { getProductById } from '../components/productService'
-
-
-
-const SingleProduct = () => {
-  
-  const {id} = useParams();
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [mainImage, setMainImage] = useState(null);
-  const [quantity, setQuantity] = useState(1);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-
-
-  // const product = products.find((p) => p.id === Number(id));
-
-  useEffect(() => {
-    const fetchProduct = async () => {
-        try {
-            const productData = await getProductById(id);
-            setProduct(productData);
-            if (productData.images.length > 0) {
-                setMainImage(productData.images[0].image_url);
-            }
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-    fetchProduct();
-}, [id]);
-
-  if (loading) return <div>Loading product...</div>;
-  if (error) return <div>{error}</div>;
-  if (!product) return <div>Product not found</div>;
-
-
-  // Product Data Handling
-  
-
-  
-
-  return (
-    <div>
-      <div className="single-container">
-        <div className="single-images">
-          <div className="thumbnail-list">
-            {product.images.map((img, index) => (
-              <img
-                key={index}
-                src={img.image_url}
-                alt="Thumbnail"
-                className={`thumbnail ${mainImage === img.image_url ? "active-thumb" : ""}`}
-                onClick={() => setMainImage(img.image_url)}
-              />
-            ))}
-          </div>
-          <img src={mainImage} alt="Main Product" className="main-image" />
-        </div>
-
-        <div className="single-info">
-          <h1>{product.product_name}</h1>
-          <p className="price">Rs. {product.product_price.toLocaleString()}</p>
-          <div className="rating">
-            ⭐⭐⭐⭐☆ <span>5 Customer Reviews</span>
-          </div>
-          <p className="description">{product.product_description}</p>
-
-          
-          
-
-          <div className="quantity-container">
-            <button onClick={() => setQuantity(quantity > 1 ? quantity - 1 : 1)}>-</button>
-            <span>{quantity}</span>
-            <button onClick={() => setQuantity(quantity + 1)}>+</button>
-          </div>
-          <button className="add-to-cart" onClick={() => setIsCartOpen(true)}>
-            Add To Cart
-          </button>
-
-          {isCartOpen && <CartPopup product={product} quantity={quantity} onClose={() => setIsCartOpen(false)} />}
-
-          <div className="single-meta">
-            <p><strong>SKU:</strong> {product.sku || "SS001"}</p>
-            <p><strong>Category:</strong> {product.category_id || "Sofas"}</p>
-            <p><strong>Tags:</strong> {product.tags?.join(", ") || "Sofa, Chair, Home, Shop"}</p>
-          </div>
-
-          <div className="single-icons">
-            <FiFacebook className="social-icon" />
-            <FiLinkedin className="social-icon" />
-            <FiInstagram className="social-icon" />
-          </div>
-        </div>
-      </div>
-      <ProductDetails />
-      <RelatedProducts />
-    </div>
-  );
-};
-
-export default SingleProduct**/}

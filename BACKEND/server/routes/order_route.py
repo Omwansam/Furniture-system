@@ -17,6 +17,47 @@ def _extract_user_id(identity):
         return identity.get('id')
     return identity
 
+
+@order_bp.route('/me', methods=['GET'])
+@jwt_required()
+def get_my_orders():
+    """Orders for the authenticated customer (account portal)."""
+    user_id = _extract_user_id(get_jwt_identity())
+    if not user_id:
+        return jsonify({"error": "Invalid user"}), 401
+    orders = (
+        Order.query.filter_by(user_id=user_id)
+        .order_by(Order.order_date.desc())
+        .limit(100)
+        .all()
+    )
+    out = []
+    for order in orders:
+        items = []
+        for oi in order.order_items or []:
+            prod = oi.product
+            items.append(
+                {
+                    "product_id": oi.product_id,
+                    "name": prod.product_name if prod else "",
+                    "quantity": oi.quantity,
+                    "price": float(oi.price) if oi.price is not None else 0,
+                }
+            )
+        out.append(
+            {
+                "order_id": order.order_id,
+                "id": f"ORD-{order.order_id}",
+                "date": order.order_date.isoformat() if order.order_date else None,
+                "status": order.order_status.value if order.order_status else None,
+                "total": float(order.total_amount) if order.total_amount is not None else 0,
+                "items": items,
+                "shipping_address": order.shipping_address,
+            }
+        )
+    return jsonify({"orders": out}), 200
+
+
 def is_admin():
     """Check if current user is admin"""
     try:

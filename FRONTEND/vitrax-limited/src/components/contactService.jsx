@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { apiUrl } from '../config/api';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = apiUrl('/api');
 
 // Contact form submission service
 export const contactService = {

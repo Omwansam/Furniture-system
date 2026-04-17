@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { apiUrl } from '../config/api';
 
-const API_URL = 'http://localhost:5000/blog';
+const API_URL = apiUrl('/blog');
 
 export const blogService = {
   // Get all blog posts with pagination

@@ -9,10 +9,11 @@ const FavoriteButton = ({ product, size = 'medium', showText = false }) => {
   const handleToggle = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    toggleFavorite(product);
+    void toggleFavorite(product);
   };
 
-  const favorite = isFavorite(product.id);
+  const pid = product?.product_id ?? product?.id;
+  const favorite = isFavorite(pid);
 
   return (
     <button

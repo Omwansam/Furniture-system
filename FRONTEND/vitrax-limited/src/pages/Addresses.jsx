@@ -10,7 +10,6 @@ import {
   FaCheck,
   FaTruck
 } from 'react-icons/fa';
-import AccountLayout from '../components/AccountLayout';
 import './Addresses.css';
 
 const Addresses = () => {
@@ -121,7 +120,6 @@ const Addresses = () => {
   };
 
   return (
-    <AccountLayout>
       <div className="addresses-container">
         <div className="addresses-header">
           <h1>My Addresses</h1>
@@ -351,7 +349,6 @@ const Addresses = () => {
           </div>
         </div>
       </div>
-    </AccountLayout>
   );
 };
 

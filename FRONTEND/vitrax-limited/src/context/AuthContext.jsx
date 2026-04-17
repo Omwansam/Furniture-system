@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { apiUrl } from '../config/api';
 
 const AuthContext = createContext();
 
@@ -37,7 +38,7 @@ export const AuthProvider = ({ children }) => {
     if (!token) return false;
     
     try {
-      const response = await fetch('http://localhost:5000/auth/protected', {
+      const response = await fetch(apiUrl('/auth/protected'), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -51,7 +52,7 @@ export const AuthProvider = ({ children }) => {
 
   const refreshToken = async (refreshTokenValue) => {
     try {
-      const response = await fetch('http://localhost:5000/auth/refresh', {
+      const response = await fetch(apiUrl('/auth/refresh'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -82,7 +83,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/auth/login', {
+      const response = await fetch(apiUrl('/auth/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -126,7 +127,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/auth/register', {
+      const response = await fetch(apiUrl('/auth/register'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

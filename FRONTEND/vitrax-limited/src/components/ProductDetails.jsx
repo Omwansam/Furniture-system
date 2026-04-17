@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import './ProductDetails.css'
+import { assetUrl } from "../config/api";
+import "./ProductDetails.css";
 
 const ProductDetails = ({ product }) => {
   const [activeTab, setActiveTab] = useState("description");
@@ -126,7 +127,7 @@ const ProductDetails = ({ product }) => {
           {productImages.slice(0, 4).map((img, index) => (
             <img 
               key={index}
-              src={img.image_url.startsWith('http') ? img.image_url : `http://localhost:5000${img.image_url}`}
+              src={img.image_url.startsWith("http") ? img.image_url : assetUrl(img.image_url)}
               alt={`${product?.product_name || 'Product'} ${index + 1}`}
               onError={(e) => {
                 e.target.src = "/placeholder-image.jpg";

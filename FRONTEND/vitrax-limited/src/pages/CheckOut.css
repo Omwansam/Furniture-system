@@ -1,31 +1,22 @@
 .app-container {
-    display: flex;
-    justify-content: space-between;
-    padding: 30px;
-    background: #f8f8f8;
-    min-height: 100vh;
-    gap: 30px;
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-8);
+  background: var(--color-bg-warm);
+  min-height: 100vh;
+  gap: var(--space-8);
 }
 
 @media (max-width: 768px) {
   .app-container {
     flex-direction: column;
-    padding: 20px;
-    gap: 20px;
-  }
-
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .app-container {
-    flex-direction: column;
-    padding: 20px;
+    padding: var(--space-5);
+    gap: var(--space-5);
   }
 }
 
 @media (max-width: 480px) {
   .app-container {
-    padding: 15px;
+    padding: var(--space-4);
   }
-}
 }

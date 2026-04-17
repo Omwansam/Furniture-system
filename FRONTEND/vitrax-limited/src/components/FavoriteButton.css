@@ -23,14 +23,14 @@
 }
 
 .favorite-button.favorited {
-  background: #fef2f2;
-  border-color: #fecaca;
-  color: #dc2626;
+  background: rgba(200, 155, 90, 0.12);
+  border-color: rgba(200, 155, 90, 0.45);
+  color: var(--color-secondary);
 }
 
 .favorite-button.favorited:hover {
-  background: #fee2e2;
-  border-color: #fca5a5;
+  background: rgba(200, 155, 90, 0.2);
+  border-color: var(--color-secondary);
 }
 
 .favorite-icon {
@@ -38,7 +38,7 @@
 }
 
 .favorite-button.favorited .favorite-icon {
-  color: #dc2626;
+  color: var(--color-secondary);
   animation: heartBeat 0.6s ease;
 }
 
@@ -155,10 +155,10 @@
 }
 
 .favorite-button.overlay.favorited {
-  background: rgba(220, 38, 38, 0.9);
-  color: white;
+  background: rgba(31, 42, 55, 0.88);
+  color: var(--color-secondary);
 }
 
 .favorite-button.overlay.favorited:hover {
-  background: rgba(220, 38, 38, 1);
+  background: rgba(31, 42, 55, 0.95);
 }

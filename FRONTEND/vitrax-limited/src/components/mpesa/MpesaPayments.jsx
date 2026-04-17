@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaPhoneAlt, FaCreditCard, FaSpinner } from "react-icons/fa";
 import PaymentStatus from "./PaymentStatus";
+import { apiUrl } from "../../config/api";
 import "./MPesaPayment.css";
 
 const MPesaPayment = () => {
@@ -23,7 +24,7 @@ const MPesaPayment = () => {
     setIsProcessing(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/payments/initiate", {
+      const response = await fetch(apiUrl("/api/payments/initiate"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -51,7 +52,7 @@ const MPesaPayment = () => {
   const checkPaymentStatus = async (txId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/payments/status/${txId}`
+        apiUrl(`/api/payments/status/${txId}`)
       );
       const data = await response.json();
 
@@ -186,7 +187,7 @@ const MPesaPayment = () => {
     setIsProcessing(true)
 
     try {
-      const response = await fetch("http://localhost:5000/api/payments/initiate", {
+      const response = await fetch(apiUrl("/api/payments/initiate"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -213,7 +214,7 @@ const MPesaPayment = () => {
 
   const checkPaymentStatus = async (txId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/payments/status/${txId}`)
+      const response = await fetch(apiUrl(`/api/payments/status/${txId}`))
       const data = await response.json()
 
       if (response.ok) {
